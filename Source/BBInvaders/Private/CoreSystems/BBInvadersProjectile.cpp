@@ -25,20 +25,17 @@ ABBInvadersProjectile::ABBInvadersProjectile() :
 	body->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 	body->SetCollisionResponseToChannel(BBInvadersUtils::ECC_Asteroid, ECR_Overlap);
 	body->SetCollisionResponseToChannel(BBInvadersUtils::ECC_Invader, ECR_Overlap);
-	body->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
 
 	body->OnComponentBeginOverlap.AddDynamic(this, &ABBInvadersProjectile::OnOverlapBegin);
-	//body->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Overlap);
 
 	movement->UpdatedComponent = body;
-	movement->InitialSpeed = 300.f;
-	movement->MaxSpeed = 300.f;
-	movement->bRotationFollowsVelocity = true;
-	//movement->bShouldBounce = true;
+	movement->InitialSpeed = speed;
+	movement->MaxSpeed = speed;
+	//movement->bRotationFollowsVelocity = true;
 	movement->bShouldBounce = false;
 	movement->ProjectileGravityScale = 0.f;
-	movement->MaxSimulationIterations = 3;
-	InitialLifeSpan = 30.0f;
+	movement->MaxSimulationIterations = simulationInteractions;
+	InitialLifeSpan = lifespan;
 }
 
 void ABBInvadersProjectile::BeginPlay()

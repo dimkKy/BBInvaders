@@ -9,6 +9,10 @@
 #include "Player/MainMenuCameraActor.h"
 #include "CoreSystems/AsteroidTracker.h"
 
+#include "Environment/Invader.h"
+#include "Environment/Asteroid.h"
+#include "Environment/Orbit.h"
+
 ABBInvadersGameModeBase::ABBInvadersGameModeBase() :
 	localController{ nullptr }, mapHalfSize{0.f}
 {
@@ -44,10 +48,6 @@ void ABBInvadersGameModeBase::StartGameplay()
 	localController->SetViewTarget(pawn);
 
 	SetActorTickEnabled(true);
-
-	BBInvadersUtils::ForActorsOfClass<AMainMenuCameraActor>(world, [](AActor* actor) {actor->GetWorld(); });
-
-	
 }
 
 void ABBInvadersGameModeBase::GoToMainMenu()
@@ -61,6 +61,8 @@ void ABBInvadersGameModeBase::GoToMainMenu()
 	localController->UnPossess();
 
 	SetActorTickEnabled(false);
+
+	//BBInvadersUtils::ForActorsOfClass<AInvader, AOrbit, AAsteroid>(world, [](AActor* actor) {actor->Destroy(); });
 }
 
 void ABBInvadersGameModeBase::TogglePause()
@@ -136,9 +138,14 @@ void ABBInvadersGameModeBase::BeginPlay()
 	world->SpawnActor<AAsteroidTracker>(
 		AAsteroidTracker::StaticClass(), pawn->GetActorTransform(), params);
 
+	
+
 	localController->GetBBInvadersHUD()->RequestBindings(*this);
 
+
 	Super::BeginPlay();
+
+	
 }
 
 void ABBInvadersGameModeBase::ChangeGameMode(bool bToMenu, bool bChangeView)

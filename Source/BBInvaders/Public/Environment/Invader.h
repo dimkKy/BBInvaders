@@ -7,9 +7,10 @@
 #include "Invader.generated.h"
 
 class UStaticMeshComponent;
+class UStaticMesh;
 class ABBInvadersProjectile;
 
-UCLASS(Abstract)
+UCLASS()
 class BBINVADERS_API AInvader : public AActor
 {
 	GENERATED_BODY()
@@ -17,8 +18,12 @@ class BBINVADERS_API AInvader : public AActor
 public:	
 	AInvader();
 	virtual void Tick(float DeltaTime) override;
+	//void Init(UStaticMesh& newMesh, )
+	void SetMesh(UStaticMesh& newMesh);
 
 	void Shoot();
+
+	void SetLookAt(const FVector& worldPos);
 
 	UFUNCTION()
 		void OnOverlapBegin(UPrimitiveComponent* component,
@@ -29,7 +34,4 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		UStaticMeshComponent* body;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-		TSubclassOf<ABBInvadersProjectile> projectileClass;
 };

@@ -11,9 +11,9 @@
 UENUM(BlueprintType)
 enum EAsteroidSize
 {
-	EAS_Big,
-	EAS_Medium,
 	EAS_Small,
+	EAS_Medium,
+	EAS_Big,
 	EAS_MAX,
 };
 
@@ -32,13 +32,13 @@ public:
 
 	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		//UInstancedStaticMeshComponent* asteroids;
-	
-
-	UPROPERTY(EditDefaultsOnly)
-		UStaticMesh* meshes[EAS_MAX];
 
 	static void SpawnNewAsteroid(const FVector2D& locationNormalized);
 
+	UFUNCTION()
+		void OnOverlapBegin(UPrimitiveComponent* component,
+			AActor* otherActor, UPrimitiveComponent* otherComp,
+			int32 otherIndex, bool bFromSweep, const FHitResult& result);
 
 protected:
 	virtual void BeginPlay() override;	
@@ -46,6 +46,10 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		UStaticMeshComponent* body;
 
+	EAsteroidSize size;
+
 	constexpr static float maxRotationDefiationHalfAngle = 40.f /** PI / 180.f*/;
+
+	FVector currentVelocity;
 
 };

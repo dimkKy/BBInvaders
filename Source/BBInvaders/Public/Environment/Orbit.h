@@ -4,12 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include <array>
+//#include <array>
 #include "Orbit.generated.h"
 
 class USplineComponent;
 class URotatingMovementComponent;
-class UStaticMesh;
 class AInvader;
 
 /*namespace OrbitHelper {
@@ -34,11 +33,12 @@ public:
 	AOrbit();
 
 	virtual void Tick(float DeltaTime) override;
-
-	void Init(UStaticMesh& invaderBody, int32 invaderCount, float newRadius);
+	
+	void SetRotationSpeed(bool bRandom, float speed = 0.f);
+	void Shrink(float distance);
+	void Init(int32 invaderCount, float newRadius);
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	
 	UPROPERTY(EditInstanceOnly, BlueprintReadWrite)
@@ -50,26 +50,25 @@ protected:
 	int32 activeInvaderCount;
 	float radius;
 
-
 	static constexpr int32 splineCount = 3;
 
+	//template<int size = splineCount>
+	//static std::array<FVector2D, size> CalculateRadiusVectors_Static();
 
-	template<int size = splineCount>
-	static std::array<FVector2D, size> CalculateRadiusVectors_Static();
+	static TArray<FVector> CalcRadiusVectors(int32 size, float length = 1.f);
 
-	static TArray<FVector> CalcRadiusVectors(int32 size);
-
-	static const std::array<FVector2D, splineCount> orbitPointsRadiusVectors;
+	//static const std::array<FVector2D, splineCount> orbitPointsRadiusVectors;
 
 	//static constexpr std::array<std::pair<float, float>, splineCount>
 		//orbitPointsRadiusVectors = OrbitHelper::CalculateRadiusVectors_Static<splineCount>();
 	UPROPERTY(EditInstanceOnly, BlueprintReadWrite )
 		USplineComponent* spline;
 	
+	static constexpr float maxRotationSpeed = 65.f;
 	//USplineComponent* splines[splineCount];
 };
 
-template<int size>
+/*template<int size>
 inline std::array<FVector2D, size> AOrbit::CalculateRadiusVectors_Static(){
 	static_assert(size >= 3, "at least 3 points");
 	std::array<FVector2D, size> out;
@@ -79,4 +78,4 @@ inline std::array<FVector2D, size> AOrbit::CalculateRadiusVectors_Static(){
 		out[i] = { FMath::Sin(angle * i), FMath::Cos(angle * i) };
 	}
 	return out;
-}
+}*/

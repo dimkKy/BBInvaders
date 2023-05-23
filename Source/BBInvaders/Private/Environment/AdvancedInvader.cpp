@@ -30,9 +30,8 @@ void AAdvancedInvader::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	auto rotation{ GetActorRotation() };
-	rotation.Yaw += DeltaTime * rotationSpeed;
-	SetActorLocationAndRotation(GetActorLocation(), rotation);
+	SetActorRotation(GetActorRotation() + 
+		BBInvadersUtils::unitRotator * DeltaTime * rotationSpeed);
 
 	orbit->TargetArmLength -= DeltaTime * descensionSpeed;
 	//no floor
@@ -50,7 +49,7 @@ void AAdvancedInvader::BeginPlay()
 
 		orbit->TargetArmLength = toTarget.Size();
 		
-		body->SetRelativeRotation(FRotator{ 0.f });
+		body->SetRelativeRotation(FRotator::ZeroRotator);
 
 		SetActorLocationAndRotation(targetLocation, 
 			FRotationMatrix::MakeFromX(toTarget).Rotator());

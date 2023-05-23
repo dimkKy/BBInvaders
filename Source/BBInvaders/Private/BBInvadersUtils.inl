@@ -35,7 +35,7 @@ auto* BBInvadersUtils::GetFirstActor(UWorld* world)
 	return *TActorIterator<TActor>(world);
 }
 
-template<BBInvadersUtils::ChildOf<AActor> TActor>
+/*template<BBInvadersUtils::ChildOf<AActor> TActor>
 void BBInvadersUtils::ForActorsOfClass(UWorld* world, std::invocable<AActor*> auto&& func)
 {
 	//UGameplayStatics::GetAllActorsOfClass
@@ -51,4 +51,4 @@ void BBInvadersUtils::ForActorsOfClass(UWorld* world, std::invocable<AActor*> au
 {
 	ForActorsOfClass<TActor>(world, func);
 	ForActorsOfClass<TOthers...>(world, func);
-}
+}*/

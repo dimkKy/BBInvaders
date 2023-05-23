@@ -3,9 +3,7 @@
 #pragma once
 
 #include <type_traits>
-#include <concepts>
 //#include <concepts>
-//#include "GameFramework/Actor.h"
 
 class UCameraComponent;
 class UButton;
@@ -54,15 +52,13 @@ namespace BBInvadersUtils {
 	template <ChildOf<AActor> TActor>
 	auto* GetFirstActor(UWorld* world);
 
-	template <ChildOf<AActor> TActor>
+	/*template <ChildOf<AActor> TActor>
 	void ForActorsOfClass(UWorld* world, std::invocable<AActor*> auto&& func);
-
+	
+	//concept non empty
 	template <ChildOf<AActor> TActor, ChildOf<AActor>...TOthers>
 		requires (sizeof...(TOthers) > 0)
-	void ForActorsOfClass(UWorld* world, std::invocable<AActor*> auto&& func);
-
-	//template <ChildOf<AActor> TActor, ChildOf<AActor>... TOther>
-	//void ForActorsOfClass(UWorld* world);
+	void ForActorsOfClass(UWorld* world, std::invocable<AActor*> auto&& func);*/
 
 	constexpr ECollisionChannel ECC_Projectile = ECollisionChannel::ECC_GameTraceChannel1;
 	constexpr ECollisionChannel ECC_Asteroid = ECollisionChannel::ECC_GameTraceChannel2;
@@ -70,6 +66,7 @@ namespace BBInvadersUtils {
 
 	const FRotator UpRotator = { -90.f, 0.f, 0.f };
 	const FRotator BehindRotator = { 0.f, 180.f, 0.f };
+	const FRotator unitRotator = { 0.f, 1.f, 0.f };
 
 	const FName muzzleSocket = "Muzzle";
 }
