@@ -6,14 +6,13 @@
 #include "UI/MainMenu.h"
 #include "UI/PauseMenu.h"
 #include "Player/PlayerPawn.h"
-#include "Player/MainMenuCameraActor.h"
+#include "Player/MainMenuPawn.h"
 #include "CoreSystems/BBInvadersGameModeBase.h"
 
 #include "Components/Button.h"
 
 ABBInvadersHUD::ABBInvadersHUD() :
-	gametimeUI{ nullptr },
-	mainMenu{ nullptr }
+	gametimeUI{ nullptr }, mainMenu{ nullptr }
 {
 }
 
@@ -22,8 +21,6 @@ void ABBInvadersHUD::PostInitializeComponents()
 	Super::PostInitializeComponents();
 	gametimeUI = CreateWidget<UGametimeUI>(PlayerOwner, gametimeUIClass);
 	mainMenu = CreateWidget<UMainMenu>(PlayerOwner, mainMenuClass);
-
-	
 }
 
 void ABBInvadersHUD::OnViewTargetChange(const AActor& newTarget)
@@ -35,7 +32,7 @@ void ABBInvadersHUD::OnViewTargetChange(const AActor& newTarget)
 		if (!gametimeUI->IsInViewport()) {
 			gametimeUI->AddToViewport();
 		}
-
+		
 		FInputModeGameAndUI inputMode;
 		inputMode.SetHideCursorDuringCapture(false);
 		PlayerOwner->SetInputMode(inputMode);
@@ -43,7 +40,7 @@ void ABBInvadersHUD::OnViewTargetChange(const AActor& newTarget)
 		return;
 	}
 
-	if (newTarget.IsA(AMainMenuCameraActor::StaticClass())) {
+	if (newTarget.IsA(AMainMenuPawn::StaticClass())) {
 		if (gametimeUI->IsInViewport()) {
 			gametimeUI->RemoveFromParent();
 		}
@@ -61,20 +58,12 @@ void ABBInvadersHUD::RequestBindings(ABBInvadersGameModeBase& gameMode)
 {
 	mainMenu->newGameButton->OnClicked.AddDynamic(
 		&gameMode, &ABBInvadersGameModeBase::StartGameplay);
-
 	gametimeUI->pauseMenu->toMainMenuButton->OnClicked.AddDynamic(
 		&gameMode, &ABBInvadersGameModeBase::GoToMainMenu);
-
 	gametimeUI->pauseButton->OnClicked.AddDynamic(
 		&gameMode, &ABBInvadersGameModeBase::TogglePause);
 	gametimeUI->pauseMenu->resumeButton->OnClicked.AddDynamic(
 		&gameMode, &ABBInvadersGameModeBase::TogglePause);
-
-	//mainMenu->exitButton->OnClicked.AddDynamic(&gameMode, &ABBInvadersGameModeBase::ExitGame);
-	
-
-	//UBlueprint
-	//gametimeUI
 }
 
 #if WITH_EDITOR

@@ -7,77 +7,39 @@
 #include "Camera/CameraComponent.h"
 #include "CoreSystems/BBInvadersProjectile.h"
 #include "CoreSystems/BBInvadersGameModeBase.h"
+#include "Environment/PlanetaryThreatable.h"
+#include "CoreSystems/AssetProvider.h"
 #include "BBInvadersUtils.h"
-//#include "Kismet/GameplayStatics.h"
-
-//MyGameMode* MyMode = Cast< MyGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 
 APlayerPawn::APlayerPawn() :
 	planet{ CreateDefaultSubobject<UStaticMeshComponent>("planet") },
-	//platformArm{ CreateDefaultSubobject<USpringArmComponent>("platformArm") },
 	platform{ CreateDefaultSubobject<UStaticMeshComponent>("platform") },
 	cameraArm{ CreateDefaultSubobject<USpringArmComponent>("platformArm") },
 	camera{ CreateDefaultSubobject<UCameraComponent>("camera") },
-	cameraArmLengthRange{450.f, 550.f}
+	currentRotationSpeed{0.f}, cameraArmLengthRange{450.f, 550.f}, health{maxHealth}
 {
 	PrimaryActorTick.bCanEverTick = true;
+
 	SetRootComponent(planet);
-
-	planet->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	planet->SetMobility(EComponentMobility::Stationary);
-	planet->SetCollisionObjectType(ECC_WorldStatic);
-	planet->SetCollisionResponseToAllChannels(ECR_Ignore);
-	planet->SetCollisionResponseToChannel(BBInvadersUtils::ECC_Asteroid, ECR_Block);
-	planet->SetCollisionResponseToChannel(BBInvadersUtils::ECC_Invader, ECR_Block);
-
-	/*platformArm->SetupAttachment(planet);
-	//redo
-	platformArm->TargetArmLength = 10.f;
-	platformArm->bDoCollisionTest = false;
-	platformArm->bUsePawnControlRotation = false;*/
-
-	//platform->SetStaticMesh(platformMesh);
-	platform->BodyInstance.bEnableGravity = false;
-	//platform->SetupAttachment(platformArm);
+	BBInvadersUtils::ConfigureDefaultCollision<true>(planet, ECC_WorldStatic,
+		BBInvadersUtils::ECC_Asteroid, BBInvadersUtils::ECC_Invader);
+	
+	//
 	platform->SetupAttachment(planet);
-	platform->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	platform->SetCollisionObjectType(ECC_Pawn);
-	platform->SetCollisionResponseToAllChannels(ECR_Ignore);
-	platform->SetCollisionResponseToChannel(BBInvadersUtils::ECC_Projectile, ECR_Block);
-	platform->SetCollisionResponseToChannel(BBInvadersUtils::ECC_Asteroid, ECR_Block);
-	platform->SetCollisionResponseToChannel(BBInvadersUtils::ECC_Invader, ECR_Block);
-
+	platform->BodyInstance.bEnableGravity = false;
+	BBInvadersUtils::ConfigureDefaultCollision<true>(platform, ECC_Pawn,
+		BBInvadersUtils::ECC_Projectile,
+		BBInvadersUtils::ECC_Asteroid,
+		BBInvadersUtils::ECC_Invader);
+	//
 	cameraArm->SetupAttachment(planet);
 	cameraArm->SetRelativeRotation(BBInvadersUtils::UpRotator);
 	cameraArm->TargetArmLength = 300.f;
 	cameraArm->bDoCollisionTest = false;
+	cameraArm->SetCanEverAffectNavigation(false);
 
 	camera->SetupAttachment(cameraArm, USpringArmComponent::SocketName);
-}
-
-void APlayerPawn::OnConstruction(const FTransform& Transform)
-{
-	//check(planet->GetStaticMesh() && platform->GetStaticMesh());
-	//camera->FieldOfView;
-
-	//float veritcalHalfFov{ 0.f };
-/*#if WITH_EDITOR
-	if (!planet->GetStaticMesh() || !platform->GetStaticMesh()) {
-		return Super::OnConstruction(Transform);
-	}
-#endif
-	float planetHalfSize{ planet->GetStaticMesh()->GetBoundingBox().GetSize().X * 0.5f };
-	float platformSize{ platform->GetStaticMesh()->GetBoundingBox().GetSize().X };
-	float cameraHorHalfFOV{ camera->FieldOfView * PI / 360.f };
-
-	float cameraArmLength{ (planetHalfSize + platformSize) *
-		camera->AspectRatio / FMath::Tan(cameraHorHalfFOV) };
-	minCameraArmLength = cameraArmLength * minZoomMultiplier;
-	maxCameraArmLength = cameraArmLength * maxZoomMultiplier;
-
-	cameraArm->TargetArmLength = minCameraArmLength;*/
-
-	Super::OnConstruction(Transform);
 }
 
 void APlayerPawn::PostInitializeComponents()
@@ -88,32 +50,22 @@ void APlayerPawn::PostInitializeComponents()
 	}
 #endif
 
-	float planetHalfSize{ planet->GetStaticMesh()->GetBoundingBox().GetSize().X * 0.5f };
-	float platformSize{ platform->GetStaticMesh()->GetBoundingBox().GetSize().X };
-	//float cameraHorHalfFOV{ camera->FieldOfView * PI / 360.f };
+	float planetHalfSize{ planet->GetStaticMesh()->GetBounds().GetSphere().W };
+	float platformSize{ platform->GetStaticMesh()->GetBounds().GetSphere().W * 2.f };
+
 	float cameraHalfHFOVTan{ FMath::Tan(camera->FieldOfView * PI / 360.f) };
 
 	float cameraArmLength{ (planetHalfSize + platformSize) *
 		camera->AspectRatio / cameraHalfHFOVTan };
+
 	cameraArmLengthRange.X = cameraArmLength * minZoomMultiplier;
 	cameraArmLengthRange.Y = cameraArmLength * maxZoomMultiplier;
 
 	cameraArm->TargetArmLength = cameraArmLengthRange.X;
 
-	/*if (auto* world{ GetWorld() }) {
-		float mapYHalfSize{ cameraHalfHFOVTan * (cameraArmLength + planetHalfSize) };
-
-		CastChecked<ABBInvadersGameModeBase>(world->GetAuthGameMode())->
-			SetMapHalfSize({ mapYHalfSize * camera->AspectRatio, mapYHalfSize });
-	}*/
 	Super::PostInitializeComponents();
-}
-
-// Called when the game starts or when spawned
-void APlayerPawn::BeginPlay()
-{
-	Super::BeginPlay();
-	
+	planet->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnOverlapBegin);
+	platform->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnOverlapBegin);
 }
 
 void APlayerPawn::MoveRight(float value)
@@ -126,25 +78,18 @@ void APlayerPawn::MoveLeft(float value)
 	Accelerate(-1.f * value);
 }
 
-/*void APlayerPawn::Stop()
-{
-	
-	check(false);
-}*/
-
 void APlayerPawn::Accelerate(float value)
 {
 	bool bHasInput{ !FMath::IsNearlyZero(value) };
-	float currentAcceleration{ bHasInput ? (value * acceleration) : CalcDamping() };
+	float currentAcc{ bHasInput ? (value * acceleration) : CalcDamping() };
 	currentRotationSpeed = FMath::Clamp(
-		currentRotationSpeed + (GetWorld()->GetDeltaSeconds() * currentAcceleration), 
-			-1.f * maxSpeed, maxSpeed);
+		currentRotationSpeed + (GetWorld()->GetDeltaSeconds() * currentAcc), 
+		-1.f * maxSpeed, maxSpeed);
 }
 
 void APlayerPawn::ZoomIn(float value)
 {
 	if (!FMath::IsNearlyZero(value)) {
-		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, FString::Printf(TEXT("ZoomIn")));
 		ZoomCamera(-1.f * value);
 	}
 }
@@ -152,9 +97,18 @@ void APlayerPawn::ZoomIn(float value)
 void APlayerPawn::ZoomOut(float value)
 {
 	if (!FMath::IsNearlyZero(value)) {
-		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, FString::Printf(TEXT("ZoomOut")));
 		ZoomCamera(value);
 	}
+}
+
+void APlayerPawn::ZoomInAction()
+{
+	ZoomCamera(-1.f * zoomActionValue);
+}
+
+void APlayerPawn::ZoomOutAction()
+{
+	ZoomCamera(zoomActionValue);
 }
 
 void APlayerPawn::ZoomCamera(float value)
@@ -166,12 +120,18 @@ void APlayerPawn::ZoomCamera(float value)
 
 void APlayerPawn::Shoot()
 {
+	auto* world{ GetWorld() };
+	check(world);
+
 	FActorSpawnParameters spawnParams;
 	spawnParams.Owner = this;
-	spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	spawnParams.SpawnCollisionHandlingOverride =
+		ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	GetWorld()->SpawnActor<ABBInvadersProjectile>(projectileClass, 
-		platform->GetSocketTransform(BBInvadersUtils::muzzleSocket), spawnParams);
+	world->SpawnActor<ABBInvadersProjectile>(
+		world->GetSubsystem<UAssetProvider>()->projectileClass,
+		platform->GetSocketTransform(BBInvadersUtils::muzzleSocket),
+		spawnParams);
 }
 
 float APlayerPawn::CalcDamping() const
@@ -187,34 +147,58 @@ float APlayerPawn::CalcDamping() const
 	return -1.f * dampingMultiplier * currentRotationSpeed;
 }
 
-// Called every frame
+void APlayerPawn::OnOverlapBegin(UPrimitiveComponent* comp, AActor* otherActor, 
+	UPrimitiveComponent* otherComp, int32 otherIndex, bool bFromSweep, const FHitResult& result)
+{
+	if (comp == platform && otherActor->GetOwner() != this) {
+		return OnGameOver();
+	}
+
+	if (auto* thread{Cast<IPlanetaryThreatable>(otherActor)}) {
+		health -= thread->GetOnPlanetCollisionDamage();
+		if (health <= 0.f) {
+			return OnGameOver();
+		}
+	}
+}
+
+void APlayerPawn::OnGameOver()
+{
+	GetWorld()->GetAuthGameMode<ABBInvadersGameModeBase>()->OnGameOver();
+}
+
 void APlayerPawn::Tick(float DeltaTime)
 {
 	auto rotation{ platform->GetRelativeRotation() };
 	rotation.Yaw += DeltaTime * currentRotationSpeed;
-	GEngine->AddOnScreenDebugMessage(-1, DeltaTime, FColor::Red, FString::Printf(TEXT("%.6f"), currentRotationSpeed));
 	platform->SetRelativeLocationAndRotation(platform->GetRelativeLocation(), rotation);
+	health += healthRegenRate * DeltaTime;
+	if (health > maxHealth) {
+		health = maxHealth;
+	}
 
 	Super::Tick(DeltaTime);
-
 }
 
-// Called to bind functionality to input
 void APlayerPawn::SetupPlayerInputComponent(UInputComponent* InputComp)
 {
 	Super::SetupPlayerInputComponent(InputComp);
+
 	InputComp->BindAxis("MoveRight", this, &APlayerPawn::MoveRight);
 	InputComp->BindAxis("MoveLeft", this, &APlayerPawn::MoveLeft);
 
 	InputComp->BindAxis("ZoomIn", this, &APlayerPawn::ZoomIn);
 	InputComp->BindAxis("ZoomOut", this, &APlayerPawn::ZoomOut);
 
+	InputComp->BindAction("ZoomInAction", IE_Pressed, this, &APlayerPawn::ZoomInAction);
+	InputComp->BindAction("ZoomOUtAction", IE_Pressed, this, &APlayerPawn::ZoomOutAction);
+
 	InputComp->BindAction("Shoot", IE_Released, this, &APlayerPawn::Shoot);
 }
 
 FVector APlayerPawn::CalcMapHalfSize() const
 {
-	float planetHalfSize{ planet->GetStaticMesh()->GetBoundingBox().GetSize().X * 0.5f};
+	float planetHalfSize{ planet->GetStaticMesh()->GetBounds().GetSphere().W };
 
 	float mapYHalfSize{ FMath::Tan(camera->FieldOfView * PI / 360.f) * 
 		(cameraArmLengthRange.Y + planetHalfSize) };
@@ -238,9 +222,6 @@ EDataValidationResult APlayerPawn::IsDataValid(TArray<FText>& ValidationErrors)
 	}
 	else {
 		ValidationErrors.Add(FText::FromString("Invalid platformMesh"));
-	}
-	if (!projectileClass) {
-		ValidationErrors.Add(FText::FromString("Invalid projectileClass"));
 	}
 
 	return ValidationErrors.Num() > 0 ?

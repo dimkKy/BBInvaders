@@ -7,11 +7,11 @@
 EDataValidationResult UBBInvadersGameInstance::IsDataValid(TArray<FText>& ValidationErrors)
 {
 	Super::IsDataValid(ValidationErrors);
-	//
+	
 	if (!assetProviderClass) {
 		ValidationErrors.Add(FText::FromString("Invalid assetProviderClass"));
 	}
-	//
+	
 	if (ValidationErrors.Num() > 0) {
 		return EDataValidationResult::Invalid;
 	}

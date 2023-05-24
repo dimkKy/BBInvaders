@@ -20,14 +20,17 @@ public:
 	AAdvancedInvader();
 	virtual void Tick(float DeltaTime) override;		
 
+	virtual float GetOnPlanetCollisionDamage() const override;
 protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 		USpringArmComponent* orbit;
 
-	float rotationSpeed = 0.f;
-	float descensionSpeed = 0.f;
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly)
+		float rotationSpeed;
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly)
+		float descensionSpeed;
 
 	static const FVector2D rotationSpeedRange;
 	static const FVector2D descensionSpeedRange;

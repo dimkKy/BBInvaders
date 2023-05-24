@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// by Dmitry Kolontay
 
 #pragma once
 
@@ -17,21 +17,11 @@ class BBINVADERS_API ABBInvadersPlayerController : public APlayerController
 
 public:
 	ABBInvadersPlayerController();
-
-	//void OnTogglePauseMenu();
-	//virtual void SetupInputComponent() override;
 	ABBInvadersHUD* GetBBInvadersHUD() const;
-	virtual void SetViewTarget(AActor* newTarget, FViewTargetTransitionParams params = {}) override;
 
 	UFUNCTION()
 		void ExitGame();
 
-
-
 protected:
-	virtual void BeginPlay() override;
-	//virtual void PostInitializeComponents() override;
-	//virtual void SetPawn(APawn* InPawn) override;
 	virtual void AcknowledgePossession(APawn* P) override;
-	//virtual void OnUnPossess() override;
 };

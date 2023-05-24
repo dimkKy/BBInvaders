@@ -39,6 +39,9 @@ namespace BBInvadersUtils {
 	constexpr float defaultNearClipPlane = 10.f;
 	float GetCameraNearPlane(const UCameraComponent& camera);
 
+	template <typename... Args>
+	concept NonEmpty = sizeof...(Args) > 0;
+
 
 	/*#define BindWrapper( object, button, onClickedFunc ) { \
 		button->SetClickMethod(EButtonClickMethod::PreciseClick); \
@@ -59,6 +62,10 @@ namespace BBInvadersUtils {
 	template <ChildOf<AActor> TActor, ChildOf<AActor>...TOthers>
 		requires (sizeof...(TOthers) > 0)
 	void ForActorsOfClass(UWorld* world, std::invocable<AActor*> auto&& func);*/
+
+	template<bool generateOverlapEvents, class...TChannels>
+	void ConfigureDefaultCollision(UPrimitiveComponent* comp, ECollisionChannel compType, 
+		TChannels...overlapChannels) requires NonEmpty<TChannels...>;
 
 	constexpr ECollisionChannel ECC_Projectile = ECollisionChannel::ECC_GameTraceChannel1;
 	constexpr ECollisionChannel ECC_Asteroid = ECollisionChannel::ECC_GameTraceChannel2;

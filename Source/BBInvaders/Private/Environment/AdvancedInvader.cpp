@@ -37,14 +37,17 @@ void AAdvancedInvader::Tick(float DeltaTime)
 	//no floor
 }
 
+float AAdvancedInvader::GetOnPlanetCollisionDamage() const
+{
+	return 75.0f;
+}
+
 void AAdvancedInvader::BeginPlay()
 {
 	Super::BeginPlay();
 	UWorld* world{ GetWorld() };
-
 	if (APlayerPawn* target{ BBInvadersUtils::GetFirstActor<APlayerPawn>(world) }) {
 		FVector targetLocation{ target->GetActorLocation() };
-
 		FVector toTarget{ targetLocation - GetActorLocation() };
 
 		orbit->TargetArmLength = toTarget.Size();
@@ -53,7 +56,6 @@ void AAdvancedInvader::BeginPlay()
 
 		SetActorLocationAndRotation(targetLocation, 
 			FRotationMatrix::MakeFromX(toTarget).Rotator());
-
 		SetActorTickEnabled(true);
 
 		rotationSpeed = FMath::RandRange(rotationSpeedRange.X, rotationSpeedRange.Y);

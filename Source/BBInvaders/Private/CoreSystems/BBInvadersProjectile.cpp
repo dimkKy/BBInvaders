@@ -25,6 +25,7 @@ ABBInvadersProjectile::ABBInvadersProjectile() :
 	body->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 	body->SetCollisionResponseToChannel(BBInvadersUtils::ECC_Asteroid, ECR_Overlap);
 	body->SetCollisionResponseToChannel(BBInvadersUtils::ECC_Invader, ECR_Overlap);
+	body->SetCanEverAffectNavigation(false);
 
 	body->OnComponentBeginOverlap.AddDynamic(this, &ABBInvadersProjectile::OnOverlapBegin);
 

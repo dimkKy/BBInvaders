@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Environment/PlanetaryThreatable.h"
 #include "Invader.generated.h"
 
 class UStaticMeshComponent;
@@ -11,26 +12,30 @@ class UStaticMesh;
 class ABBInvadersProjectile;
 
 UCLASS()
-class BBINVADERS_API AInvader : public AActor
+class BBINVADERS_API AInvader : public AActor, public IPlanetaryThreatable
 {
 	GENERATED_BODY()
 	
 public:	
 	AInvader();
-	virtual void Tick(float DeltaTime) override;
-	//void Init(UStaticMesh& newMesh, )
+
 	void SetMesh(UStaticMesh& newMesh);
-
+	//interface?
 	void Shoot();
+	//void SetLookAt(const FVector& worldPos);
 
-	void SetLookAt(const FVector& worldPos);
+	virtual float GetOnPlanetCollisionDamage() const override;
+
+#if WITH_EDITOR
+	virtual EDataValidationResult IsDataValid(TArray<FText>& ValidationErrors) override;
+#endif
+protected:
+	virtual void BeginPlay() override;
 
 	UFUNCTION()
 		void OnOverlapBegin(UPrimitiveComponent* component,
 			AActor* otherActor, UPrimitiveComponent* otherComp,
 			int32 otherIndex, bool bFromSweep, const FHitResult& result);
-protected:
-	virtual void BeginPlay() override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		UStaticMeshComponent* body;

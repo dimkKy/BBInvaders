@@ -4,6 +4,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "BBInvadersUtils.h"
 #include "Player/PlayerPawn.h"
+#include "CoreSystems/AssetProvider.h"
 
 AAsteroid::AAsteroid() :
 	body{CreateDefaultSubobject<UStaticMeshComponent>("body")},
@@ -12,26 +13,55 @@ AAsteroid::AAsteroid() :
 	PrimaryActorTick.bCanEverTick = true;
 	SetRootComponent(body);
 
-	body->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	BBInvadersUtils::ConfigureDefaultCollision<true>(body, BBInvadersUtils::ECC_Asteroid,
+		ECC_WorldStatic, BBInvadersUtils::ECC_Projectile);
+
 	//asteroids->bMultiBodyOverlap = true;
-	body->SetGenerateOverlapEvents(true);
-	body->SetCollisionObjectType(BBInvadersUtils::ECC_Asteroid);
-	body->SetCollisionResponseToAllChannels(ECR_Ignore);
-	body->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Overlap);
-	body->SetCollisionResponseToChannel(BBInvadersUtils::ECC_Projectile, ECR_Overlap);
-	body->OnComponentBeginOverlap.AddDynamic(this, &AAsteroid::OnOverlapBegin);
 }
 
-void AAsteroid::SpawnNewAsteroid(const FVector2D& location)
+void AAsteroid::SetSizeAssignMesh(EAsteroidSize newSize)
 {
-	check(location.X >= 1.f || location.Y >= 1.f);
-	FVector2D newUnitVelocity{ (location * -1.f).GetRotated(
-		FMath::RandRange(-1.f * maxRotationDefiationHalfAngle, maxRotationDefiationHalfAngle)) };
-	//asteroids->AddInstanceWorldSpace({});
-
+	check(newSize != EAsteroidSize::EAS_MAX);
+	if (size == newSize) {
+		return;
+	}
+	size = newSize;
+	body->SetStaticMesh(GetWorld()->GetSubsystem<UAssetProvider>()->asteroidMeshes[size]);
 }
 
-void AAsteroid::OnOverlapBegin(UPrimitiveComponent* component, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherIndex, bool bFromSweep, const FHitResult& result)
+void AAsteroid::SetVelocity(float newVelocity)
+{
+	currentVelocity = newVelocity;
+}
+
+float AAsteroid::GetMeshRadius() const
+{
+	check(body->GetStaticMesh());
+	return body->GetStaticMesh()->GetBounds().GetSphere().W;
+}
+
+float AAsteroid::GetOnPlanetCollisionDamage() const
+{
+	switch (size) {
+	case EAS_Small:
+		return 65.f;
+	case EAS_Medium:
+		return 85.f;
+	case EAS_Big:
+		return 99.f;
+	default:
+		return 0.f;
+	}
+}
+
+void AAsteroid::BeginPlay()
+{
+	Super::BeginPlay();
+	body->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnOverlapBegin);
+}
+
+void AAsteroid::OnOverlapBegin(UPrimitiveComponent* component, AActor* otherActor,
+	UPrimitiveComponent* otherComp, int32 otherIndex, bool bFromSweep, const FHitResult& result)
 {
 	if (otherActor->IsA(APlayerPawn::StaticClass())) {
 		Destroy();
@@ -49,21 +79,41 @@ void AAsteroid::OnOverlapBegin(UPrimitiveComponent* component, AActor* otherActo
 			body->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 			break;
 		default:
-			size = static_cast<EAsteroidSize>(static_cast<int32>(size) - 1);
+			SetSizeAssignMesh(static_cast<EAsteroidSize>(static_cast<int32>(size) - 1));
+			
+			float splitHalfAngle{ FMath::RandRange(-1.f * maxSplitDeviationHalfAngle, maxSplitDeviationHalfAngle) };
+
+			FVector forward{ GetActorForwardVector() };
+			//TODO take up from pawn
+			FVector up{ GetActorUpVector() };
+
+			SetActorRotation(FRotationMatrix::MakeFromX(
+				forward.RotateAngleAxis(splitHalfAngle, up)).Rotator());
+
+			FTransform newAsteroidTransform{ FRotationMatrix::MakeFromX(
+				forward.RotateAngleAxis(-1.f * splitHalfAngle, up)).Rotator(),
+				GetActorLocation(), GetActorScale3D() };
+
+			auto* newAsteroid{ GetWorld()->SpawnActorDeferred<AAsteroid>(
+				ThisClass::StaticClass(), newAsteroidTransform,
+				nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn) };
+
+			newAsteroid->SetSizeAssignMesh(size);
+			//newAsteroid->SetVelocity(velocity)
+			newAsteroid->FinishSpawning(newAsteroidTransform, true);
+
+			//FRotator rotation {}
+
+
 			break;
 		}
 	}
 }
 
-void AAsteroid::BeginPlay()
-{
-	Super::BeginPlay();
-}
-
 void AAsteroid::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	SetActorLocation(GetActorLocation() + currentVelocity * DeltaTime);
+	SetActorLocation(GetActorLocation() + GetActorForwardVector() * currentVelocity * DeltaTime);
 	//FTransform transform;
 	//asteroids->GetInstanceTransform(, transform, true);
 	//ast.AddToTranslation();

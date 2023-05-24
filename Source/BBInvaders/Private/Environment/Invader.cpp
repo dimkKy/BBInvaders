@@ -14,31 +14,8 @@ AInvader::AInvader() :
 	PrimaryActorTick.bCanEverTick = false;
 	SetRootComponent(body);
 
-	body->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	//asteroids->bMultiBodyOverlap = true;
-	body->SetGenerateOverlapEvents(true);
-	body->SetCollisionObjectType(BBInvadersUtils::ECC_Invader);
-	body->SetCollisionResponseToAllChannels(ECR_Ignore);
-	body->SetCollisionResponseToChannel(BBInvadersUtils::ECC_Projectile, ECR_Overlap);
-
-	body->OnComponentBeginOverlap.AddDynamic(this, &AInvader::OnOverlapBegin);
-
-	//body->GetStaticMesh()->GetBoundingBox().
-}
-
-void AInvader::BeginPlay()
-{
-	Super::BeginPlay();
-}
-
-void AInvader::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-	//FTransform transform;
-	//asteroids->GetInstanceTransform(, transform, true);
-	//ast.AddToTranslation();
-	//asteroids->UpdateInstanceTransform(0, transform, , , );
+	BBInvadersUtils::ConfigureDefaultCollision<true>(body, BBInvadersUtils::ECC_Invader,
+		BBInvadersUtils::ECC_Projectile);
 }
 
 void AInvader::SetMesh(UStaticMesh& newMesh)
@@ -48,15 +25,21 @@ void AInvader::SetMesh(UStaticMesh& newMesh)
 
 void AInvader::Shoot()
 {
+	auto* world{ GetWorld() };
+	check(world);
+
 	FActorSpawnParameters spawnParams;
 	spawnParams.Owner = this;
-	spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	spawnParams.SpawnCollisionHandlingOverride = 
+		ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	GetWorld()->SpawnActor<ABBInvadersProjectile>(GetWorld()->GetSubsystem<UAssetProvider>()->projectileClass,
-		body->GetSocketTransform(BBInvadersUtils::muzzleSocket), spawnParams);
+	world->SpawnActor<ABBInvadersProjectile>(
+		world->GetSubsystem<UAssetProvider>()->projectileClass,
+		body->GetSocketTransform(BBInvadersUtils::muzzleSocket), 
+		spawnParams);
 }
 
-void AInvader::SetLookAt(const FVector& worldPos)
+/*void AInvader::SetLookAt(const FVector& worldPos)
 {
 	FVector thisLocation{ GetActorLocation() };
 
@@ -66,9 +49,21 @@ void AInvader::SetLookAt(const FVector& worldPos)
 
 	SetActorLocationAndRotation(thisLocation,
 		FRotationMatrix::MakeFromX(toTarget).Rotator());
+}*/
+
+float AInvader::GetOnPlanetCollisionDamage() const
+{
+	return 55.f;
 }
 
-void AInvader::OnOverlapBegin(UPrimitiveComponent* component, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherIndex, bool bFromSweep, const FHitResult& result)
+void AInvader::BeginPlay()
+{
+	Super::BeginPlay();
+	body->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnOverlapBegin);
+}
+
+void AInvader::OnOverlapBegin(UPrimitiveComponent* component, AActor* otherActor,
+	UPrimitiveComponent* otherComp, int32 otherIndex, bool bFromSweep, const FHitResult& result)
 {
 	if (otherActor->IsA(APlayerPawn::StaticClass())) {
 		Destroy();
@@ -76,3 +71,23 @@ void AInvader::OnOverlapBegin(UPrimitiveComponent* component, AActor* otherActor
 	}
 }
 
+#if WITH_EDITOR
+EDataValidationResult AInvader::IsDataValid(TArray<FText>& ValidationErrors)
+{
+	Super::IsDataValid(ValidationErrors);
+
+	if (GetWorld()) {
+		if (body->GetStaticMesh()) {
+			if (!body->DoesSocketExist(BBInvadersUtils::muzzleSocket)) {
+				ValidationErrors.Add(FText::FromString("socket was not found :" + BBInvadersUtils::muzzleSocket.ToString()));
+			}
+		}
+		else {
+			ValidationErrors.Add(FText::FromString("no mesh assigned"));
+		}
+	}
+
+	return ValidationErrors.Num() > 0 ?
+		EDataValidationResult::Invalid : EDataValidationResult::Valid;
+}
+#endif

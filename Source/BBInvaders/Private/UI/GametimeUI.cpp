@@ -14,6 +14,7 @@ void UGametimeUI::NativeOnInitialized()
 	pauseButton->OnClicked.AddDynamic(this, &UGametimeUI::OnPauseButtonClicked);
 
 	pauseMenu->resumeButton->OnClicked.AddDynamic(this, &UGametimeUI::OnResumeButtonClicked);
+	pauseMenu->toMainMenuButton->OnClicked.AddDynamic(this, &UGametimeUI::OnResumeButtonClicked);
 	//BBInvadersUtils::SetupButtons(this, pauseButton, &UGametimeUI::OnPauseButtonClicked );
 
 }

@@ -35,6 +35,24 @@ auto* BBInvadersUtils::GetFirstActor(UWorld* world)
 	return *TActorIterator<TActor>(world);
 }
 
+template<bool generateOverlapEvents, class ...TChannels>
+void BBInvadersUtils::ConfigureDefaultCollision(UPrimitiveComponent* comp, ECollisionChannel compType, 
+	TChannels ...overlapChannels) requires BBInvadersUtils::NonEmpty<TChannels...> {
+	comp->SetCanEverAffectNavigation(false);
+	comp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	comp->SetCollisionObjectType(compType);
+	comp->SetCollisionResponseToAllChannels(ECR_Ignore);
+	comp->SetGenerateOverlapEvents(generateOverlapEvents);
+
+	auto setter = [=](ECollisionChannel channel) constexpr {
+		comp->SetCollisionResponseToChannel(channel, ECR_Overlap);
+	};
+	auto getter = [=](auto...channels) constexpr {
+		(setter(channels), ...);
+	};
+	getter(overlapChannels...);
+}
+
 /*template<BBInvadersUtils::ChildOf<AActor> TActor>
 void BBInvadersUtils::ForActorsOfClass(UWorld* world, std::invocable<AActor*> auto&& func)
 {

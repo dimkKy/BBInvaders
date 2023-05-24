@@ -4,9 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Math/UnrealMathUtility.h"
+#include "Environment/PlanetaryThreatable.h"
 #include "Asteroid.generated.h"
-
 
 UENUM(BlueprintType)
 enum EAsteroidSize
@@ -22,7 +21,7 @@ class UStaticMeshComponent;
 class UStaticMesh;
 
 UCLASS()
-class BBINVADERS_API AAsteroid : public AActor
+class BBINVADERS_API AAsteroid : public AActor, public IPlanetaryThreatable
 {
 	GENERATED_BODY()
 	
@@ -33,23 +32,27 @@ public:
 	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		//UInstancedStaticMeshComponent* asteroids;
 
-	static void SpawnNewAsteroid(const FVector2D& locationNormalized);
+	void SetSizeAssignMesh(EAsteroidSize newSize);
+	void SetVelocity(float newVelocity);
+	float GetMeshRadius() const;
+	
+	virtual float GetOnPlanetCollisionDamage() const override;
+
+protected:
+	virtual void BeginPlay() override;
 
 	UFUNCTION()
 		void OnOverlapBegin(UPrimitiveComponent* component,
 			AActor* otherActor, UPrimitiveComponent* otherComp,
 			int32 otherIndex, bool bFromSweep, const FHitResult& result);
 
-protected:
-	virtual void BeginPlay() override;	
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		UStaticMeshComponent* body;
 
 	EAsteroidSize size;
+	float currentVelocity;
 
-	constexpr static float maxRotationDefiationHalfAngle = 40.f /** PI / 180.f*/;
-
-	FVector currentVelocity;
-
+	constexpr static float maxRotationDeviationHalfAngle = 40.f /** PI / 180.f*/;
+	constexpr static float maxSplitDeviationHalfAngle = 30.f /** PI / 180.f*/;
+	constexpr static float onHitVelocityMultiplier = 0.9f;
 };

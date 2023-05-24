@@ -38,6 +38,7 @@ public:
 	void Shrink(float distance);
 	void Init(int32 invaderCount, float newRadius);
 
+	void Shoot();
 protected:
 	virtual void BeginPlay() override;
 	

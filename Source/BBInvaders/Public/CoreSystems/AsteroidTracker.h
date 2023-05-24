@@ -15,14 +15,13 @@ class BBINVADERS_API AAsteroidTracker : public AActor
 	
 public:	
 	AAsteroidTracker();
-	virtual void Tick(float DeltaTime) override;
 	void SetTrackArea(const FTransform& transform, const FVector& halfSize);
 	void SetTrackArea(const FVector& halfSize);
 
-	UFUNCTION()
-		void OnOverlapEnd(UPrimitiveComponent* comp, AActor* other, UPrimitiveComponent* otherComp, int32 otherBodyIndex);
 protected:
-	virtual void BeginPlay() override;
+	UFUNCTION()
+		void OnOverlapEnd(UPrimitiveComponent* comp, AActor* other, 
+			UPrimitiveComponent* otherComp, int32 otherBodyIndex);
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		UBoxComponent* trackBox;

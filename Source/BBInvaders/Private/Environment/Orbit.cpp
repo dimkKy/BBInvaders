@@ -123,3 +123,8 @@ void AOrbit::Init(int32 invaderCount, float newRadius)
 	}
 }
 
+void AOrbit::Shoot()
+{
+	invaders[FMath::RandRange(0, invaders.Num() - 1)]->Shoot();
+}
+

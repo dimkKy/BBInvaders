@@ -34,11 +34,13 @@ public:
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 		UPauseMenu* pauseMenu;
 
+	
+protected:
 	UFUNCTION()
 		void OnPauseButtonClicked();
 	UFUNCTION()
 		void OnResumeButtonClicked();
-protected:
+
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 		UWidgetSwitcher* mainSwitcher;
 
