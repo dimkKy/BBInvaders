@@ -28,9 +28,3 @@ void AMainMenuPawn::BeginPlay()
 	Super::BeginPlay();
 }
 
-/*void AMainMenuPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-}*/
-

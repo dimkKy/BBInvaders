@@ -63,10 +63,10 @@ void AAsteroid::BeginPlay()
 void AAsteroid::OnOverlapBegin(UPrimitiveComponent* component, AActor* otherActor,
 	UPrimitiveComponent* otherComp, int32 otherIndex, bool bFromSweep, const FHitResult& result)
 {
-	if (otherActor->IsA(APlayerPawn::StaticClass())) {
+	if (auto* owner{ otherActor->GetOwner() }; otherActor->IsA(APlayerPawn::StaticClass())
+		|| (owner && owner->IsA(APlayerPawn::StaticClass()))) {
 		Destroy();
 		body->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		return;
 	}
 
 	if (otherActor->GetOwner()->IsA(APlayerPawn::StaticClass())) {

@@ -22,7 +22,7 @@ APlayerPawn::APlayerPawn() :
 
 	SetRootComponent(planet);
 	planet->SetMobility(EComponentMobility::Stationary);
-	BBInvadersUtils::ConfigureDefaultCollision<true>(planet, ECC_WorldStatic,
+	BBInvadersUtils::ConfigureDefaultCollision<true>(planet, ECC_WorldDynamic,
 		BBInvadersUtils::ECC_Asteroid, BBInvadersUtils::ECC_Invader);
 	
 	//
@@ -203,7 +203,7 @@ FVector APlayerPawn::CalcMapHalfSize() const
 	float mapYHalfSize{ FMath::Tan(camera->FieldOfView * PI / 360.f) * 
 		(cameraArmLengthRange.Y + planetHalfSize) };
 
-	return { mapYHalfSize * camera->AspectRatio, mapYHalfSize, planetHalfSize };
+	return { mapYHalfSize, mapYHalfSize * camera->AspectRatio, planetHalfSize };
 }
 
 #if WITH_EDITOR

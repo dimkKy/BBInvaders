@@ -23,7 +23,6 @@ class AInvader;
 	}
 }*/
 
-
 UCLASS()
 class BBINVADERS_API AOrbit : public AActor
 {
@@ -31,13 +30,16 @@ class BBINVADERS_API AOrbit : public AActor
 	
 public:	
 	AOrbit();
-
-	virtual void Tick(float DeltaTime) override;
 	
 	void SetRotationSpeed(bool bRandom, float speed = 0.f);
 	void Shrink(float distance);
-	void Init(int32 invaderCount, float newRadius);
+	void InitWithInvaders(float newRadius, bool bAdjustRadius = true);
 
+	UE_NODISCARD static int CalcMaxInvadersNum(float invaderRadius, float orbitRadius);
+
+	UE_NODISCARD float GetOuterRadius() const;
+	UE_NODISCARD int GetInvadersNum() const;
+	
 	void Shoot();
 protected:
 	virtual void BeginPlay() override;
@@ -45,11 +47,11 @@ protected:
 	UPROPERTY(EditInstanceOnly, BlueprintReadWrite)
 		URotatingMovementComponent* rotator;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly)
 		TArray<AInvader*> invaders;
 
-	int32 activeInvaderCount;
-	float radius;
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly)
+		float radius;
 
 	static constexpr int32 splineCount = 3;
 
@@ -62,10 +64,11 @@ protected:
 
 	//static constexpr std::array<std::pair<float, float>, splineCount>
 		//orbitPointsRadiusVectors = OrbitHelper::CalculateRadiusVectors_Static<splineCount>();
-	UPROPERTY(EditInstanceOnly, BlueprintReadWrite )
-		USplineComponent* spline;
+	/*UPROPERTY(EditInstanceOnly, BlueprintReadWrite )
+		USplineComponent* spline;*/
 	
 	static constexpr float maxRotationSpeed = 65.f;
+	static constexpr std::pair<float, int> invaderNumLimit = {0.05f, 62};
 	//USplineComponent* splines[splineCount];
 };
 

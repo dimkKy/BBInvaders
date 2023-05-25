@@ -25,5 +25,7 @@ void ABBInvadersPlayerController::AcknowledgePossession(APawn* P)
 {
 	Super::AcknowledgePossession(P);
 	SetViewTarget(P);
-	GetBBInvadersHUD()->OnViewTargetChange(*P);
+	if (MyHUD) {
+		GetBBInvadersHUD()->OnViewTargetChange(*P);
+	}
 }

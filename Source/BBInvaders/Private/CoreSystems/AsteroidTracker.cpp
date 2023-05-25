@@ -14,8 +14,6 @@ AAsteroidTracker::AAsteroidTracker() :
 	SetRootComponent(trackBox);
 	BBInvadersUtils::ConfigureDefaultCollision<true>(trackBox, ECC_WorldStatic,
 		BBInvadersUtils::ECC_Asteroid, BBInvadersUtils::ECC_Projectile);
-
-	trackBox->OnComponentEndOverlap.AddDynamic(this, &AAsteroidTracker::OnOverlapEnd);
 }
 
 void AAsteroidTracker::SetTrackArea(const FTransform& transform, const FVector& halfSize)
@@ -29,7 +27,14 @@ void AAsteroidTracker::SetTrackArea(const FVector& halfSize)
 	trackBox->SetBoxExtent(halfSize, true);
 }
 
-void AAsteroidTracker::OnOverlapEnd(UPrimitiveComponent* comp, AActor* other, 
+void AAsteroidTracker::BeginPlay()
+{
+	Super::BeginPlay();
+	trackBox->OnComponentEndOverlap.AddDynamic(
+		this, &AAsteroidTracker::OnOverlapEnd);
+}
+
+void AAsteroidTracker::OnOverlapEnd(UPrimitiveComponent* comp, AActor* other,
 	UPrimitiveComponent* otherComp, int32 otherBodyIndex)
 {
 	check(!other->IsA(AAsteroid::StaticClass()));

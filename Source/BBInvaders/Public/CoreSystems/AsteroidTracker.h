@@ -19,6 +19,8 @@ public:
 	void SetTrackArea(const FVector& halfSize);
 
 protected:
+	virtual void BeginPlay() override;
+
 	UFUNCTION()
 		void OnOverlapEnd(UPrimitiveComponent* comp, AActor* other, 
 			UPrimitiveComponent* otherComp, int32 otherBodyIndex);

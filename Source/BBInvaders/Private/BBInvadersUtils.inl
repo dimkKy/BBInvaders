@@ -32,12 +32,14 @@ template<BBInvadersUtils::ChildOf<AActor> TActor>
 auto* BBInvadersUtils::GetFirstActor(UWorld* world)
 {
 	check(world);
-	return *TActorIterator<TActor>(world);
+	auto it{ TActorIterator<TActor>(world) };
+	return it ? *it : nullptr;
 }
 
 template<bool generateOverlapEvents, class ...TChannels>
 void BBInvadersUtils::ConfigureDefaultCollision(UPrimitiveComponent* comp, ECollisionChannel compType, 
-	TChannels ...overlapChannels) requires BBInvadersUtils::NonEmpty<TChannels...> {
+	TChannels ...overlapChannels) requires BBInvadersUtils::NonEmpty<TChannels...> 
+{
 	comp->SetCanEverAffectNavigation(false);
 	comp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	comp->SetCollisionObjectType(compType);
@@ -53,10 +55,9 @@ void BBInvadersUtils::ConfigureDefaultCollision(UPrimitiveComponent* comp, EColl
 	getter(overlapChannels...);
 }
 
-/*template<BBInvadersUtils::ChildOf<AActor> TActor>
+template<BBInvadersUtils::ChildOf<AActor> TActor>
 void BBInvadersUtils::ForActorsOfClass(UWorld* world, std::invocable<AActor*> auto&& func)
 {
-	//UGameplayStatics::GetAllActorsOfClass
 	check(world);
 	for (TActorIterator<TActor> it(world); it; ++it) {
 		func(*it);
@@ -64,9 +65,9 @@ void BBInvadersUtils::ForActorsOfClass(UWorld* world, std::invocable<AActor*> au
 }
 
 template<BBInvadersUtils::ChildOf<AActor> TActor, BBInvadersUtils::ChildOf<AActor>...TOthers>
-	requires (sizeof...(TOthers) > 0)
 void BBInvadersUtils::ForActorsOfClass(UWorld* world, std::invocable<AActor*> auto&& func)
+	requires BBInvadersUtils::NonEmpty<TOthers...>
 {
 	ForActorsOfClass<TActor>(world, func);
 	ForActorsOfClass<TOthers...>(world, func);
-}*/
+}

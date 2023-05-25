@@ -36,18 +36,25 @@ public:
 
 #if WITH_EDITOR
 	virtual EDataValidationResult IsDataValid(TArray<FText>& ValidationErrors) override;
+
+	UFUNCTION(CallInEditor, BlueprintCallable)
+		void SpawnNewAdvancedInvader_EDITORONLY() const
+	{
+		auto test{ SpawnNewAdvancedInvader() };
+		return;
+	}
 #endif
 protected:
 	virtual void BeginPlay() override;
 	APawn* RefreshGameState();
 
+	FVector CalcRandOutOfBoundsPos(float objectRadius) const;
+
+	UE_NODISCARD AOrbit* SpawnNewOrbit(float additionalRadius = 0.f);
+	UE_NODISCARD AAdvancedInvader* SpawnNewAdvancedInvader() const;
+	UE_NODISCARD AAsteroid* SpawnNewAsteroid() const;
 	
-
-	FVector CalcRandOutOfBoundsPos(float objectRadius);
-
-	AOrbit* SpawnNewOrbit(float additionalRadius = 0.f);
-	AAdvancedInvader* SpawnNewAdvancedInvader();
-	AAsteroid* SpawnNewAsteroid();
+	//void ShrinkOrbits(float radius);
 
 	TWeakObjectPtr<ABBInvadersPlayerController> localController;
 	TDoubleLinkedList<TWeakObjectPtr<AOrbit>> orbits;

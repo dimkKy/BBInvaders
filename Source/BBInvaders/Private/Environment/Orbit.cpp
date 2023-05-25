@@ -18,32 +18,28 @@
 AOrbit::AOrbit() :
 	rotator{ CreateDefaultSubobject<URotatingMovementComponent>("rotator") },
 	//invaders{ CreateDefaultSubobject<UHierarchicalInstancedStaticMeshComponent>("invaders") },
-	spline{ CreateDefaultSubobject<USplineComponent>("spline") },
-	radius{ 1.f }
+	//spline{ CreateDefaultSubobject<USplineComponent>("spline") },
+	radius{ 100.f }
 {
 	PrimaryActorTick.bCanEverTick = false;
 
 	rotator->bUpdateOnlyIfRendered = true;
-
 	rotator->RotationRate = FRotator::ZeroRotator;
 
 
 	//invaders->bMultiBodyOverlap = true;
 	//invaders->SetCollisionObjectType(BBInvadersUtils::ECC_Invader);
 	//invaders->SetCollisionObjectType
-
 	//invaders->UpdateInstanceTransform
 
 	//spline->SetClosedLoop(true, false);
-
-
 	//spline->UpdateSpline();
 }
 
 void AOrbit::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	check(invaders.Num());
 }
 
 TArray<FVector> AOrbit::CalcRadiusVectors(int32 size, float length/* = 1.f*/)
@@ -59,12 +55,6 @@ TArray<FVector> AOrbit::CalcRadiusVectors(int32 size, float length/* = 1.f*/)
 		out[i] *= length;
 	}
 	return out;
-}
-
-void AOrbit::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
 }
 
 void AOrbit::SetRotationSpeed(bool bRandom, float speed)
@@ -87,40 +77,90 @@ void AOrbit::Shrink(float distance)
 	}
 }
 
-void AOrbit::Init(int32 invaderCount, float newRadius)
+void AOrbit::InitWithInvaders(float newRadius, bool bAdjustRadius/* = true*/)
 {
-	
 	auto* world{ GetWorld() };
-	check(world && invaderCount > 0 && invaders.Num() == 0);
+	check(world && newRadius > 0);
+	check(invaders.Num() == 0);
+
+	UStaticMesh* invaderMesh{ world->GetSubsystem<UAssetProvider>()->invaderMesh };
+	float invaderMeshRadius{ invaderMesh->GetBounds().GetSphere().W };
+
 	radius = newRadius;
+	if (bAdjustRadius) {
+		radius += invaderMeshRadius;
+	}
 
-	auto radiusVectors{ CalcRadiusVectors(invaderCount, radius) };
+	int32 newInvaderCount{ FMath::RandRange(1, 
+		CalcMaxInvadersNum(invaderMeshRadius, radius)) };
+
+	auto radiusVectors{ CalcRadiusVectors(newInvaderCount, radius) };
+
+	FActorSpawnParameters spawnParams;
+	spawnParams.Owner = this;
+	spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
 	FVector thisLocation{ GetActorLocation() };
-	for (SIZE_T i{ 0 }; i < invaderCount; ++i) {
-		FTransform transform{ GetActorTransform() };
+	FRotator thisRotation{ GetActorRotation() };
 
-		radiusVectors[i] = transform.GetRotation().RotateVector(radiusVectors[i]);
-
-		FActorSpawnParameters spawnParams;
-		spawnParams.Owner = this;
-		spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	for (SIZE_T i{ 0 }; i < newInvaderCount; ++i) {
+		radiusVectors[i] = thisRotation.RotateVector(radiusVectors[i]);
 
 		AInvader* invader{ world->SpawnActor<AInvader>(
-			transform.GetLocation() + radiusVectors[i], 
+			thisLocation + radiusVectors[i],
 			FRotationMatrix::MakeFromX(radiusVectors[i] * -1.f).Rotator(), 
 			spawnParams) };
 
 		/*world->SpawnActorDeferred<AInvader>(
-			transform.GetLocation() + radiusVectors[i],
+			thisTransform.GetLocation() + radiusVectors[i],
 			FRotationMatrix::MakeFromX(radiusVectors[i] * -1.f).Rotator(),
 			spawnParams)*/
 
-		auto provider{ GetWorld()->GetSubsystem<UAssetProvider>() };
-		invader->SetMesh(*provider->invaderMesh);
-
+		invader->SetMesh(*invaderMesh);
 		invader->AttachToActor(this, FAttachmentTransformRules::KeepRelativeTransform);
+
 		invaders.Add(invader);
 	}
+}
+
+UE_NODISCARD int AOrbit::CalcMaxInvadersNum(float invaderRadius, float orbitRadius)
+{	
+	check(!FMath::IsNearlyZero(invaderRadius) && invaderRadius > 0.f);
+	check(!FMath::IsNearlyZero(orbitRadius) && orbitRadius > 0.f);
+
+	if (invaderRadius >= orbitRadius) {
+		return 1;
+	}
+	else {
+		//https://en.wikipedia.org/wiki/Law_of_cosines
+
+		float ratio{ invaderRadius / orbitRadius };
+		if (ratio < invaderNumLimit.first) {
+			return invaderNumLimit.second;
+		}
+		else {
+			return 2 * PI / FMath::Acos(1.f - 2 * FMath::Square(ratio));
+		}
+	}
+}
+
+float AOrbit::GetOuterRadius() const
+{
+	if (invaders.Num()) {
+		check(false);
+		return radius;
+	}
+	else {
+		//return radius + invaders[0]->GetStaticMesh()->GetBounds().GetSphere().W;
+		return radius + GetWorld()->GetSubsystem<UAssetProvider>()
+			->invaderMesh->GetBounds().GetSphere().W;
+	}
+	return float();
+}
+
+UE_NODISCARD int AOrbit::GetInvadersNum() const
+{
+	return invaders.Num();
 }
 
 void AOrbit::Shoot()

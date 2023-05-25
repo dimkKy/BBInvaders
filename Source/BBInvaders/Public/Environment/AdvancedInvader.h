@@ -21,17 +21,21 @@ public:
 	virtual void Tick(float DeltaTime) override;		
 
 	virtual float GetOnPlanetCollisionDamage() const override;
+
 protected:
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-		USpringArmComponent* orbit;
+	void RotateMoveToTarget(float distance = 0.f);
+	/*UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+		USpringArmComponent* orbit;*/
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly)
 		float rotationSpeed;
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly)
 		float descensionSpeed;
 
-	static const FVector2D rotationSpeedRange;
-	static const FVector2D descensionSpeedRange;
+	TPair<bool, FVector> target;
+
+	static constexpr std::pair<float, float> rotationSpeedRange = { 25.f, 40.f };
+	static constexpr std::pair<float, float> descensionSpeedRange = { 100.f, 125.f };
 };

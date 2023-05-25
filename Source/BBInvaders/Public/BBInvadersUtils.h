@@ -55,13 +55,12 @@ namespace BBInvadersUtils {
 	template <ChildOf<AActor> TActor>
 	auto* GetFirstActor(UWorld* world);
 
-	/*template <ChildOf<AActor> TActor>
+	template <ChildOf<AActor> TActor>
 	void ForActorsOfClass(UWorld* world, std::invocable<AActor*> auto&& func);
 	
 	//concept non empty
 	template <ChildOf<AActor> TActor, ChildOf<AActor>...TOthers>
-		requires (sizeof...(TOthers) > 0)
-	void ForActorsOfClass(UWorld* world, std::invocable<AActor*> auto&& func);*/
+	void ForActorsOfClass(UWorld* world, std::invocable<AActor*> auto&& func) requires NonEmpty<TOthers...>;
 
 	template<bool generateOverlapEvents, class...TChannels>
 	void ConfigureDefaultCollision(UPrimitiveComponent* comp, ECollisionChannel compType, 

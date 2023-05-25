@@ -8,7 +8,7 @@
 #include "BBInvadersUtils.h"
 #include "Player/MainMenuPawn.h"
 #include "CoreSystems/AsteroidTracker.h"
-
+#include "CoreSystems/BBInvadersProjectile.h"
 #include "Environment/Invader.h"
 #include "Environment/AdvancedInvader.h"
 #include "Environment/Asteroid.h"
@@ -22,7 +22,7 @@ ABBInvadersGameModeBase::ABBInvadersGameModeBase() :
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = false;
 	
-	SetActorTickInterval(2.f);
+	//SetActorTickInterval(2.f);
 }
 
 void ABBInvadersGameModeBase::HandleStartingNewPlayer_Implementation(APlayerController* player)
@@ -101,7 +101,9 @@ void ABBInvadersGameModeBase::GoToMainMenu()
 	localController->Possess(menuPawn);
 	SetActorTickEnabled(false);
 
-	//BBInvadersUtils::ForActorsOfClass<AInvader, AOrbit, AAsteroid>(world, [](AActor* actor) {actor->Destroy(); });
+	BBInvadersUtils::ForActorsOfClass
+		<AInvader, AOrbit, AAsteroid, ABBInvadersProjectile>
+		(world, [](AActor* actor) {actor->Destroy(); });
 }
 
 void ABBInvadersGameModeBase::TogglePause()
@@ -148,7 +150,8 @@ EDataValidationResult ABBInvadersGameModeBase::IsDataValid(TArray<FText>& Valida
 		ValidationErrors.Add(FText::FromString("Invalid HUDClass"));
 	}
 
-	if (PlayerControllerClass && PlayerControllerClass->IsChildOf<ABBInvadersPlayerController>()) {
+	if (PlayerControllerClass && 
+		PlayerControllerClass->IsChildOf<ABBInvadersPlayerController>()) {
 
 	}
 	else {
@@ -182,14 +185,16 @@ APawn* ABBInvadersGameModeBase::RefreshGameState()
 	}
 	else {
 		FActorSpawnParameters params;
-		params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		params.SpawnCollisionHandlingOverride = 
+			ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
 		world->SpawnActor<AAsteroidTracker>(
 			AAsteroidTracker::StaticClass(), pawn->GetActorTransform(), params);
 	}
 	return pawn;
 }
 
-FVector ABBInvadersGameModeBase::CalcRandOutOfBoundsPos(float objectRadius)
+FVector ABBInvadersGameModeBase::CalcRandOutOfBoundsPos(float objectRadius) const
 {
 	float angle{ FMath::RandRange(0.f, 360.f) };
 	return mapForward.RotateAngleAxis(angle, mapUp) * mapHalfSize.Size2D() + objectRadius;
@@ -197,33 +202,46 @@ FVector ABBInvadersGameModeBase::CalcRandOutOfBoundsPos(float objectRadius)
 
 AOrbit* ABBInvadersGameModeBase::SpawnNewOrbit(float additionalRadius)
 {
+	float newRadius{ orbits.Num() ?
+		orbits.GetTail()->GetValue()->GetOuterRadius() :
+		mapHalfSize.Size2D()
+	};
+	FActorSpawnParameters params;
+	params.Owner = this;
+	params.SpawnCollisionHandlingOverride = 
+		ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	auto* newOrbit{ GetWorld()->SpawnActor<AOrbit>( mapCenter,
+		FRotationMatrix::MakeFromXZ(mapForward, mapUp).Rotator(), params) };
+
 	return nullptr;
 }
 
-AAdvancedInvader* ABBInvadersGameModeBase::SpawnNewAdvancedInvader()
-{
-	auto* newInvader{ GetWorld()->SpawnActorDeferred<AAdvancedInvader>(
-		AAdvancedInvader::StaticClass(), FTransform::Identity,
-		nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn) };
-	
+AAdvancedInvader* ABBInvadersGameModeBase::SpawnNewAdvancedInvader() const
+{	
 	UStaticMesh* mesh{ GetWorld()->GetSubsystem<UAssetProvider>()->invaderMesh };
-	newInvader->SetMesh(*mesh);
 	FVector location{ CalcRandOutOfBoundsPos(mesh->GetBounds().GetSphere().W)};
 
-	newInvader->FinishSpawning({ 
-		FRotationMatrix::MakeFromXZ(mapCenter - location, mapUp).Rotator(),
-		location, FVector::OneVector }, false);
+	FActorSpawnParameters params;
+	params.SpawnCollisionHandlingOverride =
+		ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
+	auto* newInvader{ GetWorld()->SpawnActor<AAdvancedInvader>(
+		location,
+		FRotator::ZeroRotator, params) };
+
+	newInvader->SetMesh(*mesh);
 	return newInvader;
 }
 
-AAsteroid* ABBInvadersGameModeBase::SpawnNewAsteroid()
+AAsteroid* ABBInvadersGameModeBase::SpawnNewAsteroid() const
 {
 	auto* newAsteroid{ GetWorld()->SpawnActorDeferred<AAsteroid>(
 		AAsteroid::StaticClass(), FTransform::Identity,
 		nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn) };
 
-	newAsteroid->SetSizeAssignMesh(static_cast<EAsteroidSize>(FMath::RandRange(0, static_cast<int32>(EAsteroidSize::EAS_MAX) - 1)));
+	newAsteroid->SetSizeAssignMesh(static_cast<EAsteroidSize>(
+		FMath::RandRange(0, static_cast<int32>(EAsteroidSize::EAS_MAX) - 1)));
 
 	FVector location{ CalcRandOutOfBoundsPos(newAsteroid->GetMeshRadius()) };
 

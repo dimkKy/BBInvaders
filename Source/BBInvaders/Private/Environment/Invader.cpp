@@ -15,7 +15,7 @@ AInvader::AInvader() :
 	SetRootComponent(body);
 
 	BBInvadersUtils::ConfigureDefaultCollision<true>(body, BBInvadersUtils::ECC_Invader,
-		BBInvadersUtils::ECC_Projectile);
+		BBInvadersUtils::ECC_Projectile, ECC_Pawn, ECC_WorldDynamic);
 }
 
 void AInvader::SetMesh(UStaticMesh& newMesh)
@@ -65,7 +65,8 @@ void AInvader::BeginPlay()
 void AInvader::OnOverlapBegin(UPrimitiveComponent* component, AActor* otherActor,
 	UPrimitiveComponent* otherComp, int32 otherIndex, bool bFromSweep, const FHitResult& result)
 {
-	if (otherActor->IsA(APlayerPawn::StaticClass())) {
+	if (auto* owner{ otherActor->GetOwner() }; otherActor->IsA(APlayerPawn::StaticClass())
+		|| (owner && owner->IsA(APlayerPawn::StaticClass()))) {
 		Destroy();
 		body->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
