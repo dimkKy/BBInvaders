@@ -10,6 +10,7 @@
 class UStaticMeshComponent;
 class UStaticMesh;
 class ABBInvadersProjectile;
+class APlayerPawn;
 
 UCLASS()
 class BBINVADERS_API AInvader : public AActor, public IPlanetaryThreatable
@@ -26,6 +27,8 @@ public:
 
 	virtual float GetOnPlanetCollisionDamage() const override;
 
+	virtual int32 GetOnKillBounty() const;
+
 #if WITH_EDITOR
 	virtual EDataValidationResult IsDataValid(TArray<FText>& ValidationErrors) override;
 #endif
@@ -39,4 +42,6 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		UStaticMeshComponent* body;
+
+	void DestroyGiveReward(APlayerPawn* bountyReceiver = nullptr);
 };

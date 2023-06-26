@@ -9,11 +9,11 @@
 
 AAdvancedInvader::AAdvancedInvader() :
 	//orbit{ CreateDefaultSubobject<USpringArmComponent>("platformArm") },
-	rotationSpeed{ 0.f }, descensionSpeed{ 0.f }
-	, target{false, FVector::ForwardVector}
+	rotationSpeed{ 0.f }, descensionSpeed{ 0.f }, 
+	target{}
 {
 	PrimaryActorTick.bCanEverTick = true;
-	PrimaryActorTick.bStartWithTickEnabled = false;
+	//PrimaryActorTick.bStartWithTickEnabled = false;
 	
 	//orbit->bDoCollisionTest = false;
 	//orbit->TargetArmLength = 0.f;
@@ -22,12 +22,7 @@ AAdvancedInvader::AAdvancedInvader() :
 void AAdvancedInvader::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-
-	/*
-	SetActorRotation(GetActorRotation() +
-		BBInvadersUtils::unitRotator * DeltaTime * rotationSpeed);
-	orbit->TargetArmLength -= DeltaTime * descensionSpeed; */
+	RotateMoveToTarget(DeltaTime);
 }
 
 float AAdvancedInvader::GetOnPlanetCollisionDamage() const
@@ -35,46 +30,61 @@ float AAdvancedInvader::GetOnPlanetCollisionDamage() const
 	return 75.0f;
 }
 
+void AAdvancedInvader::SetTarget(const AActor& actor)
+{
+	/* That or similar operation always triggers overlap with pawn
+
+		FVector targetLocation{ playerPawn->GetActorLocation() };
+		FVector toTarget{ targetLocation - GetActorLocation() };
+		check(SetRootComponent(orbit));
+		SetActorLocationAndRotation(targetLocation,
+			FRotationMatrix::MakeFromX(toTarget).Rotator());
+		orbit->TargetArmLength = toTarget.Size();
+		body->AttachToComponent(orbit,
+			FAttachmentTransformRules::SnapToTargetIncludingScale,
+			USpringArmComponent::SocketName);
+		*/
+
+	target.SetTarget(actor);
+	RotateMoveToTarget();
+	//-----------
+	rotationSpeed = FMath::RandRange(
+		rotationSpeedRange.first, rotationSpeedRange.second);
+	if (FMath::RandBool()) {
+		rotationSpeed *= -1.f;
+	}
+	descensionSpeed = FMath::RandRange(
+		descensionSpeedRange.first, descensionSpeedRange.second);
+	SetActorTickEnabled(true);
+}
+
+int32 AAdvancedInvader::GetOnKillBounty() const
+{
+	return Super::GetOnKillBounty() * 2;
+}
+
 void AAdvancedInvader::BeginPlay()
 {
 	if (APlayerPawn* playerPawn{
 		BBInvadersUtils::GetFirstActor<APlayerPawn>(GetWorld()) }) 
 	{
-		/* That or similar operation always triggers overlap with pawn
-		
-		FVector targetLocation{ playerPawn->GetActorLocation() };
-		FVector toTarget{ targetLocation - GetActorLocation() };
-		check(SetRootComponent(orbit));
-		SetActorLocationAndRotation(targetLocation, 
-			FRotationMatrix::MakeFromX(toTarget).Rotator());
-		orbit->TargetArmLength = toTarget.Size();
-		body->AttachToComponent(orbit, 
-			FAttachmentTransformRules::SnapToTargetIncludingScale, 
-			USpringArmComponent::SocketName);
-		*/
-
-		target.Key = true;
-		target.Value = playerPawn->GetActorLocation();
-		RotateMoveToTarget();
-		//-----------
-		rotationSpeed = FMath::RandRange(
-			rotationSpeedRange.first, rotationSpeedRange.second);
-		if (FMath::RandBool()) {
-			rotationSpeed *= -1.f;
-		}
-		descensionSpeed = FMath::RandRange(
-			descensionSpeedRange.first, descensionSpeedRange.second);
-		SetActorTickEnabled(true);
+		SetTarget(*playerPawn);
 	}
+	check(target);
 	Super::BeginPlay();
 }
 
-void AAdvancedInvader::RotateMoveToTarget(float distance/* = 0.f*/)
+void AAdvancedInvader::RotateMoveToTarget(float deltatime/* = 0.f*/)
 {
-	check(target.Key);
-	FVector toTarget{ target.Value - GetActorLocation() };
-	body->MoveComponent(
-		toTarget.GetSafeNormal() * distance,
-		FRotationMatrix::MakeFromX(target.Value - GetActorLocation()).Rotator().Quaternion(), 
-		false);
+	if (!target) {
+		return;
+	}
+
+	FVector toThis{ GetActorLocation() - target.location };
+	toThis.GetSafeNormal() * descensionSpeed;
+	FVector newToThis{ 
+		(toThis - toThis.GetSafeNormal() * descensionSpeed * deltatime)
+		.RotateAngleAxis(rotationSpeed * deltatime , target.up) };
+	RootComponent->SetWorldLocationAndRotation(target.location + newToThis, 
+		FRotationMatrix::MakeFromX(newToThis * -1.f).Rotator().Quaternion());
 }

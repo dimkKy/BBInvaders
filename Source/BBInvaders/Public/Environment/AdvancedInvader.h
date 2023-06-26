@@ -8,6 +8,26 @@
 
 class USpringArmComponent;
 
+struct FTargetInfo 
+{
+	FTargetInfo() :
+		bAimed{ false },
+		location{}, 
+		up{} {};
+	bool bAimed;
+	FVector location;
+	FVector up;
+
+	void SetTarget(const AActor& actor) {
+		bAimed = true;
+		location = actor.GetActorLocation();
+		up = actor.GetActorUpVector();
+
+	}
+	explicit operator bool() const
+		{ return bAimed; }
+};
+
 /**
  * 
  */
@@ -22,10 +42,14 @@ public:
 
 	virtual float GetOnPlanetCollisionDamage() const override;
 
+	void SetTarget(const AActor& actor);
+
+	virtual int32 GetOnKillBounty() const override;
+
 protected:
 	virtual void BeginPlay() override;
 
-	void RotateMoveToTarget(float distance = 0.f);
+	void RotateMoveToTarget(float deltatime = 0.f);
 	/*UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 		USpringArmComponent* orbit;*/
 
@@ -34,7 +58,7 @@ protected:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly)
 		float descensionSpeed;
 
-	TPair<bool, FVector> target;
+	FTargetInfo target;
 
 	static constexpr std::pair<float, float> rotationSpeedRange = { 25.f, 40.f };
 	static constexpr std::pair<float, float> descensionSpeedRange = { 100.f, 125.f };

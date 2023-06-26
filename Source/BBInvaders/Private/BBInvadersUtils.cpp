@@ -19,6 +19,11 @@ float BBInvadersUtils::GetCameraNearPlane(const UCameraComponent& camera)
 	return nearClipPlane;
 }
 
+float BBInvadersUtils::RandomAngle()
+{
+	return FMath::FRandRange(-180.f, 180.f);
+}
+
 /*void BBInvadersUtils::SetupButtons(ChildOf<UObject> auto* object, UButton* button, TFunction<void(void)> onClickedFunc)
 {
 	check(button);

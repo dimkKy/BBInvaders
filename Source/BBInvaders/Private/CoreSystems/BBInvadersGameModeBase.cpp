@@ -5,10 +5,12 @@
 #include "UI/BBInvadersHUD.h"
 #include "Player/BBInvadersPlayerController.h"
 #include "Player/PlayerPawn.h"
+#include "Player/BBInvadersPlayerState.h"
 #include "BBInvadersUtils.h"
 #include "Player/MainMenuPawn.h"
 #include "CoreSystems/AsteroidTracker.h"
 #include "CoreSystems/BBInvadersProjectile.h"
+#include "CoreSystems/BBInvadersGameStateBase.h"
 #include "Environment/Invader.h"
 #include "Environment/AdvancedInvader.h"
 #include "Environment/Asteroid.h"
@@ -17,7 +19,7 @@
 #include "Containers/List.h"
 
 ABBInvadersGameModeBase::ABBInvadersGameModeBase() :
-	localController{ nullptr }, mapHalfSize{0.f}
+	localController{ nullptr }
 {
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = false;
@@ -87,6 +89,7 @@ void ABBInvadersGameModeBase::StartGameplay()
 {
 	localController->Possess(RefreshGameState());
 	SetActorTickEnabled(true);
+	
 }
 
 void ABBInvadersGameModeBase::GoToMainMenu()
@@ -158,6 +161,14 @@ EDataValidationResult ABBInvadersGameModeBase::IsDataValid(TArray<FText>& Valida
 		ValidationErrors.Add(FText::FromString("Invalid PlayerControllerClass"));
 	}
 
+	if (PlayerStateClass &&
+		PlayerStateClass->IsChildOf<ABBInvadersPlayerState>()) {
+
+	}
+	else {
+		ValidationErrors.Add(FText::FromString("Invalid PlayerStateClass"));
+	}
+
 	return ValidationErrors.Num() > 0 ?
 		EDataValidationResult::Invalid : EDataValidationResult::Valid;
 }
@@ -175,13 +186,12 @@ APawn* ABBInvadersGameModeBase::RefreshGameState()
 	UWorld* world{ GetWorld() };
 	APlayerPawn* pawn{ BBInvadersUtils::GetFirstActor<APlayerPawn>(world) };
 	check(world && pawn);
-	mapCenter = pawn->GetActorLocation();
-	mapForward = pawn->GetActorForwardVector();
-	mapUp = pawn->GetActorUpVector();
-	mapHalfSize = pawn->CalcMapHalfSize();
+
+	ABBInvadersGameStateBase* gameState{ GetGameState<ABBInvadersGameStateBase>() };
+	gameState->SetMapInfo(*pawn, pawn->CalcMapHalfSize());
 	
 	if (AAsteroidTracker* tracker{ BBInvadersUtils::GetFirstActor<AAsteroidTracker>(world) }) {
-		tracker->SetTrackArea(pawn->GetActorTransform(), mapHalfSize);
+		tracker->SetTrackArea(pawn->GetActorTransform(), gameState->mapInfo.halfSize);
 	}
 	else {
 		FActorSpawnParameters params;
@@ -196,23 +206,27 @@ APawn* ABBInvadersGameModeBase::RefreshGameState()
 
 FVector ABBInvadersGameModeBase::CalcRandOutOfBoundsPos(float objectRadius) const
 {
-	float angle{ FMath::RandRange(0.f, 360.f) };
-	return mapForward.RotateAngleAxis(angle, mapUp) * mapHalfSize.Size2D() + objectRadius;
+	return GetGameState<ABBInvadersGameStateBase>()->CalcRandOutOfBoundsPos(objectRadius);
 }
 
 AOrbit* ABBInvadersGameModeBase::SpawnNewOrbit(float additionalRadius)
 {
+	ABBInvadersGameStateBase* gameState{ GetGameState<ABBInvadersGameStateBase>() };
+
 	float newRadius{ orbits.Num() ?
 		orbits.GetTail()->GetValue()->GetOuterRadius() :
-		mapHalfSize.Size2D()
+		gameState->mapInfo.halfSize.Size2D()
 	};
+
 	FActorSpawnParameters params;
 	params.Owner = this;
 	params.SpawnCollisionHandlingOverride = 
 		ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	auto* newOrbit{ GetWorld()->SpawnActor<AOrbit>( mapCenter,
-		FRotationMatrix::MakeFromXZ(mapForward, mapUp).Rotator(), params) };
+	//TODO
+	auto* newOrbit{ GetWorld()->SpawnActor<AOrbit>(gameState->mapInfo.center,
+		FRotationMatrix::MakeFromXZ(gameState->mapInfo.forward, gameState->mapInfo.up).Rotator(), 
+		params) };
 
 	return nullptr;
 }
@@ -244,10 +258,15 @@ AAsteroid* ABBInvadersGameModeBase::SpawnNewAsteroid() const
 		FMath::RandRange(0, static_cast<int32>(EAsteroidSize::EAS_MAX) - 1)));
 
 	FVector location{ CalcRandOutOfBoundsPos(newAsteroid->GetMeshRadius()) };
+	FRotator randomRotator{
+		BBInvadersUtils::RandomAngle(),
+		BBInvadersUtils::RandomAngle(),
+		BBInvadersUtils::RandomAngle()
+	};
 
-	newAsteroid->FinishSpawning({
-		FRotationMatrix::MakeFromXZ(mapCenter - location, mapUp).Rotator(),
-		location, FVector::OneVector }, false);
+	newAsteroid->FinishSpawning(
+		{ randomRotator, location, FVector::OneVector }
+		, false);
 
 	return newAsteroid;
 }

@@ -6,6 +6,7 @@
 #include "CoreSystems/BBInvadersProjectile.h"
 #include "BBInvadersUtils.h"
 #include "Player/PlayerPawn.h"
+#include "Player/BBInvadersPlayerState.h"
 #include "CoreSystems/AssetProvider.h"
 
 AInvader::AInvader() :
@@ -56,6 +57,11 @@ float AInvader::GetOnPlanetCollisionDamage() const
 	return 55.f;
 }
 
+int32 AInvader::GetOnKillBounty() const
+{
+	return 100;
+}
+
 void AInvader::BeginPlay()
 {
 	Super::BeginPlay();
@@ -65,10 +71,23 @@ void AInvader::BeginPlay()
 void AInvader::OnOverlapBegin(UPrimitiveComponent* component, AActor* otherActor,
 	UPrimitiveComponent* otherComp, int32 otherIndex, bool bFromSweep, const FHitResult& result)
 {
-	if (auto* owner{ otherActor->GetOwner() }; otherActor->IsA(APlayerPawn::StaticClass())
-		|| (owner && owner->IsA(APlayerPawn::StaticClass()))) {
-		Destroy();
-		body->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	if (otherActor->IsA(APlayerPawn::StaticClass())) {
+		DestroyGiveReward();
+	}
+	else {
+		if (APlayerPawn* otherOwner{ Cast<APlayerPawn>(otherActor->GetOwner()) }) {
+			DestroyGiveReward(otherOwner);
+		}
+	}
+}
+
+void AInvader::DestroyGiveReward(APlayerPawn* bountyReceiver/* = nullptr*/)
+{
+	Destroy();
+	body->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	if (IsValid(bountyReceiver)) {
+
 	}
 }
 

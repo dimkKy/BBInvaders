@@ -8,7 +8,7 @@
 
 AAsteroid::AAsteroid() :
 	body{CreateDefaultSubobject<UStaticMeshComponent>("body")},
-	size{EAS_Big}, currentVelocity{0.f}
+	size{ EAS_MAX }, currentVelocity{0.f}
 {
 	PrimaryActorTick.bCanEverTick = true;
 	SetRootComponent(body);
@@ -26,7 +26,7 @@ void AAsteroid::SetSizeAssignMesh(EAsteroidSize newSize)
 		return;
 	}
 	size = newSize;
-	body->SetStaticMesh(GetWorld()->GetSubsystem<UAssetProvider>()->asteroidMeshes[size]);
+	check(body->SetStaticMesh(GetWorld()->GetSubsystem<UAssetProvider>()->asteroidMeshes[size]));
 }
 
 void AAsteroid::SetVelocity(float newVelocity)
@@ -63,13 +63,15 @@ void AAsteroid::BeginPlay()
 void AAsteroid::OnOverlapBegin(UPrimitiveComponent* component, AActor* otherActor,
 	UPrimitiveComponent* otherComp, int32 otherIndex, bool bFromSweep, const FHitResult& result)
 {
-	if (auto* owner{ otherActor->GetOwner() }; otherActor->IsA(APlayerPawn::StaticClass())
-		|| (owner && owner->IsA(APlayerPawn::StaticClass()))) {
+	//redo
+	auto* otherOwner{ otherActor->GetOwner() };
+	if (otherActor->IsA(APlayerPawn::StaticClass())
+		|| (otherOwner && otherOwner->IsA(APlayerPawn::StaticClass()))) {
 		Destroy();
 		body->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 
-	if (otherActor->GetOwner()->IsA(APlayerPawn::StaticClass())) {
+	if (otherOwner && otherOwner->IsA(APlayerPawn::StaticClass())) {
 		switch (size) {
 		case EAS_MAX:
 			check(false);

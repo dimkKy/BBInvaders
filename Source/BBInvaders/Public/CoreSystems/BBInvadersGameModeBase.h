@@ -11,6 +11,7 @@ class AOrbit;
 class AAdvancedInvader;
 class AAsteroid;
 class APawn;
+class ABBInvadersGameStateBase;
 
 /**
  * TO BE REFACTORED (GAS?)
@@ -39,8 +40,15 @@ public:
 
 	UFUNCTION(CallInEditor, BlueprintCallable)
 		void SpawnNewAdvancedInvader_EDITORONLY() const
+		{
+			auto test{ SpawnNewAdvancedInvader() };
+			return;
+		}
+
+	UFUNCTION(CallInEditor, BlueprintCallable)
+		void SpawnNewAsteroid_EDITORONLY() const
 	{
-		auto test{ SpawnNewAdvancedInvader() };
+		auto test{ SpawnNewAsteroid() };
 		return;
 	}
 #endif
@@ -59,11 +67,7 @@ protected:
 	TWeakObjectPtr<ABBInvadersPlayerController> localController;
 	TDoubleLinkedList<TWeakObjectPtr<AOrbit>> orbits;
 
-	//to GameState
-	FVector mapHalfSize;
-	FVector mapCenter;
-	FVector mapForward;
-	FVector mapUp;
-
 	static constexpr int32 maxOrbits = 5;
 };
+
+extern template ABBInvadersGameStateBase* AGameModeBase::GetGameState<ABBInvadersGameStateBase>() const;

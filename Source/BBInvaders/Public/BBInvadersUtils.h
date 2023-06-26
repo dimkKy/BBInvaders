@@ -3,7 +3,7 @@
 #pragma once
 
 #include <type_traits>
-//#include <concepts>
+#include <concepts>
 
 class UCameraComponent;
 class UButton;
@@ -69,6 +69,8 @@ namespace BBInvadersUtils {
 	constexpr ECollisionChannel ECC_Projectile = ECollisionChannel::ECC_GameTraceChannel1;
 	constexpr ECollisionChannel ECC_Asteroid = ECollisionChannel::ECC_GameTraceChannel2;
 	constexpr ECollisionChannel ECC_Invader = ECollisionChannel::ECC_GameTraceChannel3;
+
+	float RandomAngle();
 
 	const FRotator UpRotator = { -90.f, 0.f, 0.f };
 	const FRotator BehindRotator = { 0.f, 180.f, 0.f };
