@@ -3,7 +3,7 @@
 
 #include "Environment/AdvancedInvader.h"
 #include "BBInvadersUtils.h"
-#include "Player/PlayerPawn.h"
+//#include "Player/PlayerPawn.h"
 #include "BBInvadersUtils.h"
 #include "GameFramework/SpringArmComponent.h"
 
@@ -65,13 +65,14 @@ int32 AAdvancedInvader::GetOnKillBounty() const
 
 void AAdvancedInvader::BeginPlay()
 {
-	if (APlayerPawn* playerPawn{
+	/*if (APlayerPawn* playerPawn{
 		BBInvadersUtils::GetFirstActor<APlayerPawn>(GetWorld()) }) 
 	{
 		SetTarget(*playerPawn);
-	}
-	check(target);
+	}*/
+	
 	Super::BeginPlay();
+	check(target);
 }
 
 void AAdvancedInvader::RotateMoveToTarget(float deltatime/* = 0.f*/)

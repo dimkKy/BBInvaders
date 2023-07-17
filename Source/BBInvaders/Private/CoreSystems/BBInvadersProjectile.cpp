@@ -14,24 +14,21 @@ ABBInvadersProjectile::ABBInvadersProjectile() :
 
 	SetRootComponent(body);
 
+	//movement->ComputeHomingAcceleration
 	//body->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+
+	BBInvadersUtils::ConfigureDefaultCollision<true>
+		(body, BBInvadersUtils::ECC_Projectile,
+		BBInvadersUtils::ECC_Asteroid, ECC_Pawn, 
+		BBInvadersUtils::ECC_Invader, ECC_WorldDynamic);
+
 	body->SetSimulatePhysics(true);
 	body->SetEnableGravity(false);
 	body->BodyInstance.LinearDamping = 0.f;
-	body->BodyInstance.SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	body->SetGenerateOverlapEvents(true);
-	body->SetCollisionObjectType(BBInvadersUtils::ECC_Projectile);
-	body->SetCollisionResponseToAllChannels(ECR_Ignore);
-	body->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
-	body->SetCollisionResponseToChannel(BBInvadersUtils::ECC_Asteroid, ECR_Overlap);
-	body->SetCollisionResponseToChannel(BBInvadersUtils::ECC_Invader, ECR_Overlap);
-	body->SetCanEverAffectNavigation(false);
-
-	body->OnComponentBeginOverlap.AddDynamic(this, &ABBInvadersProjectile::OnOverlapBegin);
 
 	movement->UpdatedComponent = body;
-	movement->InitialSpeed = speed;
-	movement->MaxSpeed = speed;
+	//movement->InitialSpeed = speed;
+	//movement->MaxSpeed = speed;
 	//movement->bRotationFollowsVelocity = true;
 	movement->bShouldBounce = false;
 	movement->ProjectileGravityScale = 0.f;
@@ -42,21 +39,25 @@ ABBInvadersProjectile::ABBInvadersProjectile() :
 void ABBInvadersProjectile::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	body->OnComponentBeginOverlap.AddDynamic(
+		this, &ABBInvadersProjectile::OnOverlapBegin);
+	//movement
 }
 
 void ABBInvadersProjectile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+
 }
 
 void ABBInvadersProjectile::OnOverlapBegin(UPrimitiveComponent* component, AActor* otherActor, 
 	UPrimitiveComponent* otherComp, int32 otherIndex, bool bFromSweep, const FHitResult& result)
 {
-	if (!GetOwner()->IsA(otherActor->StaticClass())) {
+	AActor* owner{ GetOwner() };
+
+	if (owner && owner->StaticClass() != otherActor->StaticClass()) {
 		Destroy();
-		body->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 }
 

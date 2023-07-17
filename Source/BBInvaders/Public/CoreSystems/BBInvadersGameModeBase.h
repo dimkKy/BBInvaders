@@ -38,20 +38,14 @@ public:
 #if WITH_EDITOR
 	virtual EDataValidationResult IsDataValid(TArray<FText>& ValidationErrors) override;
 
-	UFUNCTION(CallInEditor, BlueprintCallable)
-		void SpawnNewAdvancedInvader_EDITORONLY() const
-		{
-			auto test{ SpawnNewAdvancedInvader() };
-			return;
-		}
+	UFUNCTION(CallInEditor, BlueprintCallable, Category = "Debug", meta = (DevelopmentOnly))
+		void _SpawnNewAdvancedInvader() const;
+	UFUNCTION(CallInEditor, BlueprintCallable, Category = "Debug", meta = (DevelopmentOnly))
+		void _SpawnNewAsteroid() const;
+	UFUNCTION(CallInEditor, BlueprintCallable, Category = "Debug", meta = (DevelopmentOnly))
+		void _SpawnNewOrbit();
 
-	UFUNCTION(CallInEditor, BlueprintCallable)
-		void SpawnNewAsteroid_EDITORONLY() const
-	{
-		auto test{ SpawnNewAsteroid() };
-		return;
-	}
-#endif
+#endif // WITH_EDITOR
 protected:
 	virtual void BeginPlay() override;
 	APawn* RefreshGameState();
@@ -62,7 +56,7 @@ protected:
 	UE_NODISCARD AAdvancedInvader* SpawnNewAdvancedInvader() const;
 	UE_NODISCARD AAsteroid* SpawnNewAsteroid() const;
 	
-	//void ShrinkOrbits(float radius);
+	void ShrinkOrbits(float deltaTime);
 
 	TWeakObjectPtr<ABBInvadersPlayerController> localController;
 	TDoubleLinkedList<TWeakObjectPtr<AOrbit>> orbits;
@@ -70,4 +64,3 @@ protected:
 	static constexpr int32 maxOrbits = 5;
 };
 
-extern template ABBInvadersGameStateBase* AGameModeBase::GetGameState<ABBInvadersGameStateBase>() const;

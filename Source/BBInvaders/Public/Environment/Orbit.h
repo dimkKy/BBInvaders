@@ -28,10 +28,13 @@ class BBINVADERS_API AOrbit : public AActor
 {
 	GENERATED_BODY()
 	
-public:	
+public:
 	AOrbit();
-	
+	virtual void Tick(float DeltaTime) override;
+
 	void SetRotationSpeed(bool bRandom, float speed = 0.f);
+	static void SetShrinkingSpeed(float speed);
+
 	void Shrink(float distance);
 	void InitWithInvaders(float newRadius, bool bAdjustRadius = true);
 
@@ -52,7 +55,12 @@ protected:
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly)
 		float radius;
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly)
+		float invaderRadius;
 
+	static float shrinkingSpeed;
+
+	float minRadius;
 	static constexpr int32 splineCount = 3;
 
 	//template<int size = splineCount>
@@ -67,6 +75,8 @@ protected:
 	/*UPROPERTY(EditInstanceOnly, BlueprintReadWrite )
 		USplineComponent* spline;*/
 	
+	//static constexpr float maxShrinkingSpeed = 65.f;
+
 	static constexpr float maxRotationSpeed = 65.f;
 	static constexpr std::pair<float, int> invaderNumLimit = {0.05f, 62};
 	//USplineComponent* splines[splineCount];

@@ -13,7 +13,7 @@ class AActor;
 //TIsDerivedFrom
 
 namespace BBInvadersUtils {
-	//if constexpr?
+	//if constexpr? !POINTERS
 	template <class S, class O>
 	inline bool IsIn(const S& subject, const O* other);
 
@@ -58,9 +58,9 @@ namespace BBInvadersUtils {
 	template <ChildOf<AActor> TActor>
 	void ForActorsOfClass(UWorld* world, std::invocable<AActor*> auto&& func);
 	
-	//concept non empty
 	template <ChildOf<AActor> TActor, ChildOf<AActor>...TOthers>
-	void ForActorsOfClass(UWorld* world, std::invocable<AActor*> auto&& func) requires NonEmpty<TOthers...>;
+	void ForActorsOfClass(UWorld* world, std::invocable<AActor*> auto&& func) 
+		requires NonEmpty<TOthers...>;
 
 	template<bool generateOverlapEvents, class...TChannels>
 	void ConfigureDefaultCollision(UPrimitiveComponent* comp, ECollisionChannel compType, 
@@ -71,6 +71,9 @@ namespace BBInvadersUtils {
 	constexpr ECollisionChannel ECC_Invader = ECollisionChannel::ECC_GameTraceChannel3;
 
 	float RandomAngle();
+	FRotator RandomRotator();
+	//Util to generate a random number in a range between -max and max
+	float RandAbsRange(float absMax);
 
 	const FRotator UpRotator = { -90.f, 0.f, 0.f };
 	const FRotator BehindRotator = { 0.f, 180.f, 0.f };

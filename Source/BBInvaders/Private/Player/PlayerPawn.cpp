@@ -217,7 +217,8 @@ EDataValidationResult APlayerPawn::IsDataValid(TArray<FText>& ValidationErrors)
 	
 	if (platform->GetStaticMesh()) {
 		if (!platform->DoesSocketExist(BBInvadersUtils::muzzleSocket)) {
-			ValidationErrors.Add(FText::FromString("socket was not found :" + BBInvadersUtils::muzzleSocket.ToString()));
+			ValidationErrors.Add(FText::FromString("socket was not found :" 
+				+ BBInvadersUtils::muzzleSocket.ToString()));
 		}
 	}
 	else {

@@ -37,32 +37,13 @@ void ABBInvadersGameModeBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	//ShrinkOrbits(DeltaTime);
+
 	/*check(localController.IsValid());
 	APawn* playerPawn{ localController->GetPawn() };
 	check(playerPawn);
 
-	for (decltype(orbits)::TIterator it{orbits.GetHead()}; it; ) {
-		if ((*it).IsValid()) {
-
-			//operate orbit
-			if (true) {
-				(*it)->SetRotationSpeed(true);
-			}
-
-			++it;
-		}
-		else {
-			auto* node{ it.GetNode()};
-			++it;
-			orbits.RemoveNode(node);
-		}
-	}
-	//shrink orbits
-	if (true) {
-		for (auto& orbit : orbits) {
-			orbit->Shrink(1.f);
-		}
-	}
+	
 	//A(x-x0) + B(y-y0) + C(z-z0) = 0
 	//A*x + B*y + C*z = A*x0 + B*y0 + C*z0
 	FVector gamePlaneNormal{ playerPawn->GetActorUpVector() };
@@ -161,6 +142,14 @@ EDataValidationResult ABBInvadersGameModeBase::IsDataValid(TArray<FText>& Valida
 		ValidationErrors.Add(FText::FromString("Invalid PlayerControllerClass"));
 	}
 
+	if (GameStateClass &&
+		GameStateClass->IsChildOf<ABBInvadersGameStateBase>()) {
+
+	}
+	else {
+		ValidationErrors.Add(FText::FromString("Invalid GameStateClass"));
+	}
+
 	if (PlayerStateClass &&
 		PlayerStateClass->IsChildOf<ABBInvadersPlayerState>()) {
 
@@ -172,12 +161,28 @@ EDataValidationResult ABBInvadersGameModeBase::IsDataValid(TArray<FText>& Valida
 	return ValidationErrors.Num() > 0 ?
 		EDataValidationResult::Invalid : EDataValidationResult::Valid;
 }
+
+
+void ABBInvadersGameModeBase::_SpawnNewAdvancedInvader() const
+{
+	check(SpawnNewAdvancedInvader());
+}
+
+void ABBInvadersGameModeBase::_SpawnNewAsteroid() const
+{
+	check(SpawnNewAsteroid());
+}
+
+void ABBInvadersGameModeBase::_SpawnNewOrbit()
+{
+	check(SpawnNewOrbit());
+}
 #endif
 
 void ABBInvadersGameModeBase::BeginPlay()
 {
-	RefreshGameState();
 	Super::BeginPlay();
+	RefreshGameState();
 	localController->GetBBInvadersHUD()->RequestBindings(*this);
 }
 
@@ -187,7 +192,7 @@ APawn* ABBInvadersGameModeBase::RefreshGameState()
 	APlayerPawn* pawn{ BBInvadersUtils::GetFirstActor<APlayerPawn>(world) };
 	check(world && pawn);
 
-	ABBInvadersGameStateBase* gameState{ GetGameState<ABBInvadersGameStateBase>() };
+	auto* gameState{ GetGameState<ABBInvadersGameStateBase>() };
 	gameState->SetMapInfo(*pawn, pawn->CalcMapHalfSize());
 	
 	if (AAsteroidTracker* tracker{ BBInvadersUtils::GetFirstActor<AAsteroidTracker>(world) }) {
@@ -212,62 +217,104 @@ FVector ABBInvadersGameModeBase::CalcRandOutOfBoundsPos(float objectRadius) cons
 AOrbit* ABBInvadersGameModeBase::SpawnNewOrbit(float additionalRadius)
 {
 	ABBInvadersGameStateBase* gameState{ GetGameState<ABBInvadersGameStateBase>() };
+	check(gameState);
+	const FPlayAreaInfo* mapInfo{ &gameState->mapInfo };
 
 	float newRadius{ orbits.Num() ?
 		orbits.GetTail()->GetValue()->GetOuterRadius() :
-		gameState->mapInfo.halfSize.Size2D()
+		mapInfo->halfSize.Size2D()
 	};
 
-	FActorSpawnParameters params;
-	params.Owner = this;
-	params.SpawnCollisionHandlingOverride = 
-		ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	FTransform newOrbitTransform{ 
+		FRotationMatrix::MakeFromXZ(mapInfo->forward, mapInfo->up).ToQuat(),
+		mapInfo->center };
 
-	//TODO
-	auto* newOrbit{ GetWorld()->SpawnActor<AOrbit>(gameState->mapInfo.center,
-		FRotationMatrix::MakeFromXZ(gameState->mapInfo.forward, gameState->mapInfo.up).Rotator(), 
-		params) };
+	auto* newOrbit{ GetWorld()->SpawnActorDeferred<AOrbit>(
+		AOrbit::StaticClass(), newOrbitTransform, nullptr, 
+		nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn) };
 
-	return nullptr;
+	newOrbit->InitWithInvaders(newRadius);
+
+	newOrbit->FinishSpawning(newOrbitTransform);
+	orbits.AddTail(TWeakObjectPtr<AOrbit>{newOrbit});
+	return newOrbit;
 }
 
 AAdvancedInvader* ABBInvadersGameModeBase::SpawnNewAdvancedInvader() const
 {	
-	UStaticMesh* mesh{ GetWorld()->GetSubsystem<UAssetProvider>()->invaderMesh };
+	UWorld* world{ GetWorld() };
+	const AActor* target{ GetGameState<ABBInvadersGameStateBase>()->GetCenter() };
+	//ensure?
+	check(world && target);
+
+	UStaticMesh* mesh{ world->GetSubsystem<UAssetProvider>()->GetInvaderMesh() };
 	FVector location{ CalcRandOutOfBoundsPos(mesh->GetBounds().GetSphere().W)};
 
-	FActorSpawnParameters params;
-	params.SpawnCollisionHandlingOverride =
-		ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	FTransform newInvaderTransform{ FRotator::ZeroRotator, location };
 
-	auto* newInvader{ GetWorld()->SpawnActor<AAdvancedInvader>(
-		location,
-		FRotator::ZeroRotator, params) };
+	auto* newInvader{ world->SpawnActorDeferred<AAdvancedInvader>(
+		AAdvancedInvader::StaticClass(), newInvaderTransform, nullptr,
+		nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn) };
 
 	newInvader->SetMesh(*mesh);
+	newInvader->SetTarget(*target);
+
+	newInvader->FinishSpawning(newInvaderTransform);
 	return newInvader;
 }
 
 AAsteroid* ABBInvadersGameModeBase::SpawnNewAsteroid() const
 {
-	auto* newAsteroid{ GetWorld()->SpawnActorDeferred<AAsteroid>(
-		AAsteroid::StaticClass(), FTransform::Identity,
-		nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn) };
+	UWorld* world{ GetWorld() };
+	const AActor* target{ GetGameState<ABBInvadersGameStateBase>()->GetCenter() };
+	//ensure?
+	check(world && target);
 
-	newAsteroid->SetSizeAssignMesh(static_cast<EAsteroidSize>(
-		FMath::RandRange(0, static_cast<int32>(EAsteroidSize::EAS_MAX) - 1)));
+	auto* newAsteroid{ world->SpawnActorDeferred<AAsteroid>(
+		AAsteroid::StaticClass(), FTransform::Identity, nullptr, 
+		nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn) };
 
-	FVector location{ CalcRandOutOfBoundsPos(newAsteroid->GetMeshRadius()) };
-	FRotator randomRotator{
-		BBInvadersUtils::RandomAngle(),
-		BBInvadersUtils::RandomAngle(),
-		BBInvadersUtils::RandomAngle()
-	};
+	auto* provider{ world->GetSubsystem<UAssetProvider>() };
+	check(provider);
+
+	newAsteroid->SetSizeAssignMesh(AAsteroid::RandomSize(), *provider);
+	newAsteroid->SetVelocity(*target);
+	newAsteroid->SetRotation();
 
 	newAsteroid->FinishSpawning(
-		{ randomRotator, location, FVector::OneVector }
-		, false);
-
+		{ BBInvadersUtils::RandomRotator(), 
+		CalcRandOutOfBoundsPos(newAsteroid->GetMeshRadius()), 
+		FVector::OneVector} , false);
 	return newAsteroid;
+}
+
+void ABBInvadersGameModeBase::ShrinkOrbits(float deltaTime)
+{
+	check(false);
+	//REDO
+	
+	for (decltype(orbits)::TIterator it{orbits.GetHead()}; it; ) {
+		if ((*it).IsValid() /*&& (*it)->GetInvadersNum()*/) {
+
+			AOrbit* operatedOrbit{ (*it).Get()};
+			check(operatedOrbit->GetInvadersNum());
+
+			//operate orbit
+			if (true) {
+				operatedOrbit->SetRotationSpeed(true);
+			}
+
+			//shrink orbit
+
+			operatedOrbit->Shrink(1.f);
+
+			++it;
+		}
+		else {
+			auto* node{ it.GetNode() };
+			++it;
+			orbits.RemoveNode(node);
+		}
+	}
 }
 

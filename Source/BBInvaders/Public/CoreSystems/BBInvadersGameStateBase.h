@@ -32,18 +32,26 @@ class BBINVADERS_API ABBInvadersGameStateBase : public AGameStateBase
 	GENERATED_BODY()
 
 public:
+	ABBInvadersGameStateBase();
 
-	FPlayAreaInfo GetMapInfo() const;
-	
 	FVector CalcRandOutOfBoundsPos(float objectRadius) const;
 
+	FPlayAreaInfo GetMapInfo() const;
+	const AActor* GetCenter() const;
+
+	float GetCurrentInflation() const;
+
 protected:
-	
+
 	FPlayAreaInfo mapInfo;
+	TWeakObjectPtr<const AActor> cachedCenter;
 
 	void SetMapInfo(const AActor& center, const FVector& halfSize);
 	void SetMapInfo(const FVector& center, const FVector& forward,
 		const FVector& up, const FVector& halfSize);
+
+	float currentInflation;
+
 
 	friend class ABBInvadersGameModeBase;
 };

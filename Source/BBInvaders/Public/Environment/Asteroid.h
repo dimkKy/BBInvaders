@@ -7,8 +7,10 @@
 #include "Environment/PlanetaryThreatable.h"
 #include "Asteroid.generated.h"
 
+
+//Get rid of _MAX?
 UENUM(BlueprintType)
-enum EAsteroidSize
+enum class EAsteroidSize : uint8
 {
 	EAS_Small,
 	EAS_Medium,
@@ -18,6 +20,7 @@ enum EAsteroidSize
 
 //class UInstancedStaticMeshComponent;
 class UStaticMeshComponent;
+class UAssetProvider;
 class UStaticMesh;
 
 UCLASS()
@@ -32,8 +35,17 @@ public:
 	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		//UInstancedStaticMeshComponent* asteroids;
 
-	void SetSizeAssignMesh(EAsteroidSize newSize);
-	void SetVelocity(float newVelocity);
+	static EAsteroidSize GetSmaller(EAsteroidSize _size);
+	static EAsteroidSize RandomSize();
+
+	void SetSizeAssignMesh(EAsteroidSize newSize, const UAssetProvider& provider);
+
+	void SetVelocity(const AActor& target);
+	void SetVelocity(const FVector& newVel);
+
+	void SetRotation();
+	void SetRotation(const FVector& rotAxis, float rotSpeed);
+
 	float GetMeshRadius() const;
 	
 	virtual float GetOnPlanetCollisionDamage() const override;
@@ -46,13 +58,21 @@ protected:
 			AActor* otherActor, UPrimitiveComponent* otherComp,
 			int32 otherIndex, bool bFromSweep, const FHitResult& result);
 
+	void Split();
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		UStaticMeshComponent* body;
 
 	EAsteroidSize size;
-	float currentVelocity;
+	FVector velocity;
+	//FVector rotationAxis;
+	FQuat rotationInfo;
+	//float rotationSpeed;
 
-	constexpr static float maxRotationDeviationHalfAngle = 40.f /** PI / 180.f*/;
-	constexpr static float maxSplitDeviationHalfAngle = 30.f /** PI / 180.f*/;
+
+	constexpr static float aimAngleAmplitude = 40.f /** PI / 180.f*/;
+	constexpr static float splitAngleAmplitude = 30.f /** PI / 180.f*/;
 	constexpr static float onHitVelocityMultiplier = 0.9f;
+	constexpr static std::pair<float, float> velocityRange = { 10.f, 200.f };
+	constexpr static std::pair<float, float> rotationSpeedRange = { 0.1f, 2.f };
 };

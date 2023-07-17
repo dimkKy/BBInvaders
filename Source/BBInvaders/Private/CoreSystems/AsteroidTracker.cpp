@@ -13,7 +13,7 @@ AAsteroidTracker::AAsteroidTracker() :
 
 	SetRootComponent(trackBox);
 	BBInvadersUtils::ConfigureDefaultCollision<true>(trackBox, ECC_WorldStatic,
-		BBInvadersUtils::ECC_Asteroid, BBInvadersUtils::ECC_Projectile);
+		BBInvadersUtils::ECC_Asteroid/*, BBInvadersUtils::ECC_Projectile*/);
 }
 
 void AAsteroidTracker::SetTrackArea(const FTransform& transform, const FVector& halfSize)
@@ -37,10 +37,23 @@ void AAsteroidTracker::BeginPlay()
 void AAsteroidTracker::OnOverlapEnd(UPrimitiveComponent* comp, AActor* other,
 	UPrimitiveComponent* otherComp, int32 otherBodyIndex)
 {
-	check(!other->IsA(AAsteroid::StaticClass()));
+	if (other->IsA(AAsteroid::StaticClass())) {
+		FVector otherLocation{ other->GetActorLocation() };
+		FVector toOther{ otherLocation - GetActorLocation() };
 
-	FVector thisLocation{ GetActorLocation() };
-	FVector otherRelativeLocation{ other->GetActorLocation() - thisLocation };
+		FVector projectForward{ toOther.ProjectOnTo(GetActorForwardVector()) };
+		FVector projectRight{ toOther.ProjectOnTo(GetActorRightVector()) };
+		FVector areaSize{ trackBox->GetScaledBoxExtent() };
 
-	other->SetActorLocation(thisLocation - otherRelativeLocation);
+		FVector halfCorrection{ 0.f };
+
+		if (projectForward.SizeSquared() >= areaSize.X * areaSize.X) {
+			halfCorrection += projectForward;
+		}
+		if (projectRight.SizeSquared() >= areaSize.Y * areaSize.Y) {
+			halfCorrection += projectRight;
+		}
+
+		other->SetActorLocation(otherLocation - 2 * halfCorrection);
+	}
 }

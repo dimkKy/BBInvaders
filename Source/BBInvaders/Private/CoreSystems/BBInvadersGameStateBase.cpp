@@ -5,9 +5,20 @@
 #include "BBInvadersUtils.h"
 
 
+ABBInvadersGameStateBase::ABBInvadersGameStateBase() :
+    mapInfo{}, cachedCenter{ nullptr }, currentInflation{ 1.f }
+{
+
+}
+
 FPlayAreaInfo ABBInvadersGameStateBase::GetMapInfo() const
 {
     return mapInfo;
+}
+
+const AActor* ABBInvadersGameStateBase::GetCenter() const
+{
+    return cachedCenter.Get();
 }
 
 FVector ABBInvadersGameStateBase::CalcRandOutOfBoundsPos(float objectRadius) const
@@ -19,8 +30,16 @@ FVector ABBInvadersGameStateBase::CalcRandOutOfBoundsPos(float objectRadius) con
         * mapInfo.halfSize.Size2D() + objectRadius;
 }
 
+float ABBInvadersGameStateBase::GetCurrentInflation() const
+{
+    return currentInflation;
+}
+
 void ABBInvadersGameStateBase::SetMapInfo(const AActor& center, const FVector& halfSize)
 {
+    check(IsValid(&center));
+    cachedCenter = MakeWeakObjectPtr(&center);
+
     return SetMapInfo(center.GetActorLocation(), 
         center.GetActorForwardVector(), center.GetActorUpVector(), halfSize);
 }

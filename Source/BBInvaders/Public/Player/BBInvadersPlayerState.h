@@ -9,6 +9,30 @@
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnMoneyCountChanged, int32);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnApprovalRatingChanged, int32);
 
+class UFactoryInfoBase;
+
+struct FFactoryInstanceInfo 
+{
+public:
+	FFactoryInstanceInfo(const UFactoryInfoBase& i);
+
+	const UFactoryInfoBase& GetFactoryInfo() const;
+	bool IsUnderConstruction() const;
+	float GetBuildingTimeLeft() const;
+	int32 GetTier() const;
+
+	float StartUpgrading();
+	float ProceedUpgrading(float deltaTime);
+
+protected:
+	void FinishConstruction();
+
+	const UFactoryInfoBase& info;
+	int32 tier;
+	bool bIsUnderConstruction;
+	float buildingTimeLeft;
+};
+
 /**
  * 
  */
@@ -23,8 +47,8 @@ public:
 	int32 GetMoneyCount() const;
 	float GetApprovalRating() const;
 
-	FOnMoneyCountChanged moneyChangetEvent;
-	FOnApprovalRatingChanged ratingChangetEvent;
+	FOnMoneyCountChanged moneyChangedEvent;
+	FOnApprovalRatingChanged ratingChangedEvent;
 
 protected:
 
@@ -34,5 +58,9 @@ protected:
 	void ChangeMoneyCount(int32 term);
 	void ChangeApprovalRating(float term);
 
+	TArray<TArray<FFactoryInstanceInfo>> factories;
+
 	friend class ABBInvadersGameModeBase;
+
+
 };

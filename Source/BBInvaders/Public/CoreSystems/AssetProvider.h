@@ -11,28 +11,33 @@
 class ABBInvadersProjectile;
 
 /**
- * 
+ * TO ASSET MANAGER!
  */
 UCLASS(Blueprintable)
 class BBINVADERS_API UAssetProvider : public UWorldSubsystem
 {
 	GENERATED_BODY()
 public:
-	//UAssetProvider();
 	virtual bool ShouldCreateSubsystem(UObject* Outer) const override;
+
+	UStaticMesh* GetAsteroidMesh(EAsteroidSize size) const;
+	UStaticMesh* GetInvaderMesh() const;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 		TSubclassOf<ABBInvadersProjectile> projectileClass;
 	//TSoftClassPtr<ABBInvadersProjectile> projectileClass;
 
-	UPROPERTY(EditDefaultsOnly)
-		UStaticMesh* asteroidMeshes[EAS_MAX];
-	//TSoftObjectPtr<UStaticMesh> asteroidMeshes[EAS_MAX];
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-		UStaticMesh* invaderMesh;
+	
 
 #if WITH_EDITOR
 	virtual EDataValidationResult IsDataValid(TArray<FText>& ValidationErrors) override;
 #endif
+
+protected:
+	UPROPERTY(EditDefaultsOnly)
+		UStaticMesh* asteroidMeshes[static_cast<int32>(EAsteroidSize::EAS_MAX)];
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+		TSoftObjectPtr<UStaticMesh> invaderMesh;
 };

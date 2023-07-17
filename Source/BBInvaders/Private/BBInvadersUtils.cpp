@@ -24,6 +24,16 @@ float BBInvadersUtils::RandomAngle()
 	return FMath::FRandRange(-180.f, 180.f);
 }
 
+FRotator BBInvadersUtils::RandomRotator()
+{
+	return { RandomAngle(), RandomAngle(), RandomAngle() };
+}
+
+float BBInvadersUtils::RandAbsRange(float absMax)
+{
+	return FMath::RandRange(-1.f * absMax, absMax);
+}
+
 /*void BBInvadersUtils::SetupButtons(ChildOf<UObject> auto* object, UButton* button, TFunction<void(void)> onClickedFunc)
 {
 	check(button);
