@@ -4,6 +4,19 @@
 #include "CoreSystems/BBInvadersGameStateBase.h"
 #include "BBInvadersUtils.h"
 
+FPlayAreaInfo::FPlayAreaInfo() :
+    center{ 0.f }, forward{ 0.f },
+    up{ 0.f }, halfSize{ 0.f }
+{
+
+}
+
+FPlayAreaInfo::operator bool() const
+{
+    return !halfSize.IsZero();
+}
+
+//---------
 
 ABBInvadersGameStateBase::ABBInvadersGameStateBase() :
     mapInfo{}, cachedCenter{ nullptr }, currentInflation{ 1.f }
@@ -27,7 +40,7 @@ FVector ABBInvadersGameStateBase::CalcRandOutOfBoundsPos(float objectRadius) con
     
     float angle{ BBInvadersUtils::RandomAngle() };
     return mapInfo.forward.RotateAngleAxis(angle, mapInfo.up).GetSafeNormal()
-        * mapInfo.halfSize.Size2D() + objectRadius;
+        * (mapInfo.halfSize.Size2D() + objectRadius);
 }
 
 float ABBInvadersGameStateBase::GetCurrentInflation() const
@@ -52,3 +65,4 @@ void ABBInvadersGameStateBase::SetMapInfo(
     mapInfo.up = up;
     mapInfo.halfSize = halfSize;
 }
+

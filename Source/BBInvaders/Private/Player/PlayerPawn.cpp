@@ -34,7 +34,7 @@ APlayerPawn::APlayerPawn() :
 		BBInvadersUtils::ECC_Invader);
 	//
 	cameraArm->SetupAttachment(planet);
-	cameraArm->SetRelativeRotation(BBInvadersUtils::UpRotator);
+	cameraArm->SetRelativeRotation(BBInvadersUtils::UpRotation);
 	cameraArm->TargetArmLength = 300.f;
 	cameraArm->bDoCollisionTest = false;
 	cameraArm->SetCanEverAffectNavigation(false);

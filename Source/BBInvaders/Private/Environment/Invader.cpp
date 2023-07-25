@@ -68,6 +68,13 @@ void AInvader::BeginPlay()
 	body->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnOverlapBegin);
 }
 
+void AInvader::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	onDestroyedDelegate.ExecuteIfBound(this);
+	onDestroyedDelegate.Unbind();
+	Super::EndPlay(EndPlayReason);
+}
+
 void AInvader::OnOverlapBegin(UPrimitiveComponent* component, AActor* otherActor,
 	UPrimitiveComponent* otherComp, int32 otherIndex, bool bFromSweep, const FHitResult& result)
 {

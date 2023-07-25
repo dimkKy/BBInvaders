@@ -10,22 +10,13 @@ class USpringArmComponent;
 
 struct FTargetInfo 
 {
-	FTargetInfo() :
-		bAimed{ false },
-		location{}, 
-		up{} {};
 	bool bAimed;
 	FVector location;
 	FVector up;
 
-	void SetTarget(const AActor& actor) {
-		bAimed = true;
-		location = actor.GetActorLocation();
-		up = actor.GetActorUpVector();
-
-	}
-	explicit operator bool() const
-		{ return bAimed; }
+	FTargetInfo();
+	void SetTarget(const AActor& actor);
+	explicit operator bool() const;
 };
 
 /**

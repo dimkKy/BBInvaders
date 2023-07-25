@@ -30,12 +30,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 		UStaticMeshComponent* body;
 
-	//UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-		//float speed = 315.f;
-
-	//UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-		//bool bIsHoming = false;
-
 	static constexpr float lifespan = 40.f;
 	static constexpr int32 simulationInteractions = 3;
 

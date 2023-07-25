@@ -12,6 +12,8 @@ class UStaticMesh;
 class ABBInvadersProjectile;
 class APlayerPawn;
 
+DECLARE_DELEGATE_OneParam(FNotifyInvaderDestroyed, AInvader*);
+
 UCLASS()
 class BBINVADERS_API AInvader : public AActor, public IPlanetaryThreatable
 {
@@ -29,11 +31,14 @@ public:
 
 	virtual int32 GetOnKillBounty() const;
 
+	FNotifyInvaderDestroyed onDestroyedDelegate;
+
 #if WITH_EDITOR
 	virtual EDataValidationResult IsDataValid(TArray<FText>& ValidationErrors) override;
 #endif
 protected:
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	UFUNCTION()
 		void OnOverlapBegin(UPrimitiveComponent* component,

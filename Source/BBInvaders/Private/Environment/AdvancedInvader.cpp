@@ -7,6 +7,26 @@
 #include "BBInvadersUtils.h"
 #include "GameFramework/SpringArmComponent.h"
 
+FTargetInfo::FTargetInfo() :
+	bAimed{ false }, location{}, up{}
+{
+
+}
+
+void FTargetInfo::SetTarget(const AActor& actor)
+{
+	bAimed = true;
+	location = actor.GetActorLocation();
+	up = actor.GetActorUpVector();
+}
+
+FTargetInfo::operator bool() const
+{
+	return bAimed;
+}
+
+//---------
+
 AAdvancedInvader::AAdvancedInvader() :
 	//orbit{ CreateDefaultSubobject<USpringArmComponent>("platformArm") },
 	rotationSpeed{ 0.f }, descensionSpeed{ 0.f }, 
@@ -89,3 +109,5 @@ void AAdvancedInvader::RotateMoveToTarget(float deltatime/* = 0.f*/)
 	RootComponent->SetWorldLocationAndRotation(target.location + newToThis, 
 		FRotationMatrix::MakeFromX(newToThis * -1.f).Rotator().Quaternion());
 }
+
+

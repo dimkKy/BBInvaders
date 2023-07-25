@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-//#include <array>
 #include "Orbit.generated.h"
 
 class USplineComponent;
@@ -23,6 +22,8 @@ class AInvader;
 	}
 }*/
 
+
+// Rewrite as independent carrier
 UCLASS()
 class BBINVADERS_API AOrbit : public AActor
 {
@@ -40,13 +41,20 @@ public:
 
 	UE_NODISCARD static int CalcMaxInvadersNum(float invaderRadius, float orbitRadius);
 
-	UE_NODISCARD float GetOuterRadius() const;
+	UE_NODISCARD float GetOuterRadius(float offsetMultiplier = 2.f) const;
 	UE_NODISCARD int GetInvadersNum() const;
 	
 	void Shoot();
 protected:
 	virtual void BeginPlay() override;
-	
+
+	UFUNCTION()
+		void OnInvaderDestroyed(AInvader* invader);
+
+	UPROPERTY(EditInstanceOnly, BlueprintReadWrite)
+		USceneComponent* body;
+
+	//do I need rotator?
 	UPROPERTY(EditInstanceOnly, BlueprintReadWrite)
 		URotatingMovementComponent* rotator;
 
@@ -59,37 +67,14 @@ protected:
 		float invaderRadius;
 
 	static float shrinkingSpeed;
+	static float shrinkingStartDelay;
+
 
 	float minRadius;
 	static constexpr int32 splineCount = 3;
 
-	//template<int size = splineCount>
-	//static std::array<FVector2D, size> CalculateRadiusVectors_Static();
+	static TArray<FVector> CalcRadiusVectors(int32 size, float length = 1.f, float offsetAngle = 0.f);
 
-	static TArray<FVector> CalcRadiusVectors(int32 size, float length = 1.f);
-
-	//static const std::array<FVector2D, splineCount> orbitPointsRadiusVectors;
-
-	//static constexpr std::array<std::pair<float, float>, splineCount>
-		//orbitPointsRadiusVectors = OrbitHelper::CalculateRadiusVectors_Static<splineCount>();
-	/*UPROPERTY(EditInstanceOnly, BlueprintReadWrite )
-		USplineComponent* spline;*/
-	
-	//static constexpr float maxShrinkingSpeed = 65.f;
-
-	static constexpr float maxRotationSpeed = 65.f;
-	static constexpr std::pair<float, int> invaderNumLimit = {0.05f, 62};
-	//USplineComponent* splines[splineCount];
+	static constexpr float maxRotationSpeed = 25.f;
+	static constexpr std::pair<float, int> invaderNumLimit = {0.1f, 32};
 };
-
-/*template<int size>
-inline std::array<FVector2D, size> AOrbit::CalculateRadiusVectors_Static(){
-	static_assert(size >= 3, "at least 3 points");
-	std::array<FVector2D, size> out;
-	//FMath::si
-	const float angle = PI * 2 / size;
-	for (SIZE_T i{ 0 }; i < size; ++i) {
-		out[i] = { FMath::Sin(angle * i), FMath::Cos(angle * i) };
-	}
-	return out;
-}*/

@@ -8,7 +8,7 @@
 #include "Player/BBInvadersPlayerState.h"
 #include "BBInvadersUtils.h"
 #include "Player/MainMenuPawn.h"
-#include "CoreSystems/AsteroidTracker.h"
+#include "CoreSystems/OutOfAreaActorTracker.h"
 #include "CoreSystems/BBInvadersProjectile.h"
 #include "CoreSystems/BBInvadersGameStateBase.h"
 #include "Environment/Invader.h"
@@ -85,8 +85,8 @@ void ABBInvadersGameModeBase::GoToMainMenu()
 	localController->Possess(menuPawn);
 	SetActorTickEnabled(false);
 
-	BBInvadersUtils::ForActorsOfClass
-		<AInvader, AOrbit, AAsteroid, ABBInvadersProjectile>
+	BBInvadersUtils::ForActorsOfClass<
+		AInvader, AOrbit, AAsteroid, ABBInvadersProjectile>
 		(world, [](AActor* actor) {actor->Destroy(); });
 }
 
@@ -194,18 +194,22 @@ APawn* ABBInvadersGameModeBase::RefreshGameState()
 
 	auto* gameState{ GetGameState<ABBInvadersGameStateBase>() };
 	gameState->SetMapInfo(*pawn, pawn->CalcMapHalfSize());
-	
-	if (AAsteroidTracker* tracker{ BBInvadersUtils::GetFirstActor<AAsteroidTracker>(world) }) {
+
+	AOutOfAreaActorTracker* tracker{ 
+		BBInvadersUtils::GetFirstActor<AOutOfAreaActorTracker>(world) };
+
+	if (tracker) {
 		tracker->SetTrackArea(pawn->GetActorTransform(), gameState->mapInfo.halfSize);
 	}
 	else {
 		FActorSpawnParameters params;
-		params.SpawnCollisionHandlingOverride = 
+		params.SpawnCollisionHandlingOverride =
 			ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-		world->SpawnActor<AAsteroidTracker>(
-			AAsteroidTracker::StaticClass(), pawn->GetActorTransform(), params);
+		tracker = world->SpawnActor<AOutOfAreaActorTracker>(
+			AOutOfAreaActorTracker::StaticClass(), pawn->GetActorTransform(), params);
 	}
+	
 	return pawn;
 }
 
@@ -220,10 +224,10 @@ AOrbit* ABBInvadersGameModeBase::SpawnNewOrbit(float additionalRadius)
 	check(gameState);
 	const FPlayAreaInfo* mapInfo{ &gameState->mapInfo };
 
-	float newRadius{ orbits.Num() ?
-		orbits.GetTail()->GetValue()->GetOuterRadius() :
-		mapInfo->halfSize.Size2D()
-	};
+	AOrbit* outermostOrbit{ ProcessCheckOrbits() };
+
+	float newRadius{ outermostOrbit ?
+		outermostOrbit->GetOuterRadius() : mapInfo->halfSize.Size2D() };
 
 	FTransform newOrbitTransform{ 
 		FRotationMatrix::MakeFromXZ(mapInfo->forward, mapInfo->up).ToQuat(),
@@ -234,6 +238,7 @@ AOrbit* ABBInvadersGameModeBase::SpawnNewOrbit(float additionalRadius)
 		nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn) };
 
 	newOrbit->InitWithInvaders(newRadius);
+	newOrbit->SetRotationSpeed(true);
 
 	newOrbit->FinishSpawning(newOrbitTransform);
 	orbits.AddTail(TWeakObjectPtr<AOrbit>{newOrbit});
@@ -278,35 +283,43 @@ AAsteroid* ABBInvadersGameModeBase::SpawnNewAsteroid() const
 	check(provider);
 
 	newAsteroid->SetSizeAssignMesh(AAsteroid::RandomSize(), *provider);
-	newAsteroid->SetVelocity(*target);
+	
 	newAsteroid->SetRotation();
 
 	newAsteroid->FinishSpawning(
 		{ BBInvadersUtils::RandomRotator(), 
 		CalcRandOutOfBoundsPos(newAsteroid->GetMeshRadius()), 
 		FVector::OneVector} , false);
+
+	newAsteroid->SetVelocity(*target);
+
 	return newAsteroid;
 }
 
-void ABBInvadersGameModeBase::ShrinkOrbits(float deltaTime)
+AOrbit* ABBInvadersGameModeBase::ProcessCheckOrbits()
 {
-	check(false);
-	//REDO
-	
 	for (decltype(orbits)::TIterator it{orbits.GetHead()}; it; ) {
 		if ((*it).IsValid() /*&& (*it)->GetInvadersNum()*/) {
+			++it;
+		}
+		else {
+			auto* node{ it.GetNode() };
+			++it;
+			orbits.RemoveNode(node);
+		}
+	}
 
-			AOrbit* operatedOrbit{ (*it).Get()};
-			check(operatedOrbit->GetInvadersNum());
+	return orbits.Num() ?
+		orbits.GetTail()->GetValue().Get() :
+		nullptr;
+}
 
-			//operate orbit
-			if (true) {
-				operatedOrbit->SetRotationSpeed(true);
-			}
+AOrbit* ABBInvadersGameModeBase::ProcessCheckOrbits(std::function<void(AOrbit&)> func)
+{
+	for (decltype(orbits)::TIterator it{orbits.GetHead()}; it; ) {
+		if (TWeakObjectPtr<AOrbit> weakP{ (*it) }; weakP.IsValid() /*&& (*it)->GetInvadersNum()*/) {
 
-			//shrink orbit
-
-			operatedOrbit->Shrink(1.f);
+			func(*weakP.Get());
 
 			++it;
 		}
@@ -316,5 +329,9 @@ void ABBInvadersGameModeBase::ShrinkOrbits(float deltaTime)
 			orbits.RemoveNode(node);
 		}
 	}
+
+	return orbits.Num() ?
+		orbits.GetTail()->GetValue().Get() :
+		nullptr;
 }
 

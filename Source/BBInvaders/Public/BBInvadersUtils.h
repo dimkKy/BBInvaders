@@ -75,9 +75,9 @@ namespace BBInvadersUtils {
 	//Util to generate a random number in a range between -max and max
 	float RandAbsRange(float absMax);
 
-	const FRotator UpRotator = { -90.f, 0.f, 0.f };
-	const FRotator BehindRotator = { 0.f, 180.f, 0.f };
-	const FRotator unitRotator = { 0.f, 1.f, 0.f };
+	const FRotator UpRotation = { -90.f, 0.f, 0.f };
+	const FRotator BehindRotation = { 0.f, 180.f, 0.f };
+	const FRotator unitRotation = { 0.f, 1.f, 0.f };
 
 	const FName muzzleSocket = "Muzzle";
 }

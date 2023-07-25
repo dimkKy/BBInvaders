@@ -14,9 +14,6 @@ ABBInvadersProjectile::ABBInvadersProjectile() :
 
 	SetRootComponent(body);
 
-	//movement->ComputeHomingAcceleration
-	//body->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-
 	BBInvadersUtils::ConfigureDefaultCollision<true>
 		(body, BBInvadersUtils::ECC_Projectile,
 		BBInvadersUtils::ECC_Asteroid, ECC_Pawn, 

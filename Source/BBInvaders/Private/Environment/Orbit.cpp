@@ -9,31 +9,28 @@
 #include "Environment/Invader.h"
 #include "CoreSystems/AssetProvider.h"
 
-//const std::array<FVector2D, AOrbit::splineCount> 
-	//AOrbit::orbitPointsRadiusVectors = AOrbit::CalculateRadiusVectors_Static();
-
-float AOrbit::shrinkingSpeed = 0.f;
+float AOrbit::shrinkingSpeed = 100.f;
+float AOrbit::shrinkingStartDelay = 3.f;
 
 AOrbit::AOrbit() :
+	body{ CreateDefaultSubobject<USceneComponent>("body") },
 	rotator{ CreateDefaultSubobject<URotatingMovementComponent>("rotator") },
 	//invaders{ CreateDefaultSubobject<UHierarchicalInstancedStaticMeshComponent>("invaders") },
-	//spline{ CreateDefaultSubobject<USplineComponent>("spline") },
 	radius{ 100.f }, invaderRadius{ 0.f }, minRadius { radius }
 {
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = false;
 
+	SetRootComponent(body);
+
 	rotator->bUpdateOnlyIfRendered = true;
 	rotator->RotationRate = FRotator::ZeroRotator;
-
-
+	rotator->SetUpdatedComponent(body);
+	
 	//invaders->bMultiBodyOverlap = true;
 	//invaders->SetCollisionObjectType(BBInvadersUtils::ECC_Invader);
 	//invaders->SetCollisionObjectType
 	//invaders->UpdateInstanceTransform
-
-	//spline->SetClosedLoop(true, false);
-	//spline->UpdateSpline();
 }
 
 void AOrbit::Tick(float DeltaTime)
@@ -45,19 +42,34 @@ void AOrbit::Tick(float DeltaTime)
 void AOrbit::BeginPlay()
 {
 	Super::BeginPlay();
+	FTimerHandle handle;
+	GetWorld()->GetTimerManager().SetTimer(handle, FTimerDelegate{ 
+		FTimerDelegate::CreateUObject(this, &AOrbit::SetActorTickEnabled, true) },
+		shrinkingStartDelay, false);
+
 	check(invaders.Num());
 }
 
-TArray<FVector> AOrbit::CalcRadiusVectors(int32 size, float length/* = 1.f*/)
+void AOrbit::OnInvaderDestroyed(AInvader* invader)
+{
+	check(invaders.Remove(invader) == 1);
+
+	if (invaders.Num() < 1) {
+		Destroy();
+		SetActorTickEnabled(false);
+	}
+}
+
+TArray<FVector> AOrbit::CalcRadiusVectors(int32 size, float length, float offsetAngle)
 {
 	check(size > 0);
 
 	TArray<FVector> out;
 	out.Reserve(size);
-
-	const float angle{ 2 * PI / size };
+	const float angle{ 2.f * PI / size };
 	for (SIZE_T i{ 0 }; i < size; ++i) {
-		out.Emplace(FMath::Sin(angle * i), FMath::Cos(angle * i), 0.f);
+		out.Emplace(FMath::Sin(angle * i + offsetAngle), 
+			FMath::Cos(angle * i + offsetAngle), 0.f);
 		out.Last() *= length;
 	}
 	return out;
@@ -66,11 +78,11 @@ TArray<FVector> AOrbit::CalcRadiusVectors(int32 size, float length/* = 1.f*/)
 void AOrbit::SetRotationSpeed(bool bRandom, float speed)
 {
 	if (bRandom) {
-		rotator->RotationRate = BBInvadersUtils::unitRotator *
+		rotator->RotationRate = BBInvadersUtils::unitRotation *
 			FMath::RandRange(0.f, maxRotationSpeed);
 	}
 	else {
-		rotator->RotationRate = BBInvadersUtils::unitRotator * 
+		rotator->RotationRate = BBInvadersUtils::unitRotation * 
 			FMath::Clamp(speed, -1.f * maxRotationSpeed, maxRotationSpeed);
 	}
 }
@@ -89,18 +101,15 @@ void AOrbit::Shrink(float distance)
 		radius = minRadius;
 	}
 
-	for (auto& invader : invaders) {
-		invader->AddActorLocalOffset(FVector::ForwardVector * (oldRadius - radius));
+	for (auto& inv : invaders) {
+		inv->AddActorLocalOffset(FVector::ForwardVector * (oldRadius - radius), true);
 	}
-
-	//invaders.RemoveSingle()
-	
 }
 
 void AOrbit::InitWithInvaders(float newRadius, bool bAdjustRadius/* = true*/)
 {
 	auto* world{ GetWorld() };
-	check(world && newRadius > 0);
+	check(world && newRadius > 0.f);
 	check(invaders.Num() == 0);
 
 	UStaticMesh* invaderMesh{ world->GetSubsystem<UAssetProvider>()->GetInvaderMesh()};
@@ -113,7 +122,8 @@ void AOrbit::InitWithInvaders(float newRadius, bool bAdjustRadius/* = true*/)
 	int32 newInvaderCount{ FMath::RandRange(1, 
 		CalcMaxInvadersNum(invaderRadius, radius)) };
 
-	auto radiusVectors{ CalcRadiusVectors(newInvaderCount, radius) };
+	auto radiusVectors{ CalcRadiusVectors(
+		newInvaderCount, radius, FMath::RandRange(0.f, PI)) };
 
 	FActorSpawnParameters spawnParams;
 	spawnParams.Owner = this;
@@ -138,6 +148,7 @@ void AOrbit::InitWithInvaders(float newRadius, bool bAdjustRadius/* = true*/)
 
 		invader->SetMesh(*invaderMesh);
 		invader->AttachToActor(this, FAttachmentTransformRules::KeepRelativeTransform);
+		invader->onDestroyedDelegate.BindUObject(this, &AOrbit::OnInvaderDestroyed);
 
 		invaders.Add(invader);
 	}
@@ -159,23 +170,14 @@ int AOrbit::CalcMaxInvadersNum(float invaderRadius, float orbitRadius)
 			return invaderNumLimit.second;
 		}
 		else {
-			return 2 * PI / FMath::Acos(1.f - 2 * FMath::Square(ratio));
+			return 2 * PI / FMath::Acos(1.f - 2.f * FMath::Square(ratio));
 		}
 	}
 }
 
-float AOrbit::GetOuterRadius() const
+float AOrbit::GetOuterRadius(float offsetMultiplier/* = 2.f*/) const
 {
-	/*if (invaders.Num()) {
-		check(false);
-		return radius;
-	}
-	else {
-		//return radius + invaders[0]->GetStaticMesh()->GetBounds().GetSphere().W;
-		return radius + GetWorld()->GetSubsystem<UAssetProvider>()
-			->invaderMesh->GetBounds().GetSphere().W;
-	}*/
-	return radius + invaderRadius;
+	return radius + invaderRadius * offsetMultiplier;
 }
 
 int AOrbit::GetInvadersNum() const

@@ -4,17 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+#include <functional>
 #include "BBInvadersGameModeBase.generated.h"
 
 class ABBInvadersPlayerController;
-class AOrbit;
 class AAdvancedInvader;
+class AOrbit;
 class AAsteroid;
 class APawn;
-class ABBInvadersGameStateBase;
 
 /**
- * TO BE REFACTORED (GAS?)
+ * TO BE REFACTORED
  */
 UCLASS()
 class BBINVADERS_API ABBInvadersGameModeBase : public AGameModeBase
@@ -55,11 +55,12 @@ protected:
 	UE_NODISCARD AOrbit* SpawnNewOrbit(float additionalRadius = 0.f);
 	UE_NODISCARD AAdvancedInvader* SpawnNewAdvancedInvader() const;
 	UE_NODISCARD AAsteroid* SpawnNewAsteroid() const;
-	
-	void ShrinkOrbits(float deltaTime);
 
 	TWeakObjectPtr<ABBInvadersPlayerController> localController;
 	TDoubleLinkedList<TWeakObjectPtr<AOrbit>> orbits;
+
+	AOrbit* ProcessCheckOrbits();
+	AOrbit* ProcessCheckOrbits(std::function<void(AOrbit&)> func);
 
 	static constexpr int32 maxOrbits = 5;
 };

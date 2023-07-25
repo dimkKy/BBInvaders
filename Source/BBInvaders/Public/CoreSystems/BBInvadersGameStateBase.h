@@ -7,20 +7,13 @@
 #include "BBInvadersGameStateBase.generated.h"
 
 struct FPlayAreaInfo {	
-
 	FVector center;
 	FVector forward;
 	FVector up;
 	FVector halfSize;
 
-	FPlayAreaInfo() :
-		center{ 0.f }, forward{ 0.f },
-		up{ 0.f }, halfSize{ 0.f } {};
-
-	explicit operator bool() const
-	{
-		return !halfSize.IsZero();
-	}
+	FPlayAreaInfo();
+	explicit operator bool() const;
 };
 
 /**

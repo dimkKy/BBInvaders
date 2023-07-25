@@ -9,14 +9,13 @@
 
 AAsteroid::AAsteroid() :
 	body{CreateDefaultSubobject<UStaticMeshComponent>("body")},
-	size{ EAsteroidSize::EAS_MAX }, velocity{0.f}, 
-	rotationInfo{EForceInit::ForceInitToZero}
+	size{ EAsteroidSize::EAS_MAX }, velocity{ 0.f }
 {
 	PrimaryActorTick.bCanEverTick = true;
 	SetRootComponent(body);
 
 	BBInvadersUtils::ConfigureDefaultCollision<true>(body, BBInvadersUtils::ECC_Asteroid,
-		ECC_WorldStatic, BBInvadersUtils::ECC_Projectile);
+		ECC_WorldStatic, BBInvadersUtils::ECC_Projectile, ECC_WorldDynamic, ECC_Pawn);
 
 	//asteroids->bMultiBodyOverlap = true;
 }
@@ -51,14 +50,11 @@ void AAsteroid::SetSizeAssignMesh(EAsteroidSize newSize, const UAssetProvider& p
 
 void AAsteroid::SetVelocity(const AActor& target)
 {
-	//FVector targetLocation{ playerPawn->GetActorLocation() };
-	FVector toTarget{ target.GetActorLocation() - RootComponent->GetRelativeLocation()};
+	FVector toTarget{ target.GetActorLocation() - RootComponent->GetRelativeLocation() };
 
-	
-	//TODO
 	velocity = toTarget.GetSafeNormal().RotateAngleAxis(
-		FMath::RandRange(-aimAngleAmplitude, aimAngleAmplitude), 
-		target.GetActorUpVector()) * 1.f;
+		FMath::RandRange(-aimAngleAmplitude, aimAngleAmplitude), target.GetActorUpVector()) * 
+		FMath::RandRange(velocityRange.first, velocityRange.second);
 }
 
 void AAsteroid::SetVelocity(const FVector& newVel)
@@ -68,19 +64,13 @@ void AAsteroid::SetVelocity(const FVector& newVel)
 
 void AAsteroid::SetRotation()
 {
-	//TODO
-	check(false);
+	//TODO WITH MATERIAL
 }
 
 void AAsteroid::SetRotation(const FVector& rotAxis, float rotSpeed)
 {
-	rotationInfo = FQuat::FQuat(rotAxis.GetSafeNormal(), rotSpeed);
+	//TODO WITH MATERIAL
 }
-
-/*void AAsteroid::SetVelocity(float newVelocity)
-{
-	currentVelocity = newVelocity;
-}*/
 
 float AAsteroid::GetMeshRadius() const
 {
@@ -175,28 +165,13 @@ void AAsteroid::Split()
 	newAsteroid->SetSizeAssignMesh(newSize, *provider);
 	//newAsteroid->SetVelocity(velocity)
 	newAsteroid->FinishSpawning(newAsteroidTransform, true);
-
-	//FRotator rotation {}
-
-
 }
 
 void AAsteroid::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	/*const FQuat CurRelRotQuat = 
-		RootComponent->GetRelativeRotationCache().RotatorToQuat(RootComponent->GetRelativeRotation());*/
-	
-	/*const FQuat NewRelRotQuat{ 
-		RootComponent->GetRelativeRotation().Quaternion() *
-		FQuat{ rotationAxis, rotationSpeed * DeltaTime } };*/
-
-	const FQuat NewRelRotQuat{
-		RootComponent->GetRelativeRotation().Quaternion() *
-		FQuat { rotationInfo.X, rotationInfo.Y, rotationInfo.Z, rotationInfo.W * DeltaTime } };
-	
 	RootComponent->SetWorldLocationAndRotation(
 		RootComponent->GetRelativeLocation() + velocity * DeltaTime,
-		NewRelRotQuat);
+		RootComponent->GetRelativeRotation(), true);
 }
