@@ -38,11 +38,11 @@ public:
 #if WITH_EDITOR
 	virtual EDataValidationResult IsDataValid(TArray<FText>& ValidationErrors) override;
 
-	UFUNCTION(CallInEditor, BlueprintCallable, Category = "Debug", meta = (DevelopmentOnly))
+	UFUNCTION(CallInEditor, Category = "Debug", meta = (DevelopmentOnly))
 		void _SpawnNewAdvancedInvader() const;
-	UFUNCTION(CallInEditor, BlueprintCallable, Category = "Debug", meta = (DevelopmentOnly))
+	UFUNCTION(CallInEditor, Category = "Debug", meta = (DevelopmentOnly))
 		void _SpawnNewAsteroid() const;
-	UFUNCTION(CallInEditor, BlueprintCallable, Category = "Debug", meta = (DevelopmentOnly))
+	UFUNCTION(CallInEditor, Category = "Debug", meta = (DevelopmentOnly))
 		void _SpawnNewOrbit();
 
 #endif // WITH_EDITOR
@@ -62,6 +62,6 @@ protected:
 	AOrbit* ProcessCheckOrbits();
 	AOrbit* ProcessCheckOrbits(std::function<void(AOrbit&)> func);
 
-	static constexpr int32 maxOrbits = 5;
+	static constexpr int32 maxOrbits{ 5 };
 };
 

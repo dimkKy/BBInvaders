@@ -65,15 +65,15 @@ protected:
 	FVector2D cameraArmLengthRange;
 	float health;
 
-	static constexpr float maxHealth = 100.f;
-	static constexpr float healthRegenRate = 1.f;
+	static constexpr float maxHealth{ 100.f };
+	static constexpr float healthRegenRate{ 1.f };
 
-	static constexpr float maxSpeed = 120.f;
-	static constexpr float dampingMultiplier = 0.95f;
-	static constexpr float acceleration = 100.f;
+	static constexpr float maxSpeed{ 120.f };
+	static constexpr float dampingMultiplier{ 0.95f };
+	static constexpr float acceleration{ 100.f };
 
-	static constexpr float zoomSpeed = 375.f;
-	static constexpr float zoomActionValue = 10.f;
-	static constexpr float minZoomMultiplier = 1.15f;
-	static constexpr float maxZoomMultiplier = 4.5f;
+	static constexpr float zoomSpeed{ 375.f };
+	static constexpr float zoomActionValue{ 10.f };
+	static constexpr float minZoomMultiplier{ 1.15f };
+	static constexpr float maxZoomMultiplier{ 4.5f };
 };

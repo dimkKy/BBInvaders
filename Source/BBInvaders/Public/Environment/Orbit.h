@@ -10,19 +10,6 @@ class USplineComponent;
 class URotatingMovementComponent;
 class AInvader;
 
-/*namespace OrbitHelper {
-	
-	template<int pointsCount>
-	constexpr std::array<std::pair<float, float>, pointsCount> CalculateRadiusVectors_Static() {
-		std::array<std::pair<float, float>, pointsCount> out;
-		for (auto i{ 0 }; i < pointsCount; ++i) {
-			out[i] = { FMath::Sin(1.f), FMath::Cos(1.f) };
-		}
-		return out;
-	}
-}*/
-
-
 // Rewrite as independent carrier
 UCLASS()
 class BBINVADERS_API AOrbit : public AActor
@@ -69,12 +56,10 @@ protected:
 	static float shrinkingSpeed;
 	static float shrinkingStartDelay;
 
-
 	float minRadius;
-	static constexpr int32 splineCount = 3;
 
 	static TArray<FVector> CalcRadiusVectors(int32 size, float length = 1.f, float offsetAngle = 0.f);
 
-	static constexpr float maxRotationSpeed = 25.f;
-	static constexpr std::pair<float, int> invaderNumLimit = {0.1f, 32};
+	static constexpr float maxRotationSpeed{ 25.f };
+	static constexpr std::pair<float, int> invaderNumLimit{ 0.1f, 32 };
 };

@@ -30,7 +30,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 		UStaticMeshComponent* body;
 
-	static constexpr float lifespan = 40.f;
-	static constexpr int32 simulationInteractions = 3;
+	static constexpr float lifespan{ 40.f };
+	static constexpr int32 simulationInteractions{ 3 };
 
 };

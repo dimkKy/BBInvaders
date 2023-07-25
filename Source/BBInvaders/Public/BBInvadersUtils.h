@@ -36,21 +36,11 @@ namespace BBInvadersUtils {
 	template <class TDerived, template<typename> typename TBase>
 	concept ChildOfAny = is_derived_from_any<TDerived, TBase>::type::value;
 
-	constexpr float defaultNearClipPlane = 10.f;
+	constexpr float defaultNearClipPlane{ 10.f };
 	float GetCameraNearPlane(const UCameraComponent& camera);
 
 	template <typename... Args>
 	concept NonEmpty = sizeof...(Args) > 0;
-
-
-	/*#define BindWrapper( object, button, onClickedFunc ) { \
-		button->SetClickMethod(EButtonClickMethod::PreciseClick); \
-		button->OnClicked.AddDynamic(object, onClickedFunc); \
-	}*/
-	//template <ChildOf<UObject> TObject>
-	//void SetupButtons(TObject* object, UButton* button, void (TObject::* onClickedFunc)(void));
-
-	//void SetupButtons(ChildOf<UObject> auto* object, UButton* button, TFunction<void(void)> onClickedFunc);
 
 	template <ChildOf<AActor> TActor>
 	auto* GetFirstActor(UWorld* world);
@@ -66,20 +56,20 @@ namespace BBInvadersUtils {
 	void ConfigureDefaultCollision(UPrimitiveComponent* comp, ECollisionChannel compType, 
 		TChannels...overlapChannels) requires NonEmpty<TChannels...>;
 
-	constexpr ECollisionChannel ECC_Projectile = ECollisionChannel::ECC_GameTraceChannel1;
-	constexpr ECollisionChannel ECC_Asteroid = ECollisionChannel::ECC_GameTraceChannel2;
-	constexpr ECollisionChannel ECC_Invader = ECollisionChannel::ECC_GameTraceChannel3;
+	constexpr ECollisionChannel ECC_Projectile{ ECollisionChannel::ECC_GameTraceChannel1 };
+	constexpr ECollisionChannel ECC_Asteroid{ ECollisionChannel::ECC_GameTraceChannel2 };
+	constexpr ECollisionChannel ECC_Invader{ ECollisionChannel::ECC_GameTraceChannel3 };
 
 	float RandomAngle();
 	FRotator RandomRotator();
 	//Util to generate a random number in a range between -max and max
 	float RandAbsRange(float absMax);
 
-	const FRotator UpRotation = { -90.f, 0.f, 0.f };
-	const FRotator BehindRotation = { 0.f, 180.f, 0.f };
-	const FRotator unitRotation = { 0.f, 1.f, 0.f };
+	const FRotator UpRotation{ -90.f, 0.f, 0.f };
+	const FRotator BehindRotation{ 0.f, 180.f, 0.f };
+	const FRotator unitRotation{ 0.f, 1.f, 0.f };
 
-	const FName muzzleSocket = "Muzzle";
+	const FName muzzleSocket{ "Muzzle" };
 }
 
 /*namespace WHTS87Utils::NamingRules {

@@ -45,6 +45,5 @@ protected:
 
 	float currentInflation;
 
-
 	friend class ABBInvadersGameModeBase;
 };

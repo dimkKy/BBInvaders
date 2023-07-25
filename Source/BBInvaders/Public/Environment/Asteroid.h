@@ -66,9 +66,9 @@ protected:
 	EAsteroidSize size;
 	FVector velocity;
 
-	constexpr static float aimAngleAmplitude = 40.f /** PI / 180.f*/;
-	constexpr static float splitAngleAmplitude = 30.f /** PI / 180.f*/;
-	constexpr static float onHitVelocityMultiplier = 0.9f;
-	constexpr static std::pair<float, float> velocityRange = { 100.f, 500.f };
-	constexpr static std::pair<float, float> rotationSpeedRange = { 0.1f, 2.f };
+	constexpr static float aimAngleAmplitude{ 40.f } /** PI / 180.f*/;
+	constexpr static float splitAngleAmplitude{ 30.f } /** PI / 180.f*/;
+	constexpr static float onHitVelocityMultiplier{ 0.9f };
+	constexpr static std::pair<float, float> velocityRange{ 100.f, 500.f };
+	constexpr static std::pair<float, float> rotationSpeedRange{ 0.1f, 2.f };
 };
