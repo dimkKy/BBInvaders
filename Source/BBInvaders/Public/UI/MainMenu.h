@@ -25,6 +25,6 @@ protected:
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 		UButton* exitButton;
 
-	//UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
-		//UButton* settingsButton;
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+		UButton* settingsButton;
 };

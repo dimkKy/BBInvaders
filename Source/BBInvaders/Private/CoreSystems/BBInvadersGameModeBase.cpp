@@ -2,6 +2,7 @@
 
 
 #include "CoreSystems/BBInvadersGameModeBase.h"
+#include "CoreSystems/BBInvadersAssetManager.h"
 #include "UI/BBInvadersHUD.h"
 #include "Player/BBInvadersPlayerController.h"
 #include "Player/PlayerPawn.h"
@@ -69,8 +70,8 @@ void ABBInvadersGameModeBase::Tick(float DeltaTime)
 void ABBInvadersGameModeBase::StartGameplay()
 {
 	localController->Possess(RefreshGameState());
-	SetActorTickEnabled(true);
-	
+	auto test{ UBBInvadersAssetManager::GetIfValid() };
+	SetActorTickEnabled(true);	
 }
 
 void ABBInvadersGameModeBase::GoToMainMenu()

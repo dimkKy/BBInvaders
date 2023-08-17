@@ -10,6 +10,7 @@ class UWidgetSwitcher;
 class UButton;
 class UPauseMenu;
 class UCanvasPanel;
+class UProjectileSelector;
 
 /**
  * 
@@ -26,14 +27,14 @@ public:
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 		UButton* exitButton;*/
 
-	
-
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 		UButton* pauseButton;
 
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 		UPauseMenu* pauseMenu;
 
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+		UProjectileSelector* projectileSelector;
 	
 protected:
 	UFUNCTION()

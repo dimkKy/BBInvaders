@@ -4,7 +4,12 @@
 #include "CoreSystems/OutOfAreaActorTracker.h"
 #include "Environment/Asteroid.h"
 #include "Components/BoxComponent.h"
+#include <array>
 #include "BBInvadersUtils.h"
+
+const FVector AOutOfAreaActorTracker::zKillBoxExtent{ 1.5f, 1.5f, 0.125f };
+const FVector AOutOfAreaActorTracker::xKillBoxExtent{ 0.125f, 1.5f, 1.875f };
+const FVector AOutOfAreaActorTracker::yKillBoxExtent{ 1.5f, 0.125f, 1.875f };
 
 AOutOfAreaActorTracker::AOutOfAreaActorTracker() :
 	asteroidTrackBox{ CreateDefaultSubobject<UBoxComponent>("asteroidTrackBox") },
@@ -16,6 +21,8 @@ AOutOfAreaActorTracker::AOutOfAreaActorTracker() :
 		CreateDefaultSubobject<UBoxComponent>("xyKillBox4"), }
 {
 	PrimaryActorTick.bCanEverTick = false;
+	asteroidTrackBox->SetMobility(EComponentMobility::Static);
+	
 	SetRootComponent(asteroidTrackBox);
 
 	BBInvadersUtils::ConfigureDefaultCollision<true>(asteroidTrackBox, ECC_WorldStatic,
@@ -26,7 +33,7 @@ AOutOfAreaActorTracker::AOutOfAreaActorTracker() :
 		BBInvadersUtils::ConfigureDefaultCollision<true>(box, ECC_WorldStatic,
 			BBInvadersUtils::ECC_Asteroid/*, BBInvadersUtils::ECC_Invader, 
 			BBInvadersUtils::ECC_Projectile*/);
-		
+			
 	} };
 
 	for (auto box : zKillBoxes) {
@@ -35,7 +42,8 @@ AOutOfAreaActorTracker::AOutOfAreaActorTracker() :
 	for (auto box : xyKillBoxes) {
 		configureKillBox(box);
 	};
-	
+
+	asteroidTrackBox->SetHiddenInGame(true, true);
 }
 
 void AOutOfAreaActorTracker::SetTrackArea(const FTransform& t, const FVector& halfSize)
@@ -46,7 +54,28 @@ void AOutOfAreaActorTracker::SetTrackArea(const FTransform& t, const FVector& ha
 
 void AOutOfAreaActorTracker::SetTrackArea(const FVector& halfSize)
 {
-	asteroidTrackBox->SetBoxExtent(halfSize, true);
+	asteroidTrackBox->SetBoxExtent(halfSize);
+
+	//--
+	FVector newKillBoxExtent{ halfSize * zKillBoxExtent };
+	for (auto box : zKillBoxes) {
+		box->SetBoxExtent(newKillBoxExtent);
+	};
+	zKillBoxes[0]->SetRelativeLocation({ 0.f, 0.f, halfSize.Z * 2.f });
+	zKillBoxes[1]->SetRelativeLocation({ 0.f, 0.f, halfSize.Z * -2.f });
+
+	//--
+	newKillBoxExtent = halfSize * xKillBoxExtent;
+	xyKillBoxes[0]->SetBoxExtent(newKillBoxExtent);
+	xyKillBoxes[2]->SetBoxExtent(newKillBoxExtent);
+	xyKillBoxes[0]->SetRelativeLocation({ halfSize.X * 1.625f, 0.f, 0.f });
+	xyKillBoxes[2]->SetRelativeLocation({ halfSize.X * -1.625f, 0.f, 0.f });
+
+	newKillBoxExtent = halfSize * yKillBoxExtent;
+	xyKillBoxes[1]->SetBoxExtent(newKillBoxExtent);
+	xyKillBoxes[3]->SetBoxExtent(newKillBoxExtent);
+	xyKillBoxes[1]->SetRelativeLocation({ 0.f, halfSize.Y * 1.625f, 0.f });
+	xyKillBoxes[3]->SetRelativeLocation({ 0.f, halfSize.Y * -1.625f, 0.f });
 }
 
 void AOutOfAreaActorTracker::BeginPlay()

@@ -2,6 +2,7 @@
 
 
 #include "CoreSystems/BBInvadersProjectile.h"
+#include "CoreSystems/ProjectileDataAsset.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "BBInvadersUtils.h"
@@ -57,4 +58,9 @@ void ABBInvadersProjectile::OnOverlapBegin(UPrimitiveComponent* component, AActo
 		Destroy();
 	}
 }
+
+void ABBInvadersProjectile::SetProjectileData(const UProjectileDataAsset& data)
+{
+}
+
 

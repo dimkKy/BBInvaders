@@ -25,10 +25,6 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 		TSubclassOf<ABBInvadersProjectile> projectileClass;
-	//TSoftClassPtr<ABBInvadersProjectile> projectileClass;
-
-
-	
 
 #if WITH_EDITOR
 	virtual EDataValidationResult IsDataValid(TArray<FText>& ValidationErrors) override;

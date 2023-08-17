@@ -4,9 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Engine/DataTable.h"
 #include "BBInvadersProjectile.generated.h"
 
 class UProjectileMovementComponent;
+class UProjectileDataAsset;
 
 UCLASS(Abstract)
 class BBINVADERS_API ABBInvadersProjectile : public AActor
@@ -21,6 +23,11 @@ public:
 		void OnOverlapBegin(UPrimitiveComponent* component, 
 			AActor* otherActor, UPrimitiveComponent* otherComp, 
 			int32 otherIndex, bool bFromSweep, const FHitResult& result);
+
+	void SetProjectileData(const UProjectileDataAsset& data);
+	
+	/*static ABBInvadersProjectile* SpawnProjectile(UWorld& world, 
+		const FTransform& transform, AActor* owner, const FProjectileData& data);*/
 
 protected:
 	virtual void BeginPlay() override;

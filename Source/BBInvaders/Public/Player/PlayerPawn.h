@@ -4,14 +4,19 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "CoreSystems/Shooter.h"
 #include "PlayerPawn.generated.h"
 
 class UStaticMeshComponent;
 class USpringArmComponent;
 class UCameraComponent;
+class ABBInvadersProjectile;
 
+/*
+ *
+ */
 UCLASS(Abstract)
-class BBINVADERS_API APlayerPawn : public APawn
+class BBINVADERS_API APlayerPawn : public APawn, public IShooter
 {
 	GENERATED_BODY()
 
@@ -38,8 +43,8 @@ protected:
 	void ZoomOutAction();
 
 	void ZoomCamera(float value);
-	//interface?
-	void Shoot();
+
+	virtual void Shoot() override;
 
 	UE_NODISCARD float CalcDamping() const;
 

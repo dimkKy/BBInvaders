@@ -34,7 +34,11 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 		UBoxComponent* zKillBoxes[2];
+	static const FVector zKillBoxExtent;
+
 	UPROPERTY(VisibleAnywhere)
 		UBoxComponent* xyKillBoxes[4];
+	static const FVector xKillBoxExtent;
+	static const FVector yKillBoxExtent;
 
 };
