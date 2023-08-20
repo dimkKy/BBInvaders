@@ -6,6 +6,7 @@
 #include "UObject/Interface.h"
 #include "Shooter.generated.h"
 
+//UHT does not see it for some reason
 UENUM(BlueprintType)
 enum class EShooterType : uint8
 {
@@ -17,7 +18,7 @@ enum class EShooterType : uint8
 	EST_Invader,
 	/*Both invaders**/
 	EST_AdvancedInvader,
-	EST_MAX,
+	EST_MAX	UMETA(Hidden),
 };
 
 UINTERFACE(MinimalAPI)
@@ -36,6 +37,6 @@ public:
 	virtual void Shoot()
 		PURE_VIRTUAL(IShooter::Shoot, return; );
 
-	/*virtual EShooterType GetShooterType() const
-		PURE_VIRTUAL(IShooter::GetShooterType, return EShooterType::EST_MAX; );*/
+	virtual EShooterType GetShooterType() const
+		PURE_VIRTUAL(IShooter::GetShooterType, return EShooterType::EST_MAX; );
 };

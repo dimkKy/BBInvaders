@@ -7,6 +7,7 @@
 #include "BBInvadersPlayerController.generated.h"
 
 class ABBInvadersHUD;
+class UProjectileDataAsset;
 /**
  * 
  */
@@ -18,6 +19,8 @@ class BBINVADERS_API ABBInvadersPlayerController : public APlayerController
 public:
 	ABBInvadersPlayerController();
 	ABBInvadersHUD* GetBBInvadersHUD() const;
+
+	UProjectileDataAsset* GetSelectedProjectile() const;
 
 	UFUNCTION()
 		void ExitGame();

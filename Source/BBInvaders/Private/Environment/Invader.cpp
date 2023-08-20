@@ -7,7 +7,6 @@
 #include "BBInvadersUtils.h"
 #include "Player/PlayerPawn.h"
 #include "Player/BBInvadersPlayerState.h"
-#include "CoreSystems/AssetProvider.h"
 
 AInvader::AInvader() :
 	body{ CreateDefaultSubobject<UStaticMeshComponent>("body") }
@@ -27,17 +26,17 @@ void AInvader::SetMesh(UStaticMesh& newMesh)
 void AInvader::Shoot()
 {
 	auto* world{ GetWorld() };
-	check(world);
+	check(GetWorld() && false);
 
-	FActorSpawnParameters spawnParams;
-	spawnParams.Owner = this;
-	spawnParams.SpawnCollisionHandlingOverride = 
-		ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	/*ABBInvadersProjectile::SpawnProjectile(*GetWorld(), 
+		body->GetSocketTransform(BBInvadersUtils::muzzleSocket),
+		, this);*/
 
-	world->SpawnActor<ABBInvadersProjectile>(
-		world->GetSubsystem<UAssetProvider>()->projectileClass,
-		body->GetSocketTransform(BBInvadersUtils::muzzleSocket), 
-		spawnParams);
+}
+
+EShooterType AInvader::GetShooterType() const
+{
+	return EShooterType::EST_Invader;
 }
 
 /*void AInvader::SetLookAt(const FVector& worldPos)

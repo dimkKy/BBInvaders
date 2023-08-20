@@ -19,15 +19,17 @@ public:
 	ABBInvadersProjectile();
 	virtual void Tick(float DeltaTime) override;
 
+	static ABBInvadersProjectile* SpawnProjectile(UWorld& w, 
+		const FTransform& t, const UProjectileDataAsset& d, AActor* owner = nullptr);
+
 	UFUNCTION()
 		void OnOverlapBegin(UPrimitiveComponent* component, 
 			AActor* otherActor, UPrimitiveComponent* otherComp, 
 			int32 otherIndex, bool bFromSweep, const FHitResult& result);
 
 	void SetProjectileData(const UProjectileDataAsset& data);
-	
-	/*static ABBInvadersProjectile* SpawnProjectile(UWorld& world, 
-		const FTransform& transform, AActor* owner, const FProjectileData& data);*/
+
+	const UProjectileDataAsset* GetProjectileData() const;
 
 protected:
 	virtual void BeginPlay() override;
@@ -36,6 +38,8 @@ protected:
 		UProjectileMovementComponent* movement;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 		UStaticMeshComponent* body;
+
+	const UProjectileDataAsset* projectileData;
 
 	static constexpr float lifespan{ 40.f };
 	static constexpr int32 simulationInteractions{ 3 };

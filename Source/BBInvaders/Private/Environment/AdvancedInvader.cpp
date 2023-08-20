@@ -45,6 +45,11 @@ void AAdvancedInvader::Tick(float DeltaTime)
 	RotateMoveToTarget(DeltaTime);
 }
 
+EShooterType AAdvancedInvader::GetShooterType() const
+{
+	return EShooterType::EST_AdvancedInvader;
+}
+
 float AAdvancedInvader::GetOnPlanetCollisionDamage() const
 {
 	return 75.0f;

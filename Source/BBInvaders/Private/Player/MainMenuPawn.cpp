@@ -11,6 +11,15 @@ AMainMenuPawn::AMainMenuPawn() :
 	SetRootComponent(camera);
 }
 
+void AMainMenuPawn::Shoot()
+{
+}
+
+EShooterType AMainMenuPawn::GetShooterType() const
+{
+	return EShooterType::EST_Human;
+}
+
 EDataValidationResult AMainMenuPawn::IsDataValid(TArray<FText>& ValidationErrors)
 {
 	Super::IsDataValid(ValidationErrors);

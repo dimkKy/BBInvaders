@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "CoreSystems/Shooter.h"
 #include "Environment/PlanetaryThreatable.h"
 #include "Invader.generated.h"
 
@@ -15,7 +16,7 @@ class APlayerPawn;
 DECLARE_DELEGATE_OneParam(FNotifyInvaderDestroyed, AInvader*);
 
 UCLASS()
-class BBINVADERS_API AInvader : public AActor, public IPlanetaryThreatable
+class BBINVADERS_API AInvader : public AActor, public IShooter, public IPlanetaryThreatable
 {
 	GENERATED_BODY()
 	
@@ -23,8 +24,10 @@ public:
 	AInvader();
 
 	void SetMesh(UStaticMesh& newMesh);
-	//interface?
-	void Shoot();
+
+	virtual void Shoot() override;
+	virtual EShooterType GetShooterType() const override;
+
 	//void SetLookAt(const FVector& worldPos);
 
 	virtual float GetOnPlanetCollisionDamage() const override;

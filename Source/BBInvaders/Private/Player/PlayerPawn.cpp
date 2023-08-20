@@ -2,13 +2,14 @@
 
 
 #include "Player/PlayerPawn.h"
+#include "Player/BBInvadersPlayerController.h"
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "CoreSystems/BBInvadersProjectile.h"
+#include "CoreSystems/Shooter.h"
 #include "CoreSystems/BBInvadersGameModeBase.h"
 #include "Environment/PlanetaryThreatable.h"
-#include "CoreSystems/AssetProvider.h"
 #include "BBInvadersUtils.h"
 
 APlayerPawn::APlayerPawn() :
@@ -120,18 +121,17 @@ void APlayerPawn::ZoomCamera(float value)
 
 void APlayerPawn::Shoot()
 {
-	auto* world{ GetWorld() };
-	check(world);
+	check(GetWorld());
 
-	FActorSpawnParameters spawnParams;
-	spawnParams.Owner = this;
-	spawnParams.SpawnCollisionHandlingOverride =
-		ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-	world->SpawnActor<ABBInvadersProjectile>(
-		world->GetSubsystem<UAssetProvider>()->projectileClass,
+	ABBInvadersProjectile::SpawnProjectile(*GetWorld(),
 		platform->GetSocketTransform(BBInvadersUtils::muzzleSocket),
-		spawnParams);
+		*CastChecked<ABBInvadersPlayerController>(GetController())->GetSelectedProjectile(),
+		this);
+}
+
+EShooterType APlayerPawn::GetShooterType() const
+{
+	return EShooterType::EST_PlayerOnly;
 }
 
 float APlayerPawn::CalcDamping() const

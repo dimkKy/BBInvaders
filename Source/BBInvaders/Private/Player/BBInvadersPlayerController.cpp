@@ -16,6 +16,11 @@ ABBInvadersHUD* ABBInvadersPlayerController::GetBBInvadersHUD() const
 	return CastChecked<ABBInvadersHUD>(MyHUD);
 }
 
+UProjectileDataAsset* ABBInvadersPlayerController::GetSelectedProjectile() const
+{
+	return nullptr;
+}
+
 void ABBInvadersPlayerController::ExitGame()
 {
 	ConsoleCommand("quit");

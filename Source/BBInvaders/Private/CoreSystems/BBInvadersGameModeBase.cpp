@@ -16,8 +16,9 @@
 #include "Environment/AdvancedInvader.h"
 #include "Environment/Asteroid.h"
 #include "Environment/Orbit.h"
-#include "CoreSystems/AssetProvider.h"
 #include "Containers/List.h"
+
+#include "CoreSystems/ProjectileDataAsset.h"
 
 ABBInvadersGameModeBase::ABBInvadersGameModeBase() :
 	localController{ nullptr }
@@ -70,7 +71,12 @@ void ABBInvadersGameModeBase::Tick(float DeltaTime)
 void ABBInvadersGameModeBase::StartGameplay()
 {
 	localController->Possess(RefreshGameState());
-	auto test{ UBBInvadersAssetManager::GetIfValid() };
+	auto* test{ UBBInvadersAssetManager::GetIfValid() };
+
+	FStreamableDelegate delegate = FStreamableDelegate::CreateUObject(this, &ABBInvadersGameModeBase::OnTestLoadingComplete);
+
+	testHandle = test->LoadPrimaryAssetsWithType(UProjectileDataAsset::assetType, {}, delegate);
+
 	SetActorTickEnabled(true);	
 }
 
@@ -249,12 +255,12 @@ AOrbit* ABBInvadersGameModeBase::SpawnNewOrbit(float additionalRadius)
 AAdvancedInvader* ABBInvadersGameModeBase::SpawnNewAdvancedInvader() const
 {	
 	UWorld* world{ GetWorld() };
-	const AActor* target{ GetGameState<ABBInvadersGameStateBase>()->GetCenter() };
+	const AActor* target{ GetGameState<ABBInvadersGameStateBase>()->GetCenterActor() };
 	//ensure?
 	check(world && target);
 
-	UStaticMesh* mesh{ world->GetSubsystem<UAssetProvider>()->GetInvaderMesh() };
-	FVector location{ CalcRandOutOfBoundsPos(mesh->GetBounds().GetSphere().W)};
+	//UStaticMesh* mesh{ world->GetSubsystem<UAssetProvider>()->GetInvaderMesh() };
+	FVector location{ /*CalcRandOutOfBoundsPos(mesh->GetBounds().GetSphere().W)*/};
 
 	FTransform newInvaderTransform{ FRotator::ZeroRotator, location };
 
@@ -262,7 +268,7 @@ AAdvancedInvader* ABBInvadersGameModeBase::SpawnNewAdvancedInvader() const
 		AAdvancedInvader::StaticClass(), newInvaderTransform, nullptr,
 		nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn) };
 
-	newInvader->SetMesh(*mesh);
+	//newInvader->SetMesh(*mesh);
 	newInvader->SetTarget(*target);
 
 	newInvader->FinishSpawning(newInvaderTransform);
@@ -272,27 +278,13 @@ AAdvancedInvader* ABBInvadersGameModeBase::SpawnNewAdvancedInvader() const
 AAsteroid* ABBInvadersGameModeBase::SpawnNewAsteroid() const
 {
 	UWorld* world{ GetWorld() };
-	const AActor* target{ GetGameState<ABBInvadersGameStateBase>()->GetCenter() };
 	//ensure?
-	check(world && target);
+	check(world);
 
-	auto* newAsteroid{ world->SpawnActorDeferred<AAsteroid>(
-		AAsteroid::StaticClass(), FTransform::Identity, nullptr, 
-		nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn) };
-
-	auto* provider{ world->GetSubsystem<UAssetProvider>() };
-	check(provider);
-
-	newAsteroid->SetSizeAssignMesh(AAsteroid::RandomSize(), *provider);
-	
-	newAsteroid->SetRotation();
-
-	newAsteroid->FinishSpawning(
-		{ BBInvadersUtils::RandomRotator(), 
+	auto* newAsteroid{ AAsteroid::SpawnAsteroidDeferred(*world) };
+	newAsteroid->FinishSpawningSetVelocity(
 		CalcRandOutOfBoundsPos(newAsteroid->GetMeshRadius()), 
-		FVector::OneVector} , false);
-
-	newAsteroid->SetVelocity(*target);
+		CastChecked<ABBInvadersGameStateBase>(world->GetGameState())->GetCenter());
 
 	return newAsteroid;
 }
@@ -334,5 +326,14 @@ AOrbit* ABBInvadersGameModeBase::ProcessCheckOrbits(std::function<void(AOrbit&)>
 	return orbits.Num() ?
 		orbits.GetTail()->GetValue().Get() :
 		nullptr;
+}
+
+void ABBInvadersGameModeBase::OnTestLoadingComplete()
+{
+	UAssetManager* manager = UAssetManager::GetIfValid();
+	if (manager)
+	{
+		int32{ 1 };
+	}
 }
 

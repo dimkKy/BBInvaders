@@ -13,6 +13,8 @@ class AOrbit;
 class AAsteroid;
 class APawn;
 
+struct FStreamableHandle;
+
 /**
  * TO BE REFACTORED
  */
@@ -61,6 +63,11 @@ protected:
 
 	AOrbit* ProcessCheckOrbits();
 	AOrbit* ProcessCheckOrbits(std::function<void(AOrbit&)> func);
+
+
+	TSharedPtr<FStreamableHandle> testHandle;
+	
+	void OnTestLoadingComplete();
 
 	static constexpr int32 maxOrbits{ 5 };
 };

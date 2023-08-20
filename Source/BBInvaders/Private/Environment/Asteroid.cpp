@@ -5,7 +5,6 @@
 #include "BBInvadersUtils.h"
 #include "Player/PlayerPawn.h"
 #include "CoreSystems/BBInvadersGameStateBase.h"
-#include "CoreSystems/AssetProvider.h"
 
 AAsteroid::AAsteroid() :
 	body{CreateDefaultSubobject<UStaticMeshComponent>("body")},
@@ -38,29 +37,31 @@ EAsteroidSize AAsteroid::RandomSize()
 		FMath::RandRange(0, static_cast<int32>(EAsteroidSize::EAS_MAX) - 1));
 }
 
-void AAsteroid::SetSizeAssignMesh(EAsteroidSize newSize, const UAssetProvider& provider)
+void AAsteroid::SetSizeAssignMesh(EAsteroidSize newSize)
 {
+	check(false);
 	check(newSize != EAsteroidSize::EAS_MAX);
 	if (size == newSize) {
 		return;
 	}
 	size = newSize;
-	check(body->SetStaticMesh(provider.GetAsteroidMesh(size)));
+	//check(body->SetStaticMesh(provider.GetAsteroidMesh(size)));
 }
 
-void AAsteroid::SetVelocity(const AActor& target)
+void AAsteroid::SetVelocity(const FVector& targetLocation)
 {
-	FVector toTarget{ target.GetActorLocation() - RootComponent->GetRelativeLocation() };
+	FVector toTarget{ targetLocation - RootComponent->GetRelativeLocation() };
 
 	velocity = toTarget.GetSafeNormal().RotateAngleAxis(
-		FMath::RandRange(-aimAngleAmplitude, aimAngleAmplitude), target.GetActorUpVector()) * 
+		FMath::RandRange(-aimAngleAmplitude, aimAngleAmplitude), 
+		CastChecked<ABBInvadersGameStateBase>(GetWorld()->GetGameState())->GetUpVector()) *
 		FMath::RandRange(velocityRange.first, velocityRange.second);
 }
 
-void AAsteroid::SetVelocity(const FVector& newVel)
+/*void AAsteroid::SetVelocity(const FVector& newVel)
 {
 	velocity = newVel;
-}
+}*/
 
 void AAsteroid::SetRotation()
 {
@@ -135,13 +136,11 @@ void AAsteroid::Split()
 	check(size != EAsteroidSize::EAS_MAX && size != EAsteroidSize::EAS_Small);
 
 	UWorld* world{ GetWorld() };
-
-	const UAssetProvider* provider{ world->GetSubsystem<UAssetProvider>() };
-	check(provider);
-
+	//REDO
+	check(false);
 	EAsteroidSize newSize{ static_cast<EAsteroidSize>(static_cast<int32>(size) - 1) };
 
-	SetSizeAssignMesh(newSize, *provider);
+	SetSizeAssignMesh(newSize);
 
 	float splitHalfAngle{ BBInvadersUtils::RandAbsRange(splitAngleAmplitude) };
 
@@ -162,7 +161,7 @@ void AAsteroid::Split()
 		ThisClass::StaticClass(), newAsteroidTransform,
 		nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn) };
 
-	newAsteroid->SetSizeAssignMesh(newSize, *provider);
+	newAsteroid->SetSizeAssignMesh(newSize);
 	//newAsteroid->SetVelocity(velocity)
 	newAsteroid->FinishSpawning(newAsteroidTransform, true);
 }
@@ -174,4 +173,38 @@ void AAsteroid::Tick(float DeltaTime)
 	RootComponent->SetWorldLocationAndRotation(
 		RootComponent->GetRelativeLocation() + velocity * DeltaTime,
 		RootComponent->GetRelativeRotation(), true);
+}
+
+AAsteroid* AAsteroid::SpawnAsteroid(UWorld& w, const FVector& location, 
+	const FVector& targetLocation, EAsteroidSize size)
+{
+	AAsteroid* newAsteroid{ SpawnAsteroidDeferred(w, size)};
+
+	newAsteroid->FinishSpawning(
+		{ BBInvadersUtils::RandomRotator(), location, FVector::OneVector }, false);
+	newAsteroid->SetVelocity(targetLocation);
+
+	return newAsteroid;
+}
+
+UE_NODISCARD AAsteroid* AAsteroid::SpawnAsteroidDeferred(UWorld& w, EAsteroidSize size)
+{
+	AAsteroid* newAsteroid{ w.SpawnActorDeferred<ThisClass>(
+		ThisClass::StaticClass(), FTransform::Identity, nullptr,
+		nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn) };
+
+	//auto* provider{ world->GetSubsystem<UAssetProvider>() };
+	//check(provider);
+	//w.GetGameState()
+
+	newAsteroid->SetSizeAssignMesh(size);
+	newAsteroid->SetRotation();
+
+	return newAsteroid;
+}
+
+void AAsteroid::FinishSpawningSetVelocity(const FVector& location, const FVector& targetLoc)
+{
+	FinishSpawning({ BBInvadersUtils::RandomRotator(), location}, false);
+	SetVelocity(targetLoc);
 }

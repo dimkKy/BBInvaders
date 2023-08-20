@@ -6,8 +6,6 @@
 #include "Engine/GameInstance.h"
 #include "BBInvadersGameInstance.generated.h"
 
-class UAssetProvider;
-
 /**
  * 
  */
@@ -16,8 +14,7 @@ class BBINVADERS_API UBBInvadersGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-		TSubclassOf<UAssetProvider> assetProviderClass;
+
 #if WITH_EDITOR
 	virtual EDataValidationResult IsDataValid(TArray<FText>& ValidationErrors) override;
 #endif

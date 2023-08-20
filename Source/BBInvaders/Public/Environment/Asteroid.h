@@ -15,12 +15,11 @@ enum class EAsteroidSize : uint8
 	EAS_Small,
 	EAS_Medium,
 	EAS_Big,
-	EAS_MAX,
+	EAS_MAX UMETA(Hidden),
 };
 
 //class UInstancedStaticMeshComponent;
 class UStaticMeshComponent;
-class UAssetProvider;
 class UStaticMesh;
 
 UCLASS()
@@ -32,16 +31,18 @@ public:
 	AAsteroid();
 	virtual void Tick(float DeltaTime) override;
 
-	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		//UInstancedStaticMeshComponent* asteroids;
+	static AAsteroid* SpawnAsteroid(UWorld& w, const FVector& location,
+		const FVector& targetLoc, EAsteroidSize size = AAsteroid::RandomSize());
+	UE_NODISCARD static AAsteroid* SpawnAsteroidDeferred(UWorld& w, EAsteroidSize size = AAsteroid::RandomSize());
+	void FinishSpawningSetVelocity(const FVector& location, const FVector& targetLoc);
 
 	static EAsteroidSize GetSmaller(EAsteroidSize _size);
 	static EAsteroidSize RandomSize();
 
-	void SetSizeAssignMesh(EAsteroidSize newSize, const UAssetProvider& provider);
+	void SetSizeAssignMesh(EAsteroidSize newSize);
 
-	void SetVelocity(const AActor& target);
-	void SetVelocity(const FVector& newVel);
+	void SetVelocity(const FVector& targetLocation);
+	//void SetVelocity(const FVector& newVel);
 
 	void SetRotation();
 	void SetRotation(const FVector& rotAxis, float rotSpeed);

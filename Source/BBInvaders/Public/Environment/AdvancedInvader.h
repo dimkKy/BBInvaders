@@ -31,6 +31,8 @@ public:
 	AAdvancedInvader();
 	virtual void Tick(float DeltaTime) override;		
 
+	virtual EShooterType GetShooterType() const override;
+
 	virtual float GetOnPlanetCollisionDamage() const override;
 
 	void SetTarget(const AActor& actor);

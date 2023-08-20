@@ -30,7 +30,11 @@ public:
 	FVector CalcRandOutOfBoundsPos(float objectRadius) const;
 
 	FPlayAreaInfo GetMapInfo() const;
-	const AActor* GetCenter() const;
+	FVector GetUpVector() const;
+	FVector GetCenter() const;
+
+	const AActor* GetCenterActor() const;
+	
 
 	float GetCurrentInflation() const;
 

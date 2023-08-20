@@ -7,7 +7,6 @@
 #include "Components/SplineComponent.h"
 #include "BBInvadersUtils.h"
 #include "Environment/Invader.h"
-#include "CoreSystems/AssetProvider.h"
 
 float AOrbit::shrinkingSpeed = 100.f;
 float AOrbit::shrinkingStartDelay = 3.f;
@@ -112,7 +111,9 @@ void AOrbit::InitWithInvaders(float newRadius, bool bAdjustRadius/* = true*/)
 	check(world && newRadius > 0.f);
 	check(invaders.Num() == 0);
 
-	UStaticMesh* invaderMesh{ world->GetSubsystem<UAssetProvider>()->GetInvaderMesh()};
+	check(false);
+	UStaticMesh* invaderMesh{ /*world->GetSubsystem<UAssetProvider>()->GetInvaderMesh()*/};
+
 	invaderRadius = invaderMesh->GetBounds().GetSphere().W ;
 
 	radius = bAdjustRadius ? newRadius + invaderRadius : newRadius;

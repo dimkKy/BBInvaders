@@ -45,6 +45,7 @@ protected:
 	void ZoomCamera(float value);
 
 	virtual void Shoot() override;
+	virtual EShooterType GetShooterType() const override;
 
 	UE_NODISCARD float CalcDamping() const;
 

@@ -29,9 +29,20 @@ FPlayAreaInfo ABBInvadersGameStateBase::GetMapInfo() const
     return mapInfo;
 }
 
-const AActor* ABBInvadersGameStateBase::GetCenter() const
+const AActor* ABBInvadersGameStateBase::GetCenterActor() const
 {
     return cachedCenter.Get();
+}
+
+FVector ABBInvadersGameStateBase::GetUpVector() const
+{
+    check(mapInfo);
+    return mapInfo.up;
+}
+
+FVector ABBInvadersGameStateBase::GetCenter() const
+{
+    return mapInfo.center;
 }
 
 FVector ABBInvadersGameStateBase::CalcRandOutOfBoundsPos(float objectRadius) const

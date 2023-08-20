@@ -9,9 +9,15 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(Blueprintable)
 class BBINVADERS_API UBBInvadersAssetManager : public UAssetManager
 {
 	GENERATED_BODY()
-	
+
+public:
+
+	virtual void StartInitialLoading() override;
+	//UPROP
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		float initialSpeed;
 };

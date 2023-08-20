@@ -4,11 +4,11 @@
 #include "CoreSystems/ProjectileDataAsset.h"
 //#include "CoreSystems/Shooter.h"
 
-const FPrimaryAssetType UProjectileDataAsset::assetType{ "ProjectileDataAsset" };
+const FPrimaryAssetType UProjectileDataAsset::assetType{ "ProjectileData" };
 
 UProjectileDataAsset::UProjectileDataAsset() :
-	visibleName{}, initialSpeed{ 0.f }, maxSpeed{ 100.f },
-	baseCost{ 0.f }
+	userType{ EShooterType::EST_MAX }, visibleName {}, initialSpeed{ 0.f }, 
+	maxSpeed{ 100.f }, bIsHoming{ false }, baseCost { 0.f }
 {
 
 }
@@ -33,13 +33,14 @@ EDataValidationResult UProjectileDataAsset::IsDataValid(TArray<FText>& Validatio
 		ValidationErrors.Add(FText::FromString("baseCost can not be negative"));
 	}
 	else {
-		/*if (userType == EShooterType::EST_PlayerOnly && baseCost == 0.f) {
+		if (userType == EShooterType::EST_PlayerOnly && baseCost == 0.f) {
 			ValidationErrors.Add(FText::FromString("baseCost should be positive for player to use this"));
-		}*/
+		}
 	}		
 
-	//if (bEverAvailableToPlayer && baseCost <= 0.f)
-		//ValidationErrors.Add(FText::FromString("available to player can not be free"));
+	if (userType == EShooterType::EST_MAX) {
+		ValidationErrors.Add(FText::FromString("invalid userType"));
+	}
 
 	return ValidationErrors.Num() > 0 ?
 		EDataValidationResult::Invalid : EDataValidationResult::Valid;

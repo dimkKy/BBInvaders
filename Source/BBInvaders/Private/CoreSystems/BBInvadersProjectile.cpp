@@ -9,7 +9,8 @@
 
 ABBInvadersProjectile::ABBInvadersProjectile() :
 	movement{ CreateDefaultSubobject<UProjectileMovementComponent>("movementComp") },
-	body{ CreateDefaultSubobject<UStaticMeshComponent>("body") }
+	body{ CreateDefaultSubobject<UStaticMeshComponent>("body") }, 
+	projectileData{ nullptr }
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -49,6 +50,18 @@ void ABBInvadersProjectile::Tick(float DeltaTime)
 
 }
 
+ABBInvadersProjectile* ABBInvadersProjectile::SpawnProjectile(UWorld& w, 
+	const FTransform& transform, const UProjectileDataAsset& d, AActor* owner)
+{
+	ABBInvadersProjectile* projectile{ w.SpawnActorDeferred<ThisClass>(ThisClass::StaticClass(), 
+		transform, owner, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn) };
+
+	projectile->SetProjectileData(d);
+	projectile->FinishSpawning(transform, true);
+
+	return projectile;
+}
+
 void ABBInvadersProjectile::OnOverlapBegin(UPrimitiveComponent* component, AActor* otherActor, 
 	UPrimitiveComponent* otherComp, int32 otherIndex, bool bFromSweep, const FHitResult& result)
 {
@@ -61,6 +74,12 @@ void ABBInvadersProjectile::OnOverlapBegin(UPrimitiveComponent* component, AActo
 
 void ABBInvadersProjectile::SetProjectileData(const UProjectileDataAsset& data)
 {
+	projectileData = &data;
+}
+
+const UProjectileDataAsset* ABBInvadersProjectile::GetProjectileData() const
+{
+	return projectileData;
 }
 
 

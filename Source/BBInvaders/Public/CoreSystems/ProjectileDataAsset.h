@@ -4,11 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
-//#include "CoreSystems/Shooter.h"
+#include "CoreSystems/Shooter.h"
 #include "ProjectileDataAsset.generated.h"
 
-enum class EShooterType : uint8;
-enum class EAsteroidSize : uint8;
+//enum class EShooterType : uint8;
 
 /**
  * 
@@ -25,10 +24,7 @@ public:
 	static const FPrimaryAssetType assetType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-		EAsteroidSize userType1;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-		EShooterType userType2;
+		EShooterType userType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		FText visibleName;
