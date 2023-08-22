@@ -31,11 +31,13 @@ public:
 	AAdvancedInvader();
 	virtual void Tick(float DeltaTime) override;		
 
+	UE_NODISCARD static AAdvancedInvader* SpawnAdvancedInvaderDeferred(UWorld& w, const AActor& target);
+
 	virtual EShooterType GetShooterType() const override;
 
 	virtual float GetOnPlanetCollisionDamage() const override;
 
-	void SetTarget(const AActor& actor);
+	void SetTarget(const AActor& target) &;
 
 	virtual int32 GetOnKillBounty() const override;
 

@@ -18,6 +18,7 @@ void UProjectileSelectorEntry::NativeOnInitialized()
 	icon->Brush.DrawAs = ESlateBrushDrawType::Image;
 }
 
+#if WITH_EDITOR
 EDataValidationResult UProjectileSelectorEntry::IsDataValid(TArray<FText>& ValidationErrors)
 {
 	Super::IsDataValid(ValidationErrors);
@@ -28,6 +29,7 @@ EDataValidationResult UProjectileSelectorEntry::IsDataValid(TArray<FText>& Valid
 	return ValidationErrors.Num() > 0 ?
 		EDataValidationResult::Invalid : EDataValidationResult::Valid;
 }
+#endif
 
 void UProjectileSelectorEntry::NativeOnItemSelectionChanged(bool bIsSelected)
 {

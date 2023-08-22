@@ -2,7 +2,6 @@
 
 
 #include "CoreSystems/BBInvadersGameModeBase.h"
-#include "CoreSystems/BBInvadersAssetManager.h"
 #include "UI/BBInvadersHUD.h"
 #include "Player/BBInvadersPlayerController.h"
 #include "Player/PlayerPawn.h"
@@ -71,13 +70,7 @@ void ABBInvadersGameModeBase::Tick(float DeltaTime)
 void ABBInvadersGameModeBase::StartGameplay()
 {
 	localController->Possess(RefreshGameState());
-	auto* test{ UBBInvadersAssetManager::GetIfValid() };
-
-	FStreamableDelegate delegate = FStreamableDelegate::CreateUObject(this, &ABBInvadersGameModeBase::OnTestLoadingComplete);
-
-	testHandle = test->LoadPrimaryAssetsWithType(UProjectileDataAsset::assetType, {}, delegate);
-
-	SetActorTickEnabled(true);	
+	SetActorTickEnabled(true);
 }
 
 void ABBInvadersGameModeBase::GoToMainMenu()
@@ -259,19 +252,13 @@ AAdvancedInvader* ABBInvadersGameModeBase::SpawnNewAdvancedInvader() const
 	//ensure?
 	check(world && target);
 
-	//UStaticMesh* mesh{ world->GetSubsystem<UAssetProvider>()->GetInvaderMesh() };
-	FVector location{ /*CalcRandOutOfBoundsPos(mesh->GetBounds().GetSphere().W)*/};
 
-	FTransform newInvaderTransform{ FRotator::ZeroRotator, location };
+	AAdvancedInvader* newInvader{ AAdvancedInvader::SpawnAdvancedInvaderDeferred(*world,
+		*CastChecked<ABBInvadersGameStateBase>(world->GetGameState())->GetCenterActor()) };
 
-	auto* newInvader{ world->SpawnActorDeferred<AAdvancedInvader>(
-		AAdvancedInvader::StaticClass(), newInvaderTransform, nullptr,
-		nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn) };
+	FVector location{ /*CalcRandOutOfBoundsPos(mesh->GetBounds().GetSphere().W)*/ };
 
-	//newInvader->SetMesh(*mesh);
-	newInvader->SetTarget(*target);
-
-	newInvader->FinishSpawning(newInvaderTransform);
+	newInvader->FinishSpawning({ FRotator::ZeroRotator, location });
 	return newInvader;
 }
 
@@ -326,14 +313,5 @@ AOrbit* ABBInvadersGameModeBase::ProcessCheckOrbits(std::function<void(AOrbit&)>
 	return orbits.Num() ?
 		orbits.GetTail()->GetValue().Get() :
 		nullptr;
-}
-
-void ABBInvadersGameModeBase::OnTestLoadingComplete()
-{
-	UAssetManager* manager = UAssetManager::GetIfValid();
-	if (manager)
-	{
-		int32{ 1 };
-	}
 }
 

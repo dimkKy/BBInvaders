@@ -12,9 +12,9 @@
 UENUM(BlueprintType)
 enum class EAsteroidSize : uint8
 {
-	EAS_Small,
-	EAS_Medium,
-	EAS_Big,
+	EAS_Small UMETA(DisplayName = "Small"),
+	EAS_Medium UMETA(DisplayName = "Medium"),
+	EAS_Big UMETA(DisplayName = "Big"),
 	EAS_MAX UMETA(Hidden),
 };
 
@@ -41,8 +41,8 @@ public:
 
 	void SetSizeAssignMesh(EAsteroidSize newSize);
 
-	void SetVelocity(const FVector& targetLocation);
-	//void SetVelocity(const FVector& newVel);
+	void CalculateRandomVelocity(const FVector& targetLocation);
+	//void CalculateRandomVelocity(const FVector& newVel);
 
 	void SetRotation();
 	void SetRotation(const FVector& rotAxis, float rotSpeed);
@@ -59,7 +59,9 @@ protected:
 			AActor* otherActor, UPrimitiveComponent* otherComp,
 			int32 otherIndex, bool bFromSweep, const FHitResult& result);
 
-	void Split();
+	static AAsteroid* SpawnAsteroid(UWorld& w, const FVector& location, EAsteroidSize size);
+
+	AAsteroid* Split();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		UStaticMeshComponent* body;

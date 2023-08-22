@@ -48,7 +48,7 @@ void AAsteroid::SetSizeAssignMesh(EAsteroidSize newSize)
 	//check(body->SetStaticMesh(provider.GetAsteroidMesh(size)));
 }
 
-void AAsteroid::SetVelocity(const FVector& targetLocation)
+void AAsteroid::CalculateRandomVelocity(const FVector& targetLocation)
 {
 	FVector toTarget{ targetLocation - RootComponent->GetRelativeLocation() };
 
@@ -58,7 +58,7 @@ void AAsteroid::SetVelocity(const FVector& targetLocation)
 		FMath::RandRange(velocityRange.first, velocityRange.second);
 }
 
-/*void AAsteroid::SetVelocity(const FVector& newVel)
+/*void AAsteroid::CalculateRandomVelocity(const FVector& newVel)
 {
 	velocity = newVel;
 }*/
@@ -131,39 +131,28 @@ void AAsteroid::OnOverlapBegin(UPrimitiveComponent* component, AActor* otherActo
 	}
 }
 
-void AAsteroid::Split()
+AAsteroid* AAsteroid::Split()
 {
-	check(size != EAsteroidSize::EAS_MAX && size != EAsteroidSize::EAS_Small);
-
-	UWorld* world{ GetWorld() };
-	//REDO
-	check(false);
+	check(GetWorld() && size != EAsteroidSize::EAS_MAX);
+	if (size == EAsteroidSize::EAS_Small) {
+		Destroy();
+		return nullptr;
+	}
+	
 	EAsteroidSize newSize{ static_cast<EAsteroidSize>(static_cast<int32>(size) - 1) };
-
 	SetSizeAssignMesh(newSize);
 
+	UWorld* world{ GetWorld() };
+	AAsteroid* newAsteroid{ AAsteroid::SpawnAsteroid(*world, GetActorLocation(), newSize) };
+
 	float splitHalfAngle{ BBInvadersUtils::RandAbsRange(splitAngleAmplitude) };
+	FVector up{ CastChecked<ABBInvadersGameStateBase>(world->GetGameState())->GetUpVector() };
 
-	FVector forward{ GetActorForwardVector() };
-	//TODO take up from pawn
+	newAsteroid->velocity = velocity.RotateAngleAxis(splitHalfAngle, up);
 
-	auto* gameState{ CastChecked<ABBInvadersGameStateBase>(world->GetGameState()) };
-	FVector up{ GetActorUpVector() };
+	velocity = velocity.RotateAngleAxis(-splitHalfAngle, up);
 
-	SetActorRotation(FRotationMatrix::MakeFromX(
-		forward.RotateAngleAxis(splitHalfAngle, up)).Rotator());
-
-	FTransform newAsteroidTransform{ FRotationMatrix::MakeFromX(
-		forward.RotateAngleAxis(-1.f * splitHalfAngle, up)).Rotator(),
-		GetActorLocation(), GetActorScale3D() };
-
-	auto* newAsteroid{ world->SpawnActorDeferred<AAsteroid>(
-		ThisClass::StaticClass(), newAsteroidTransform,
-		nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn) };
-
-	newAsteroid->SetSizeAssignMesh(newSize);
-	//newAsteroid->SetVelocity(velocity)
-	newAsteroid->FinishSpawning(newAsteroidTransform, true);
+	return newAsteroid;
 }
 
 void AAsteroid::Tick(float DeltaTime)
@@ -175,15 +164,19 @@ void AAsteroid::Tick(float DeltaTime)
 		RootComponent->GetRelativeRotation(), true);
 }
 
+AAsteroid* AAsteroid::SpawnAsteroid(UWorld& w, const FVector& location, EAsteroidSize size)
+{
+	AAsteroid* newAsteroid{ SpawnAsteroidDeferred(w, size) };
+	newAsteroid->FinishSpawning(
+		{ BBInvadersUtils::RandomRotator(), location }, false);
+	return newAsteroid;
+}
+
 AAsteroid* AAsteroid::SpawnAsteroid(UWorld& w, const FVector& location, 
 	const FVector& targetLocation, EAsteroidSize size)
 {
-	AAsteroid* newAsteroid{ SpawnAsteroidDeferred(w, size)};
-
-	newAsteroid->FinishSpawning(
-		{ BBInvadersUtils::RandomRotator(), location, FVector::OneVector }, false);
-	newAsteroid->SetVelocity(targetLocation);
-
+	AAsteroid* newAsteroid{ SpawnAsteroid(w, location, size)};
+	newAsteroid->CalculateRandomVelocity(targetLocation);
 	return newAsteroid;
 }
 
@@ -206,5 +199,5 @@ UE_NODISCARD AAsteroid* AAsteroid::SpawnAsteroidDeferred(UWorld& w, EAsteroidSiz
 void AAsteroid::FinishSpawningSetVelocity(const FVector& location, const FVector& targetLoc)
 {
 	FinishSpawning({ BBInvadersUtils::RandomRotator(), location}, false);
-	SetVelocity(targetLoc);
+	CalculateRandomVelocity(targetLoc);
 }

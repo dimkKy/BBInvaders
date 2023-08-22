@@ -20,6 +20,7 @@ EShooterType AMainMenuPawn::GetShooterType() const
 	return EShooterType::EST_Human;
 }
 
+#if WITH_EDITOR
 EDataValidationResult AMainMenuPawn::IsDataValid(TArray<FText>& ValidationErrors)
 {
 	Super::IsDataValid(ValidationErrors);
@@ -31,6 +32,7 @@ EDataValidationResult AMainMenuPawn::IsDataValid(TArray<FText>& ValidationErrors
 	return ValidationErrors.Num() > 0 ?
 		EDataValidationResult::Invalid : EDataValidationResult::Valid;
 }
+#endif
 
 void AMainMenuPawn::BeginPlay()
 {

@@ -64,11 +64,6 @@ protected:
 	AOrbit* ProcessCheckOrbits();
 	AOrbit* ProcessCheckOrbits(std::function<void(AOrbit&)> func);
 
-
-	TSharedPtr<FStreamableHandle> testHandle;
-	
-	void OnTestLoadingComplete();
-
 	static constexpr int32 maxOrbits{ 5 };
 };
 

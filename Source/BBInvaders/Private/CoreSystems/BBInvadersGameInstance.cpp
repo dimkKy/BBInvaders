@@ -3,6 +3,7 @@
 
 #include "CoreSystems/BBInvadersGameInstance.h"
 
+#if WITH_EDITOR
 EDataValidationResult UBBInvadersGameInstance::IsDataValid(TArray<FText>& ValidationErrors)
 {
 	Super::IsDataValid(ValidationErrors);
@@ -15,3 +16,5 @@ EDataValidationResult UBBInvadersGameInstance::IsDataValid(TArray<FText>& Valida
 		return EDataValidationResult::Valid;
 	}
 }
+#endif
+
