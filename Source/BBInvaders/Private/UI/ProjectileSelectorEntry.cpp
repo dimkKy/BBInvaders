@@ -3,6 +3,7 @@
 
 #include "UI/ProjectileSelectorEntry.h"
 #include "CoreSystems/ProjectileDataAsset.h"
+#include "CoreSystems/BBInvadersGameStateBase.h"
 #include "Components/TextBlock.h"
 #include "Components/Image.h"
 #include "Blueprint/WidgetTree.h"
@@ -16,6 +17,12 @@ void UProjectileSelectorEntry::NativeOnInitialized()
 	outline->SetRenderOpacity(0.f);
 
 	icon->Brush.DrawAs = ESlateBrushDrawType::Image;
+}
+
+void UProjectileSelectorEntry::UpdateCost(float currentInflation)
+{
+	check(cachedInfo);
+	SetCost(cachedInfo->baseCost * currentInflation);
 }
 
 #if WITH_EDITOR
@@ -39,8 +46,18 @@ void UProjectileSelectorEntry::NativeOnItemSelectionChanged(bool bIsSelected)
 void UProjectileSelectorEntry::NativeOnListItemObjectSet(UObject* ListItemObject)
 {
 	UProjectileDataAsset* projectileInfo{ CastChecked<UProjectileDataAsset>(ListItemObject) };
+	cachedInfo = CastChecked<UProjectileDataAsset>(ListItemObject);
 
-	currentCost->SetText(FText::AsNumber(projectileInfo->baseCost, &formattingOptions));
+	SetCost(projectileInfo->baseCost
+		//* CastChecked<ABBInvadersGameStateBase>(GetWorld()->GetGameState())->GetCurrentInflation()
+	);
+
 	visibleName->SetText(projectileInfo->visibleName);
 	icon->SetBrushFromSoftTexture(projectileInfo->icon, true);
+}
+
+void UProjectileSelectorEntry::SetCost(float cost)
+{
+	//add currency later
+	currentCost->SetText(FText::AsNumber(cost, &formattingOptions));
 }

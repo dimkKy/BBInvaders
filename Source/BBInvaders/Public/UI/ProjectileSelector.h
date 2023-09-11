@@ -23,6 +23,8 @@ public:
 	void SetAvailableProjectiles(const TArray<UProjectileDataAsset*>& projectiles);
 	void SelectNext(bool bReverse = false);
 
+	void UpdatePrices();
+
 protected:
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 		UListView* listView;

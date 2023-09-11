@@ -8,6 +8,8 @@
 
 class ABBInvadersHUD;
 class UProjectileDataAsset;
+struct FStreamableHandle;
+
 /**
  * 
  */
@@ -22,9 +24,16 @@ public:
 
 	UProjectileDataAsset* GetSelectedProjectile() const;
 
+	void OnGameplayInitiated();
+
 	UFUNCTION()
 		void ExitGame();
 
 protected:
 	virtual void AcknowledgePossession(APawn* P) override;
+
+	UPROPERTY()
+		TArray<UProjectileDataAsset*> availableProjectiles;
+
+	TSharedPtr<FStreamableHandle> projectilesHanle;
 };

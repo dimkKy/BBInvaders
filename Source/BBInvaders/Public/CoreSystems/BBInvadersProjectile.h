@@ -39,7 +39,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 		UStaticMeshComponent* body;
 
-	const UProjectileDataAsset* projectileData;
+	UPROPERTY()
+		const UProjectileDataAsset* projectileData;
 
 	static constexpr float lifespan{ 40.f };
 	static constexpr int32 simulationInteractions{ 3 };

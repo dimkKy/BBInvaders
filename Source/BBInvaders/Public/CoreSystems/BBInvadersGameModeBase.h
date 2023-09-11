@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
-#include <functional>
 #include "BBInvadersGameModeBase.generated.h"
 
 class ABBInvadersPlayerController;
@@ -62,7 +61,7 @@ protected:
 	TDoubleLinkedList<TWeakObjectPtr<AOrbit>> orbits;
 
 	AOrbit* ProcessCheckOrbits();
-	AOrbit* ProcessCheckOrbits(std::function<void(AOrbit&)> func);
+	AOrbit* ProcessCheckOrbits(TFunction<void(AOrbit&)>&& func);
 
 	static constexpr int32 maxOrbits{ 5 };
 };

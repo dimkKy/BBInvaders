@@ -17,23 +17,23 @@ void UBBInvadersAssetManager::FinishInitialLoading()
 	Super::FinishInitialLoading();
 }
 
-int32 UBBInvadersAssetManager::GetProjectilesAvailableToPlayer(TArray<UProjectileDataAsset*>& outArray)
+UBBInvadersAssetManager& UBBInvadersAssetManager::Get()
 {
-	int32 addedAmount{ 0 };
+	return static_cast<ThisClass&>(Super::Get());
+}
 
-	if (projectileDataAssets[static_cast<int32>(EShooterType::EST_PlayerOnly)].Num()) {
-		for (auto asset : projectileDataAssets[static_cast<int32>(EShooterType::EST_PlayerOnly)]) {
-			outArray.Add(asset.LoadSynchronous());
-			addedAmount++;
-		}
+int32 UBBInvadersAssetManager::GetProjectilesAvailableToUserType(EShooterType userType, TArray<FSoftObjectPath>& outArray)
+{
+	check(outArray.Num() == 0);
+
+	if (userType != EShooterType::EST_MAX && projectileDataAssets[static_cast<int32>(userType)].Num()) {
+		outArray = projectileDataAssets[static_cast<int32>(userType)];
 	}
 	else {
-		for (auto asset : projectileDataAssets[static_cast<int32>(EShooterType::EST_MAX)]) {
-			outArray.Add(asset.LoadSynchronous());
-			addedAmount++;
-		}
+		outArray = projectileDataAssets[static_cast<int32>(EShooterType::EST_MAX)];
+		
 	}
-	return addedAmount;
+	return outArray.Num();
 }
 
 void UBBInvadersAssetManager::PostInitialAssetScan()
@@ -57,40 +57,47 @@ void UBBInvadersAssetManager::OnDataFailureDetected(bool bIsCritical, const FTex
 	//TODO
 }
 
-void UBBInvadersAssetManager::OnProjectileDataAssetsLoaded()
+void UBBInvadersAssetManager::LoadProcessUnloadData(TSharedPtr<FStreamableHandle>& handle, 
+	TFunction<bool(UObject*)>&& processFunc, bool bForceGC)
 {
-
-	if (projectileAssetsLoadHandle.IsValid()) {
+	if (handle.IsValid()) {
 		int32 loadedNum, requestedNum;
-		projectileAssetsLoadHandle->GetLoadedCount(loadedNum, requestedNum);
+		handle->GetLoadedCount(loadedNum, requestedNum);
 		if (loadedNum) {
 			TArray<UObject*> loadedAssets;
 			loadedAssets.Reserve(loadedNum);
-			projectileAssetsLoadHandle->GetLoadedAssets(loadedAssets);
+			handle->GetLoadedAssets(loadedAssets);
 
 			TArray<FPrimaryAssetId> assetsToUnload;
 
 			for (auto* asset : loadedAssets) {
-				if (auto* projectileData{ ExactCast<UProjectileDataAsset>(asset) }) {
-					projectileDataAssets[static_cast<int32>(projectileData->userType)].Emplace(projectileData);
-					assetsToUnload.Add(projectileData->GetPrimaryAssetId());
-					//projectileData->MarkPendingKill();					
+				if (processFunc(asset)) {
+					assetsToUnload.Add(asset->GetPrimaryAssetId());
 				}
 			}
-			projectileAssetsLoadHandle->ReleaseHandle();
-			projectileAssetsLoadHandle.Reset();
-
-			if (!IsProjectilesDataSufficient()) {
-				//todo
-				return;
-			}
+			handle->ReleaseHandle();
 
 			UnloadPrimaryAssets(assetsToUnload);
-			//?
-			GEngine->ForceGarbageCollection(true);
+
+			if (bForceGC) {
+				GEngine->ForceGarbageCollection(true);
+			}
 			return;
 		}
 	}
+}
+
+void UBBInvadersAssetManager::OnProjectileDataAssetsLoaded()
+{
+	LoadProcessUnloadData(projectileAssetsLoadHandle, [this](UObject* object) {
+		if (auto* projectileData{ ExactCast<UProjectileDataAsset>(object) }) {
+			projectileDataAssets[static_cast<int32>(projectileData->userType)].Emplace(projectileData);
+			return true;				
+		}
+		else {
+			return false;
+		}
+	});
 }
 
 bool UBBInvadersAssetManager::IsProjectilesDataSufficient()
@@ -100,5 +107,13 @@ bool UBBInvadersAssetManager::IsProjectilesDataSufficient()
 
 void UBBInvadersAssetManager::OnAsteroidMeshSetsLoaded()
 {
-
+	LoadProcessUnloadData(projectileAssetsLoadHandle, [this](UObject* object) {
+		if (auto * projectileData{ ExactCast<UAsteroidMeshSetAsset>(object) }) {
+			asteroidMeshSets.Emplace(projectileData);
+			return true;
+		}
+		else {
+			return false;
+		}
+	});
 }

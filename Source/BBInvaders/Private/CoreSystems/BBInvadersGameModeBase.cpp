@@ -294,7 +294,7 @@ AOrbit* ABBInvadersGameModeBase::ProcessCheckOrbits()
 		nullptr;
 }
 
-AOrbit* ABBInvadersGameModeBase::ProcessCheckOrbits(std::function<void(AOrbit&)> func)
+AOrbit* ABBInvadersGameModeBase::ProcessCheckOrbits(TFunction<void(AOrbit&)>&& func)
 {
 	for (decltype(orbits)::TIterator it{orbits.GetHead()}; it; ) {
 		if (TWeakObjectPtr<AOrbit> weakP{ (*it) }; weakP.IsValid() /*&& (*it)->GetInvadersNum()*/) {

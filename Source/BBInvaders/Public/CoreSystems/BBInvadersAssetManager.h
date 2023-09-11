@@ -22,16 +22,20 @@ public:
 
 	virtual void StartInitialLoading() override;
 	virtual void FinishInitialLoading() override;
+	
+	static ThisClass& Get();
 
-	//Redo to async?
-	int32 GetProjectilesAvailableToPlayer(TArray<UProjectileDataAsset*>& outArray);
+	int32 GetProjectilesAvailableToUserType(EShooterType userType, TArray<FSoftObjectPath>& outArray);
 
 protected:
 	virtual void PostInitialAssetScan() override;
 
 	void OnDataFailureDetected(bool bIsCritical, const FText& errorText);
+
+	void LoadProcessUnloadData(TSharedPtr<FStreamableHandle>& handle, TFunction<bool(UObject*)>&& processFunc, bool bForceGC = false);
 	
-	TArray <TSoftObjectPtr<UProjectileDataAsset>> projectileDataAssets[static_cast<int32>(EShooterType::EST_MAX) + 1];
+	//TArray <TSoftObjectPtr<UProjectileDataAsset>> projectileDataAssets[static_cast<int32>(EShooterType::EST_MAX) + 1];
+	TArray <FSoftObjectPath> projectileDataAssets[static_cast<int32>(EShooterType::EST_MAX) + 1];
 	TSharedPtr<FStreamableHandle> projectileAssetsLoadHandle;
 
 	void OnProjectileDataAssetsLoaded();

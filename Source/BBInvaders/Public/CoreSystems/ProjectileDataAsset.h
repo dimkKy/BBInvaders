@@ -7,6 +7,8 @@
 #include "CoreSystems/Shooter.h"
 #include "ProjectileDataAsset.generated.h"
 
+DECLARE_DELEGATE(FStreamableDelegate);
+
 //enum class EShooterType : uint8;
 
 /**
@@ -20,6 +22,8 @@ public:
 	UProjectileDataAsset();
 
 	virtual FPrimaryAssetId GetPrimaryAssetId() const override;
+
+	void PreLoadAsync(bool bLoadMesh = false, FStreamableDelegate onIconLoaded = {});
 
 	static const FPrimaryAssetType assetType;
 

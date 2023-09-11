@@ -9,6 +9,7 @@
 
 class UTextBlock;
 class UImage;
+class UProjectileDataAsset;
 
 /**
  * 
@@ -19,6 +20,7 @@ class BBINVADERS_API UProjectileSelectorEntry : public UUserWidget, public IUser
 	GENERATED_BODY()
 public:
 	virtual void NativeOnInitialized() override;
+	void UpdateCost(float currentInflation);
 
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 		UImage* outline;
@@ -37,5 +39,10 @@ protected:
 	virtual void NativeOnItemSelectionChanged(bool bIsSelected) override;
 	virtual void NativeOnListItemObjectSet(UObject* ListItemObject) override;
 
+	void SetCost(float cost);
+
 	static const FNumberFormattingOptions formattingOptions;
+	
+	//for faster access?
+	const UProjectileDataAsset* cachedInfo;
 };

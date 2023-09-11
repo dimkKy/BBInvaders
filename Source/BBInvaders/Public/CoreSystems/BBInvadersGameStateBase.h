@@ -34,7 +34,6 @@ public:
 	FVector GetCenter() const;
 
 	const AActor* GetCenterActor() const;
-	
 
 	float GetCurrentInflation() const;
 

@@ -2,6 +2,8 @@
 
 
 #include "CoreSystems/ProjectileDataAsset.h"
+#include "Engine/Texture2D.h"
+#include "CoreSystems/BBInvadersAssetManager.h"
 //#include "CoreSystems/Shooter.h"
 
 const FPrimaryAssetType UProjectileDataAsset::assetType{ "ProjectileData" };
@@ -16,6 +18,19 @@ UProjectileDataAsset::UProjectileDataAsset() :
 FPrimaryAssetId UProjectileDataAsset::GetPrimaryAssetId() const
 {
 	return {assetType, GetFName()};
+}
+
+void UProjectileDataAsset::PreLoadAsync(bool bLoadMesh, FStreamableDelegate onIconLoaded)
+{
+	if (icon.IsPending()) {
+		UBBInvadersAssetManager::Get().GetStreamableManager().RequestAsyncLoad(
+			icon.ToSoftObjectPath(), MoveTemp(onIconLoaded), FStreamableManager::AsyncLoadHighPriority);
+	}
+	if (bLoadMesh && bodyMesh.IsPending()) {
+		UBBInvadersAssetManager::Get().GetStreamableManager().RequestAsyncLoad(
+			bodyMesh.ToSoftObjectPath(), FStreamableDelegate{}, FStreamableManager::AsyncLoadHighPriority);
+	}
+	
 }
 
 #if WITH_EDITOR

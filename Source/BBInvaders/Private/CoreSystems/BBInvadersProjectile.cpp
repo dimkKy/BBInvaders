@@ -2,6 +2,7 @@
 
 
 #include "CoreSystems/BBInvadersProjectile.h"
+#include "CoreSystems/BBInvadersAssetManager.h"
 #include "CoreSystems/ProjectileDataAsset.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/StaticMeshComponent.h"
@@ -75,6 +76,23 @@ void ABBInvadersProjectile::OnOverlapBegin(UPrimitiveComponent* component, AActo
 void ABBInvadersProjectile::SetProjectileData(const UProjectileDataAsset& data)
 {
 	projectileData = &data;
+	movement->InitialSpeed = data.initialSpeed;
+	movement->MaxSpeed = data.maxSpeed;
+	movement->bIsHomingProjectile = data.bIsHoming;
+	/*TWeakObjectPtr<ThisClass> weakThis{ this };
+
+	//UBBInvadersAssetManager::Get().lo
+
+	RequestAsyncLoad(SoftTexture,
+		[WeakThis, SoftTexture, bMatchSize]() {
+			if (UImage* StrongThis = WeakThis.Get())
+			{
+				ensureMsgf(SoftTexture.Get(), TEXT("Failed to load %s"), *SoftTexture.ToSoftObjectPath().ToString());
+				StrongThis->SetBrushFromTexture(SoftTexture.Get(), bMatchSize);
+			}
+		}
+	);*/
+	body->SetStaticMesh(data.bodyMesh.LoadSynchronous());
 }
 
 const UProjectileDataAsset* ABBInvadersProjectile::GetProjectileData() const

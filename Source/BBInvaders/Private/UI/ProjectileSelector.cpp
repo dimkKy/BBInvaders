@@ -2,6 +2,8 @@
 
 
 #include "UI/ProjectileSelector.h"
+#include "UI/ProjectileSelectorEntry.h"
+#include "CoreSystems/BBInvadersGameStateBase.h"
 #include "Components/ListView.h"
 #include "CoreSystems/ProjectileDataAsset.h"
 
@@ -38,4 +40,15 @@ void UProjectileSelector::SelectNext(bool bReverse)
         }
     }
     listView->SetSelectedIndex(selectedIndex);
+}
+
+void UProjectileSelector::UpdatePrices()
+{
+    float currentInflation{ CastChecked<ABBInvadersGameStateBase>(GetWorld()->GetGameState())->GetCurrentInflation() };
+
+    for (auto&& object : listView->GetDisplayedEntryWidgets()) {
+        if (auto&& entry{ ExactCast<UProjectileSelectorEntry>(object) }) {
+            entry->UpdateCost(currentInflation);
+        }
+    }
 }
