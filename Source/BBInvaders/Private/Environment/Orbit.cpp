@@ -38,6 +38,19 @@ void AOrbit::Tick(float DeltaTime)
 	Shrink(DeltaTime * shrinkingSpeed);
 }
 
+AOrbit* AOrbit::SpawnOrbit(UWorld& w, const FTransform& transform, float radius, int32 invaderNum, bool bZeroRotationSpeed)
+{
+	auto* newOrbit{ w.SpawnActorDeferred<ThisClass>(
+		ThisClass::StaticClass(), transform, nullptr,
+		nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn) };
+
+	newOrbit->InitWithInvaders(radius);
+	newOrbit->ChangeRotationSpeed(bZeroRotationSpeed);
+
+	newOrbit->FinishSpawning(transform, true);
+	return newOrbit;
+}
+
 void AOrbit::BeginPlay()
 {
 	Super::BeginPlay();
@@ -74,15 +87,14 @@ TArray<FVector> AOrbit::CalcRadiusVectors(int32 size, float length, float offset
 	return out;
 }
 
-void AOrbit::SetRotationSpeed(bool bRandom, float speed)
+void AOrbit::ChangeRotationSpeed(bool bZero)
 {
-	if (bRandom) {
-		rotator->RotationRate = BBInvadersUtils::unitRotation *
-			FMath::RandRange(0.f, maxRotationSpeed);
+	if (bZero) {
+		rotator->RotationRate = FRotator::ZeroRotator;
 	}
 	else {
-		rotator->RotationRate = BBInvadersUtils::unitRotation * 
-			FMath::Clamp(speed, -1.f * maxRotationSpeed, maxRotationSpeed);
+		rotator->RotationRate = BBInvadersUtils::unitRotation *
+			FMath::RandRange(0.f, maxRotationSpeed);
 	}
 }
 

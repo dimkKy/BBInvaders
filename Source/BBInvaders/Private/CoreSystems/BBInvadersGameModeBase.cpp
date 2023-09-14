@@ -224,7 +224,7 @@ AOrbit* ABBInvadersGameModeBase::SpawnNewOrbit(float additionalRadius)
 	check(gameState);
 	const FPlayAreaInfo* mapInfo{ &gameState->mapInfo };
 
-	AOrbit* outermostOrbit{ ProcessCheckOrbits() };
+	auto* outermostOrbit{ ProcessCheckOrbits() };
 
 	float newRadius{ outermostOrbit ?
 		outermostOrbit->GetOuterRadius() : mapInfo->halfSize.Size2D() };
@@ -233,15 +233,9 @@ AOrbit* ABBInvadersGameModeBase::SpawnNewOrbit(float additionalRadius)
 		FRotationMatrix::MakeFromXZ(mapInfo->forward, mapInfo->up).ToQuat(),
 		mapInfo->center };
 
-	auto* newOrbit{ GetWorld()->SpawnActorDeferred<AOrbit>(
-		AOrbit::StaticClass(), newOrbitTransform, nullptr, 
-		nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn) };
-
-	newOrbit->InitWithInvaders(newRadius);
-	newOrbit->SetRotationSpeed(true);
-
-	newOrbit->FinishSpawning(newOrbitTransform);
-	orbits.AddTail(TWeakObjectPtr<AOrbit>{newOrbit});
+	auto* newOrbit{ AOrbit::SpawnOrbit(*GetWorld(), newOrbitTransform, newRadius)};
+	//cringe
+	orbits.AddTail(TWeakObjectPtr<std::remove_pointer<decltype(newOrbit)>::type>{newOrbit});
 	return newOrbit;
 }
 
@@ -252,11 +246,9 @@ AAdvancedInvader* ABBInvadersGameModeBase::SpawnNewAdvancedInvader() const
 	//ensure?
 	check(world && target);
 
+	auto* newInvader{ AAdvancedInvader::SpawnAdvancedInvaderDeferred(*world, *target) };
 
-	AAdvancedInvader* newInvader{ AAdvancedInvader::SpawnAdvancedInvaderDeferred(*world,
-		*CastChecked<ABBInvadersGameStateBase>(world->GetGameState())->GetCenterActor()) };
-
-	FVector location{ /*CalcRandOutOfBoundsPos(mesh->GetBounds().GetSphere().W)*/ };
+	FVector location{ CalcRandOutOfBoundsPos(newInvader->GetCollisionRadius()) };
 
 	newInvader->FinishSpawning({ FRotator::ZeroRotator, location });
 	return newInvader;
@@ -279,11 +271,11 @@ AAsteroid* ABBInvadersGameModeBase::SpawnNewAsteroid() const
 AOrbit* ABBInvadersGameModeBase::ProcessCheckOrbits()
 {
 	for (decltype(orbits)::TIterator it{orbits.GetHead()}; it; ) {
-		if ((*it).IsValid() /*&& (*it)->GetInvadersNum()*/) {
+		if ((*it).IsValid()) {
 			++it;
 		}
 		else {
-			auto* node{ it.GetNode() };
+			auto&& node{ it.GetNode() };
 			++it;
 			orbits.RemoveNode(node);
 		}

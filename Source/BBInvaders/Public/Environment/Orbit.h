@@ -20,7 +20,10 @@ public:
 	AOrbit();
 	virtual void Tick(float DeltaTime) override;
 
-	void SetRotationSpeed(bool bRandom, float speed = 0.f);
+	UE_NODISCARD static ThisClass* SpawnOrbit(UWorld& w, const FTransform& transform,
+		float radius, int32 invaderNum = 0, bool bZeroRotationSpeed = false);
+
+	void ChangeRotationSpeed(bool bZero);
 	static void SetShrinkingSpeed(float speed);
 
 	void Shrink(float distance);

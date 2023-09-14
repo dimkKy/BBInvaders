@@ -32,9 +32,9 @@ public:
 	AAsteroid();
 	virtual void Tick(float DeltaTime) override;
 
-	static AAsteroid* SpawnAsteroid(UWorld& w, const FVector& location,
+	static ThisClass* SpawnAsteroid(UWorld& w, const FVector& location,
 		const FVector& targetLoc, EAsteroidSize size = AAsteroid::RandomSize());
-	UE_NODISCARD static AAsteroid* SpawnAsteroidDeferred(UWorld& w, EAsteroidSize size = AAsteroid::RandomSize());
+	UE_NODISCARD static ThisClass* SpawnAsteroidDeferred(UWorld& w, EAsteroidSize size = AAsteroid::RandomSize());
 	void FinishSpawningSetVelocity(const FVector& location, const FVector& targetLoc);
 
 	static EAsteroidSize GetSmaller(EAsteroidSize _size);

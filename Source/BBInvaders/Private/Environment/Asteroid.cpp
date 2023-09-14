@@ -175,14 +175,14 @@ AAsteroid* AAsteroid::SpawnAsteroid(UWorld& w, const FVector& location, EAsteroi
 AAsteroid* AAsteroid::SpawnAsteroid(UWorld& w, const FVector& location, 
 	const FVector& targetLocation, EAsteroidSize size)
 {
-	AAsteroid* newAsteroid{ SpawnAsteroid(w, location, size)};
+	auto* newAsteroid{ SpawnAsteroid(w, location, size)};
 	newAsteroid->CalculateRandomVelocity(targetLocation);
 	return newAsteroid;
 }
 
 UE_NODISCARD AAsteroid* AAsteroid::SpawnAsteroidDeferred(UWorld& w, EAsteroidSize size)
 {
-	AAsteroid* newAsteroid{ w.SpawnActorDeferred<ThisClass>(
+	auto* newAsteroid{ w.SpawnActorDeferred<ThisClass>(
 		ThisClass::StaticClass(), FTransform::Identity, nullptr,
 		nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn) };
 

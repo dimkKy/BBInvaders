@@ -24,6 +24,7 @@ public:
 	AInvader();
 
 	void SetMesh(UStaticMesh& newMesh);
+	float GetCollisionRadius() const;
 
 	virtual void Shoot() override;
 	virtual EShooterType GetShooterType() const override;

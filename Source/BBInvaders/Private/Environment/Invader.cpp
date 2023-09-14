@@ -23,6 +23,12 @@ void AInvader::SetMesh(UStaticMesh& newMesh)
 	body->SetStaticMesh(&newMesh);
 }
 
+float AInvader::GetCollisionRadius() const
+{
+	check(body->GetStaticMesh());
+	return body->GetStaticMesh()->GetBounds().GetSphere().W;
+}
+
 void AInvader::Shoot()
 {
 	auto* world{ GetWorld() };
