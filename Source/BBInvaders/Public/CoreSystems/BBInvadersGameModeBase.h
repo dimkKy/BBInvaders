@@ -37,7 +37,7 @@ public:
 	void OnGameOver();
 
 #if WITH_EDITOR
-	virtual EDataValidationResult IsDataValid(TArray<FText>& ValidationErrors) override;
+	virtual EDataValidationResult IsDataValid(FDataValidationContext& context) const override;
 
 	UFUNCTION(CallInEditor, Category = "Debug", meta = (DevelopmentOnly))
 		void _SpawnNewAdvancedInvader() const;
@@ -51,9 +51,9 @@ protected:
 	virtual void BeginPlay() override;
 	APawn* RefreshGameState();
 
-	FVector CalcRandOutOfBoundsPos(float objectRadius) const;
+	FVector CalcRandOutOfBoundsPos(double objectRadius) const;
 
-	UE_NODISCARD AOrbit* SpawnNewOrbit(float additionalRadius = 0.f);
+	UE_NODISCARD AOrbit* SpawnNewOrbit(double additionalRadius = 0.);
 	UE_NODISCARD AAdvancedInvader* SpawnNewAdvancedInvader() const;
 	UE_NODISCARD AAsteroid* SpawnNewAsteroid() const;
 

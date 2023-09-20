@@ -11,6 +11,9 @@
 #include "CoreSystems/BBInvadersGameModeBase.h"
 #include "Environment/PlanetaryThreatable.h"
 #include "BBInvadersUtils.h"
+#if WITH_EDITOR
+#include "Misc/DataValidation.h"
+#endif
 
 APlayerPawn::APlayerPawn() :
 	planet{ CreateDefaultSubobject<UStaticMeshComponent>("planet") },
@@ -51,12 +54,12 @@ void APlayerPawn::PostInitializeComponents()
 	}
 #endif
 
-	float planetHalfSize{ planet->GetStaticMesh()->GetBounds().GetSphere().W };
-	float platformSize{ platform->GetStaticMesh()->GetBounds().GetSphere().W * 2.f };
+	double planetHalfSize{ planet->GetStaticMesh()->GetBounds().GetSphere().W };
+	double platformSize{ platform->GetStaticMesh()->GetBounds().GetSphere().W * 2. };
 
-	float cameraHalfHFOVTan{ FMath::Tan(camera->FieldOfView * PI / 360.f) };
+	float cameraHalfHFOVTan{ FMath::Tan(camera->FieldOfView / 360.f * UE_PI) };
 
-	float cameraArmLength{ (planetHalfSize + platformSize) *
+	float cameraArmLength{ static_cast<float>(planetHalfSize + platformSize) *
 		camera->AspectRatio / cameraHalfHFOVTan };
 
 	cameraArmLengthRange.X = cameraArmLength * minZoomMultiplier;
@@ -198,34 +201,34 @@ void APlayerPawn::SetupPlayerInputComponent(UInputComponent* InputComp)
 
 FVector APlayerPawn::CalcMapHalfSize() const
 {
-	float planetHalfSize{ planet->GetStaticMesh()->GetBounds().GetSphere().W };
+	double planetHalfSize{ planet->GetStaticMesh()->GetBounds().GetSphere().W };
 
-	float mapYHalfSize{ FMath::Tan(camera->FieldOfView * PI / 360.f) * 
+	double mapYHalfSize{ FMath::Tan(camera->FieldOfView / 360. * UE_PI ) *
 		(cameraArmLengthRange.Y + planetHalfSize) };
 
 	return { mapYHalfSize, mapYHalfSize * camera->AspectRatio, planetHalfSize };
 }
 
 #if WITH_EDITOR
-EDataValidationResult APlayerPawn::IsDataValid(TArray<FText>& ValidationErrors)
+EDataValidationResult APlayerPawn::IsDataValid(FDataValidationContext& context) const
 {
-	Super::IsDataValid(ValidationErrors);
+	Super::IsDataValid(context);
 
 	if (!planet->GetStaticMesh()) {
-		ValidationErrors.Add(FText::FromString("Invalid planetMesh"));
+		context.AddError(FText::FromString("Invalid planetMesh"));
 	}
 	
 	if (platform->GetStaticMesh()) {
 		if (!platform->DoesSocketExist(BBInvadersUtils::muzzleSocket)) {
-			ValidationErrors.Add(FText::FromString("socket was not found :" 
+			context.AddError(FText::FromString("socket was not found :"
 				+ BBInvadersUtils::muzzleSocket.ToString()));
 		}
 	}
 	else {
-		ValidationErrors.Add(FText::FromString("Invalid platformMesh"));
+		context.AddError(FText::FromString("Invalid platformMesh"));
 	}
 
-	return ValidationErrors.Num() > 0 ?
+	return context.GetNumErrors() > 0 ?
 		EDataValidationResult::Invalid : EDataValidationResult::Valid;
 }
 #endif

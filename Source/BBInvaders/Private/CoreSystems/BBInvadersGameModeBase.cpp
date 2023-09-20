@@ -16,8 +16,10 @@
 #include "Environment/Asteroid.h"
 #include "Environment/Orbit.h"
 #include "Containers/List.h"
-
 #include "CoreSystems/ProjectileDataAsset.h"
+#if WITH_EDITOR
+#include "Misc/DataValidation.h"
+#endif
 
 ABBInvadersGameModeBase::ABBInvadersGameModeBase() :
 	localController{ nullptr }
@@ -107,9 +109,9 @@ void ABBInvadersGameModeBase::OnGameOver()
 }
 
 #if WITH_EDITOR
-EDataValidationResult ABBInvadersGameModeBase::IsDataValid(TArray<FText>& ValidationErrors)
+EDataValidationResult ABBInvadersGameModeBase::IsDataValid(FDataValidationContext& context) const
 {
-	Super::IsDataValid(ValidationErrors);
+	Super::IsDataValid(context);
 
 	/*if (mainMenuLevel) {
 		int32 introCamerasCount{ 0 };
@@ -118,20 +120,20 @@ EDataValidationResult ABBInvadersGameModeBase::IsDataValid(TArray<FText>& Valida
 			introCamerasCount++;
 		}
 		if (introCamerasCount != 1) {
-			ValidationErrors.Add(FText::FromString("There should be exactly one intro camera in main level"));
+			context.AddError(FText::FromString("There should be exactly one intro camera in main level"));
 		}
 	}
 	else {
-		ValidationErrors.Add(FText::FromString("Invalid mainMenuLevel"));
+		context.AddError(FText::FromString("Invalid mainMenuLevel"));
 	}*/
 
 	if (HUDClass && HUDClass->IsChildOf<ABBInvadersHUD>()) {
 		if (!HUDClass->IsInBlueprint()) {
-			ValidationErrors.Add(FText::FromString("Use blueprinted ABBInvadersHUD"));
+			context.AddError(FText::FromString("Use blueprinted ABBInvadersHUD"));
 		}
 	}
 	else {
-		ValidationErrors.Add(FText::FromString("Invalid HUDClass"));
+		context.AddError(FText::FromString("Invalid HUDClass"));
 	}
 
 	if (PlayerControllerClass && 
@@ -139,7 +141,7 @@ EDataValidationResult ABBInvadersGameModeBase::IsDataValid(TArray<FText>& Valida
 
 	}
 	else {
-		ValidationErrors.Add(FText::FromString("Invalid PlayerControllerClass"));
+		context.AddError(FText::FromString("Invalid PlayerControllerClass"));
 	}
 
 	if (GameStateClass &&
@@ -147,7 +149,7 @@ EDataValidationResult ABBInvadersGameModeBase::IsDataValid(TArray<FText>& Valida
 
 	}
 	else {
-		ValidationErrors.Add(FText::FromString("Invalid GameStateClass"));
+		context.AddError(FText::FromString("Invalid GameStateClass"));
 	}
 
 	if (PlayerStateClass &&
@@ -155,10 +157,10 @@ EDataValidationResult ABBInvadersGameModeBase::IsDataValid(TArray<FText>& Valida
 
 	}
 	else {
-		ValidationErrors.Add(FText::FromString("Invalid PlayerStateClass"));
+		context.AddError(FText::FromString("Invalid PlayerStateClass"));
 	}
 
-	return ValidationErrors.Num() > 0 ?
+	return context.GetNumErrors() > 0 ?
 		EDataValidationResult::Invalid : EDataValidationResult::Valid;
 }
 
@@ -213,12 +215,12 @@ APawn* ABBInvadersGameModeBase::RefreshGameState()
 	return pawn;
 }
 
-FVector ABBInvadersGameModeBase::CalcRandOutOfBoundsPos(float objectRadius) const
+FVector ABBInvadersGameModeBase::CalcRandOutOfBoundsPos(double objectRadius) const
 {
 	return GetGameState<ABBInvadersGameStateBase>()->CalcRandOutOfBoundsPos(objectRadius);
 }
 
-AOrbit* ABBInvadersGameModeBase::SpawnNewOrbit(float additionalRadius)
+AOrbit* ABBInvadersGameModeBase::SpawnNewOrbit(double additionalRadius)
 {
 	ABBInvadersGameStateBase* gameState{ GetGameState<ABBInvadersGameStateBase>() };
 	check(gameState);
@@ -226,7 +228,7 @@ AOrbit* ABBInvadersGameModeBase::SpawnNewOrbit(float additionalRadius)
 
 	auto* outermostOrbit{ ProcessCheckOrbits() };
 
-	float newRadius{ outermostOrbit ?
+	double newRadius{ outermostOrbit ?
 		outermostOrbit->GetOuterRadius() : mapInfo->halfSize.Size2D() };
 
 	FTransform newOrbitTransform{ 
@@ -235,7 +237,7 @@ AOrbit* ABBInvadersGameModeBase::SpawnNewOrbit(float additionalRadius)
 
 	auto* newOrbit{ AOrbit::SpawnOrbit(*GetWorld(), newOrbitTransform, newRadius)};
 	//cringe
-	orbits.AddTail(TWeakObjectPtr<std::remove_pointer<decltype(newOrbit)>::type>{newOrbit});
+	orbits.AddTail(TWeakObjectPtr<AOrbit>{newOrbit});
 	return newOrbit;
 }
 

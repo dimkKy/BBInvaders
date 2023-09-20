@@ -8,14 +8,14 @@
 #include "BBInvadersUtils.h"
 #include "Environment/Invader.h"
 
-float AOrbit::shrinkingSpeed = 100.f;
+double AOrbit::shrinkingSpeed = 100.;
 float AOrbit::shrinkingStartDelay = 3.f;
 
 AOrbit::AOrbit() :
 	body{ CreateDefaultSubobject<USceneComponent>("body") },
 	rotator{ CreateDefaultSubobject<URotatingMovementComponent>("rotator") },
 	//invaders{ CreateDefaultSubobject<UHierarchicalInstancedStaticMeshComponent>("invaders") },
-	radius{ 100.f }, invaderRadius{ 0.f }, minRadius { radius }
+	radius{ 100. }, invaderRadius{ 0. }, minRadius { radius }
 {
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = false;
@@ -72,16 +72,16 @@ void AOrbit::OnInvaderDestroyed(AInvader* invader)
 	}
 }
 
-TArray<FVector> AOrbit::CalcRadiusVectors(int32 size, float length, float offsetAngle)
+TArray<FVector> AOrbit::CalcRadiusVectors(int32 size, double length, double offsetAngle)
 {
 	check(size > 0);
 
 	TArray<FVector> out;
 	out.Reserve(size);
-	const float angle{ 2.f * PI / size };
-	for (SIZE_T i{ 0 }; i < size; ++i) {
+	const double angle{ UE_DOUBLE_PI / static_cast<double>(size) * 2.};
+	for (int32 i{ 0 }; i < size; ++i) {
 		out.Emplace(FMath::Sin(angle * i + offsetAngle), 
-			FMath::Cos(angle * i + offsetAngle), 0.f);
+			FMath::Cos(angle * i + offsetAngle), 0.);
 		out.Last() *= length;
 	}
 	return out;
@@ -103,21 +103,21 @@ void AOrbit::SetShrinkingSpeed(float speed)
 	shrinkingSpeed = speed;
 }
 
-void AOrbit::Shrink(float distance)
+void AOrbit::Shrink(double distance)
 {
-	float oldRadius{ radius };
+	double oldRadius{ radius };
 
 	radius -= distance;
 	if (radius < minRadius) {
 		radius = minRadius;
 	}
 
-	for (auto& inv : invaders) {
+	for (auto* inv : invaders) {
 		inv->AddActorLocalOffset(FVector::ForwardVector * (oldRadius - radius), true);
 	}
 }
 
-void AOrbit::InitWithInvaders(float newRadius, bool bAdjustRadius/* = true*/)
+void AOrbit::InitWithInvaders(double newRadius, bool bAdjustRadius/* = true*/)
 {
 	auto* world{ GetWorld() };
 	check(world && newRadius > 0.f);
@@ -126,17 +126,17 @@ void AOrbit::InitWithInvaders(float newRadius, bool bAdjustRadius/* = true*/)
 	check(false);
 	UStaticMesh* invaderMesh{ /*world->GetSubsystem<UAssetProvider>()->GetInvaderMesh()*/};
 
-	invaderRadius = invaderMesh->GetBounds().GetSphere().W ;
+	invaderRadius = invaderMesh->GetBounds().GetSphere().W;
 
 	radius = bAdjustRadius ? newRadius + invaderRadius : newRadius;
 
-	minRadius = invaderRadius * 1.1f;
+	minRadius = invaderRadius * 1.1;
 
 	int32 newInvaderCount{ FMath::RandRange(1, 
 		CalcMaxInvadersNum(invaderRadius, radius)) };
-
+	
 	auto radiusVectors{ CalcRadiusVectors(
-		newInvaderCount, radius, FMath::RandRange(0.f, PI)) };
+		newInvaderCount, radius, FMath::RandRange(0., UE_DOUBLE_PI)) };
 
 	FActorSpawnParameters spawnParams;
 	spawnParams.Owner = this;
@@ -146,17 +146,17 @@ void AOrbit::InitWithInvaders(float newRadius, bool bAdjustRadius/* = true*/)
 	FVector thisLocation{ GetActorLocation() };
 	FRotator thisRotation{ GetActorRotation() };
 
-	for (SIZE_T i{ 0 }; i < newInvaderCount; ++i) {
+	for (int32 i{ 0 }; i < newInvaderCount; ++i) {
 		radiusVectors[i] = thisRotation.RotateVector(radiusVectors[i]);
 
 		AInvader* invader{ world->SpawnActor<AInvader>(
 			thisLocation + radiusVectors[i],
-			FRotationMatrix::MakeFromX(radiusVectors[i] * -1.f).Rotator(), 
+			FRotationMatrix::MakeFromX(radiusVectors[i] * -1.).Rotator(), 
 			spawnParams) };
 
 		/*world->SpawnActorDeferred<AInvader>(
 			thisTransform.GetLocation() + radiusVectors[i],
-			FRotationMatrix::MakeFromX(radiusVectors[i] * -1.f).Rotator(),
+			FRotationMatrix::MakeFromX(radiusVectors[i] * -1.).Rotator(),
 			spawnParams)*/
 
 		invader->SetMesh(*invaderMesh);
@@ -167,10 +167,10 @@ void AOrbit::InitWithInvaders(float newRadius, bool bAdjustRadius/* = true*/)
 	}
 }
 
-int AOrbit::CalcMaxInvadersNum(float invaderRadius, float orbitRadius)
+int32 AOrbit::CalcMaxInvadersNum(double invaderRadius, double orbitRadius)
 {	
-	check(!FMath::IsNearlyZero(invaderRadius) && invaderRadius > 0.f);
-	check(!FMath::IsNearlyZero(orbitRadius) && orbitRadius > 0.f);
+	check(!FMath::IsNearlyZero(invaderRadius) && invaderRadius > 0.);
+	check(!FMath::IsNearlyZero(orbitRadius) && orbitRadius > 0.);
 
 	if (invaderRadius >= orbitRadius) {
 		return 1;
@@ -178,22 +178,22 @@ int AOrbit::CalcMaxInvadersNum(float invaderRadius, float orbitRadius)
 	else {
 		//https://en.wikipedia.org/wiki/Law_of_cosines
 
-		float ratio{ invaderRadius / orbitRadius };
+		double ratio{ invaderRadius / orbitRadius };
 		if (ratio < invaderNumLimit.first) {
 			return invaderNumLimit.second;
 		}
 		else {
-			return 2 * PI / FMath::Acos(1.f - 2.f * FMath::Square(ratio));
+			return 2. / FMath::Acos(1. - 2. * FMath::Square(ratio)) * UE_DOUBLE_PI;
 		}
 	}
 }
 
-float AOrbit::GetOuterRadius(float offsetMultiplier/* = 2.f*/) const
+double AOrbit::GetOuterRadius(double offsetMultiplier/* = 2.f*/) const
 {
 	return radius + invaderRadius * offsetMultiplier;
 }
 
-int AOrbit::GetInvadersNum() const
+int32 AOrbit::GetInvadersNum() const
 {
 	return invaders.Num();
 }

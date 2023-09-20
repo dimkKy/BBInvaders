@@ -5,8 +5,8 @@
 #include "BBInvadersUtils.h"
 
 FPlayAreaInfo::FPlayAreaInfo() :
-    center{ 0.f }, forward{ 0.f },
-    up{ 0.f }, halfSize{ 0.f }
+    center{ 0. }, forward{ 0. },
+    up{ 0. }, halfSize{ 0. }
 {
 
 }
@@ -45,11 +45,11 @@ FVector ABBInvadersGameStateBase::GetCenter() const
     return mapInfo.center;
 }
 
-FVector ABBInvadersGameStateBase::CalcRandOutOfBoundsPos(float objectRadius) const
+FVector ABBInvadersGameStateBase::CalcRandOutOfBoundsPos(double objectRadius) const
 {
     check(mapInfo);
     
-    float angle{ BBInvadersUtils::RandomAngle() };
+    double angle{ BBInvadersUtils::RandomAngle_Double() };
     return mapInfo.forward.RotateAngleAxis(angle, mapInfo.up).GetSafeNormal()
         * (mapInfo.halfSize.Size2D() + objectRadius);
 }

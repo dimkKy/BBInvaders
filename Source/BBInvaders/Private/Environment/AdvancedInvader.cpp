@@ -123,7 +123,7 @@ void AAdvancedInvader::RotateMoveToTarget(float deltatime/* = 0.f*/)
 		(toThis - toThis.GetSafeNormal() * descensionSpeed * deltatime)
 		.RotateAngleAxis(rotationSpeed * deltatime , target.up) };
 	RootComponent->SetWorldLocationAndRotation(target.location + newToThis, 
-		FRotationMatrix::MakeFromX(newToThis * -1.f).Rotator().Quaternion());
+		FRotationMatrix::MakeFromX(newToThis * -1.).Rotator().Quaternion());
 }
 
 

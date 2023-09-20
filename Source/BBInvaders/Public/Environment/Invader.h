@@ -24,7 +24,7 @@ public:
 	AInvader();
 
 	void SetMesh(UStaticMesh& newMesh);
-	float GetCollisionRadius() const;
+	double GetCollisionRadius() const;
 
 	virtual void Shoot() override;
 	virtual EShooterType GetShooterType() const override;
@@ -38,7 +38,7 @@ public:
 	FNotifyInvaderDestroyed onDestroyedDelegate;
 
 #if WITH_EDITOR
-	virtual EDataValidationResult IsDataValid(TArray<FText>& ValidationErrors) override;
+	virtual EDataValidationResult IsDataValid(FDataValidationContext& context) const override;
 #endif
 protected:
 	virtual void BeginPlay() override;

@@ -3,6 +3,9 @@
 
 #include "Player/MainMenuPawn.h"
 #include "Camera/CameraComponent.h"
+#if WITH_EDITOR
+#include "Misc/DataValidation.h"
+#endif
 
 AMainMenuPawn::AMainMenuPawn() :
 	camera{ CreateDefaultSubobject<UCameraComponent>("camera") }
@@ -21,15 +24,15 @@ EShooterType AMainMenuPawn::GetShooterType() const
 }
 
 #if WITH_EDITOR
-EDataValidationResult AMainMenuPawn::IsDataValid(TArray<FText>& ValidationErrors)
+EDataValidationResult AMainMenuPawn::IsDataValid(FDataValidationContext& context) const
 {
-	Super::IsDataValid(ValidationErrors);
+	Super::IsDataValid(context);
 
 	if (GetWorld() && AutoPossessPlayer == EAutoReceiveInput::Disabled) {
-		ValidationErrors.Add(FText::FromString("Invalid AutoPossessPlayer"));
+		context.AddError(FText::FromString("Invalid AutoPossessPlayer"));
 	}
 
-	return ValidationErrors.Num() > 0 ?
+	return context.GetNumErrors() > 0 ?
 		EDataValidationResult::Invalid : EDataValidationResult::Valid;
 }
 #endif

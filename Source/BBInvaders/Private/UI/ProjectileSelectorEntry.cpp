@@ -13,10 +13,11 @@ const FNumberFormattingOptions UProjectileSelectorEntry::formattingOptions{
 
 void UProjectileSelectorEntry::NativeOnInitialized()
 {
-	outline->Brush.DrawAs = ESlateBrushDrawType::Border;
-	outline->SetRenderOpacity(0.f);
+	auto tempBrush{ outline->GetBrush() };
+	tempBrush.DrawAs = ESlateBrushDrawType::Image;
+	outline->SetBrush(tempBrush);
 
-	icon->Brush.DrawAs = ESlateBrushDrawType::Image;
+	outline->SetRenderOpacity(0.f);
 }
 
 void UProjectileSelectorEntry::UpdateCost(float currentInflation)

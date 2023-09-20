@@ -5,6 +5,9 @@
 #include "Engine/Texture2D.h"
 #include "CoreSystems/BBInvadersAssetManager.h"
 //#include "CoreSystems/Shooter.h"
+#if WITH_EDITOR
+#include "Misc/DataValidation.h"
+#endif
 
 const FPrimaryAssetType UProjectileDataAsset::assetType{ "ProjectileData" };
 
@@ -34,30 +37,30 @@ void UProjectileDataAsset::PreLoadAsync(bool bLoadMesh, FStreamableDelegate onIc
 }
 
 #if WITH_EDITOR
-EDataValidationResult UProjectileDataAsset::IsDataValid(TArray<FText>& ValidationErrors)
+EDataValidationResult UProjectileDataAsset::IsDataValid(FDataValidationContext& context) const
 {
-	Super::IsDataValid(ValidationErrors);
+	Super::IsDataValid(context);
 
 	if (maxSpeed <= 0.f)
-		ValidationErrors.Add(FText::FromString("maxSpeed have to be positive"));
+		context.AddError(FText::FromString("maxSpeed have to be positive"));
 
 	if (maxSpeed < initialSpeed)
-		ValidationErrors.Add(FText::FromString("maxSpeed can not be lower then initialSpeed"));
+		context.AddError(FText::FromString("maxSpeed can not be lower then initialSpeed"));
 
 	if (baseCost < 0.f) {
-		ValidationErrors.Add(FText::FromString("baseCost can not be negative"));
+		context.AddError(FText::FromString("baseCost can not be negative"));
 	}
 	else {
 		if (userType == EShooterType::EST_PlayerOnly && baseCost == 0.f) {
-			ValidationErrors.Add(FText::FromString("baseCost should be positive for player to use this"));
+			context.AddError(FText::FromString("baseCost should be positive for player to use this"));
 		}
 	}		
 
 	if (userType == EShooterType::EST_MAX) {
-		ValidationErrors.Add(FText::FromString("invalid userType"));
+		context.AddError(FText::FromString("invalid userType"));
 	}
 
-	return ValidationErrors.Num() > 0 ?
+	return context.GetNumErrors() > 0 ?
 		EDataValidationResult::Invalid : EDataValidationResult::Valid;
 }
 #endif

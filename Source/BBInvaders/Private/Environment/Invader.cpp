@@ -7,6 +7,9 @@
 #include "BBInvadersUtils.h"
 #include "Player/PlayerPawn.h"
 #include "Player/BBInvadersPlayerState.h"
+#if WITH_EDITOR
+#include "Misc/DataValidation.h"
+#endif
 
 AInvader::AInvader() :
 	body{ CreateDefaultSubobject<UStaticMeshComponent>("body") }
@@ -23,7 +26,7 @@ void AInvader::SetMesh(UStaticMesh& newMesh)
 	body->SetStaticMesh(&newMesh);
 }
 
-float AInvader::GetCollisionRadius() const
+double AInvader::GetCollisionRadius() const
 {
 	check(body->GetStaticMesh());
 	return body->GetStaticMesh()->GetBounds().GetSphere().W;
@@ -104,22 +107,22 @@ void AInvader::DestroyGiveReward(APlayerPawn* bountyReceiver/* = nullptr*/)
 }
 
 #if WITH_EDITOR
-EDataValidationResult AInvader::IsDataValid(TArray<FText>& ValidationErrors)
+EDataValidationResult AInvader::IsDataValid(FDataValidationContext& context) const
 {
-	Super::IsDataValid(ValidationErrors);
+	Super::IsDataValid(context);
 
 	if (GetWorld()) {
 		if (body->GetStaticMesh()) {
 			if (!body->DoesSocketExist(BBInvadersUtils::muzzleSocket)) {
-				ValidationErrors.Add(FText::FromString("socket was not found :" + BBInvadersUtils::muzzleSocket.ToString()));
+				context.AddError(FText::FromString("socket was not found :" + BBInvadersUtils::muzzleSocket.ToString()));
 			}
 		}
 		else {
-			ValidationErrors.Add(FText::FromString("no mesh assigned"));
+			context.AddError(FText::FromString("no mesh assigned"));
 		}
 	}
 
-	return ValidationErrors.Num() > 0 ?
+	return context.GetNumErrors() > 0 ?
 		EDataValidationResult::Invalid : EDataValidationResult::Valid;
 }
 #endif

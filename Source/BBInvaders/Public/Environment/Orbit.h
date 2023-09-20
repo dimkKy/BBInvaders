@@ -26,13 +26,13 @@ public:
 	void ChangeRotationSpeed(bool bZero);
 	static void SetShrinkingSpeed(float speed);
 
-	void Shrink(float distance);
-	void InitWithInvaders(float newRadius, bool bAdjustRadius = true);
+	void Shrink(double distance);
+	void InitWithInvaders(double newRadius, bool bAdjustRadius = true);
 
-	UE_NODISCARD static int CalcMaxInvadersNum(float invaderRadius, float orbitRadius);
+	UE_NODISCARD static int32 CalcMaxInvadersNum(double invaderRadius, double orbitRadius);
 
-	UE_NODISCARD float GetOuterRadius(float offsetMultiplier = 2.f) const;
-	UE_NODISCARD int GetInvadersNum() const;
+	UE_NODISCARD double GetOuterRadius(double offsetMultiplier = 2.) const;
+	UE_NODISCARD int32 GetInvadersNum() const;
 	
 	void Shoot();
 protected:
@@ -52,17 +52,17 @@ protected:
 		TArray<AInvader*> invaders;
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly)
-		float radius;
+		double radius;
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly)
-		float invaderRadius;
+		double invaderRadius;
 
-	static float shrinkingSpeed;
+	static double shrinkingSpeed;
 	static float shrinkingStartDelay;
 
-	float minRadius;
+	double minRadius;
 
-	static TArray<FVector> CalcRadiusVectors(int32 size, float length = 1.f, float offsetAngle = 0.f);
+	static TArray<FVector> CalcRadiusVectors(int32 size, double length = 1., double offsetAngle = 0.);
 
 	static constexpr float maxRotationSpeed{ 25.f };
-	static constexpr std::pair<float, int> invaderNumLimit{ 0.1f, 32 };
+	static constexpr std::pair<double, int> invaderNumLimit{ 0.1, 32 };
 };

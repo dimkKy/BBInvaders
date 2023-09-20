@@ -27,7 +27,7 @@ class BBINVADERS_API ABBInvadersGameStateBase : public AGameStateBase
 public:
 	ABBInvadersGameStateBase();
 
-	FVector CalcRandOutOfBoundsPos(float objectRadius) const;
+	FVector CalcRandOutOfBoundsPos(double objectRadius) const;
 
 	FPlayAreaInfo GetMapInfo() const;
 	FVector GetUpVector() const;

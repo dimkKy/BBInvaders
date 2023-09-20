@@ -8,8 +8,10 @@
 #include "Player/PlayerPawn.h"
 #include "Player/MainMenuPawn.h"
 #include "CoreSystems/BBInvadersGameModeBase.h"
-
 #include "Components/Button.h"
+#if WITH_EDITOR
+#include "Misc/DataValidation.h"
+#endif
 
 ABBInvadersHUD::ABBInvadersHUD() :
 	gametimeUI{ nullptr }, mainMenu{ nullptr }
@@ -67,16 +69,16 @@ void ABBInvadersHUD::RequestBindings(ABBInvadersGameModeBase& gameMode)
 }
 
 #if WITH_EDITOR
-EDataValidationResult ABBInvadersHUD::IsDataValid(TArray<FText>& ValidationErrors)
+EDataValidationResult ABBInvadersHUD::IsDataValid(FDataValidationContext& context) const
 {
-	Super::IsDataValid(ValidationErrors);
+	Super::IsDataValid(context);
 
 	if (!IsValid(gametimeUIClass))
-		ValidationErrors.Add(FText::FromString("Invalid gametimeUI class"));
+		context.AddError(FText::FromString("Invalid gametimeUI class"));
 	if (!IsValid(mainMenuClass))
-		ValidationErrors.Add(FText::FromString("Invalid mainMenu class"));
+		context.AddError(FText::FromString("Invalid mainMenu class"));
 
-	return ValidationErrors.Num() > 0 ?
+	return context.GetNumErrors() > 0 ?
 		EDataValidationResult::Invalid : EDataValidationResult::Valid;
 }
 #endif

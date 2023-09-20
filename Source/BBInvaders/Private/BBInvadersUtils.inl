@@ -29,7 +29,7 @@ void BBInvadersUtils::SetupButtons(TObject* object, UButton* button, void(TObjec
 }*/
 
 template<BBInvadersUtils::ChildOf<AActor> TActor>
-auto* BBInvadersUtils::GetFirstActor(UWorld* world)
+TActor* BBInvadersUtils::GetFirstActor(UWorld* world)
 {
 	check(world);
 	auto it{ TActorIterator<TActor>(world) };

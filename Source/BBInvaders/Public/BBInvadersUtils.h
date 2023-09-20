@@ -43,7 +43,7 @@ namespace BBInvadersUtils {
 	concept NonEmpty = sizeof...(Args) > 0;
 
 	template <ChildOf<AActor> TActor>
-	auto* GetFirstActor(UWorld* world);
+	TActor* GetFirstActor(UWorld* world);
 
 	template <ChildOf<AActor> TActor>
 	void ForActorsOfClass(UWorld* world, std::invocable<AActor*> auto&& func);
@@ -61,13 +61,15 @@ namespace BBInvadersUtils {
 	constexpr ECollisionChannel ECC_Invader{ ECollisionChannel::ECC_GameTraceChannel3 };
 
 	float RandomAngle();
+	double RandomAngle_Double();
 	FRotator RandomRotator();
 	//Util to generate a random number in a range between -max and max
 	float RandAbsRange(float absMax);
+	double RandAbsRange(double absMax);
 
-	const FRotator UpRotation{ -90.f, 0.f, 0.f };
-	const FRotator BehindRotation{ 0.f, 180.f, 0.f };
-	const FRotator unitRotation{ 0.f, 1.f, 0.f };
+	const FRotator UpRotation{ -90., 0., 0. };
+	const FRotator BehindRotation{ 0., 180., 0. };
+	const FRotator unitRotation{ 0., 1., 0. };
 
 	const FName muzzleSocket{ "Muzzle" };
 }
