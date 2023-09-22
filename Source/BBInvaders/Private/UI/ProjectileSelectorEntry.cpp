@@ -7,6 +7,9 @@
 #include "Components/TextBlock.h"
 #include "Components/Image.h"
 #include "Blueprint/WidgetTree.h"
+#if WITH_EDITOR
+#include "Misc/DataValidation.h"
+#endif
 
 const FNumberFormattingOptions UProjectileSelectorEntry::formattingOptions{
 	FNumberFormattingOptions().SetMaximumFractionalDigits(2) };
@@ -27,14 +30,14 @@ void UProjectileSelectorEntry::UpdateCost(float currentInflation)
 }
 
 #if WITH_EDITOR
-EDataValidationResult UProjectileSelectorEntry::IsDataValid(TArray<FText>& ValidationErrors)
+EDataValidationResult UProjectileSelectorEntry::IsDataValid(FDataValidationContext& context) const
 {
-	Super::IsDataValid(ValidationErrors);
+	Super::IsDataValid(context);
 
 	if (WidgetTree->RootWidget != outline)
-		ValidationErrors.Add(FText::FromString("outline is supposed to be the root"));
+		context.AddError(FText::FromString("outline is supposed to be the root"));
 
-	return ValidationErrors.Num() > 0 ?
+	return context.GetNumErrors() > 0 ?
 		EDataValidationResult::Invalid : EDataValidationResult::Valid;
 }
 #endif

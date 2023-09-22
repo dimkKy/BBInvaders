@@ -9,5 +9,4 @@ Like, at all. And I honestly no idea why, since the mesh itself had collision an
 I could _assign_ collision components to each instance, but decided to stick with regular SM components. If you have any ideas what I missed, suggestions would be highly appreceated.
 
 ### Compatibility
-* Unreal Engine 4.27
-* C++20 standart is required to build game module. Corresponding UBT files for UE4 can be found [here](https://github.com/dimkKy/UBT4-CPP20/releases/tag/1.0)
+* Unreal Engine 5.3

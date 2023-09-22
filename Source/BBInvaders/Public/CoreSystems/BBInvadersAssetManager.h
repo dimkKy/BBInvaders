@@ -25,7 +25,7 @@ public:
 	
 	static ThisClass& Get();
 
-	int32 GetProjectilesAvailableToUserType(EShooterType userType, TArray<FSoftObjectPath>& outArray);
+	int32 GetProjectilesAvailableToUserType(EShooterType userType, TArray<TSoftObjectPtr<UProjectileDataAsset>>& outArray);
 
 protected:
 	virtual void PostInitialAssetScan() override;
@@ -34,8 +34,8 @@ protected:
 
 	void LoadProcessUnloadData(TSharedPtr<FStreamableHandle>& handle, TFunction<bool(UObject*)>&& processFunc, bool bForceGC = false);
 	
-	//TArray <TSoftObjectPtr<UProjectileDataAsset>> projectileDataAssets[static_cast<int32>(EShooterType::EST_MAX) + 1];
-	TArray <FSoftObjectPath> projectileDataAssets[static_cast<int32>(EShooterType::EST_MAX) + 1];
+	TArray <TSoftObjectPtr<UProjectileDataAsset>> projectileDataAssets[static_cast<int32>(EShooterType::EST_MAX) + 1];
+	//TArray <FSoftObjectPath> projectileDataAssets[static_cast<int32>(EShooterType::EST_MAX) + 1];
 	TSharedPtr<FStreamableHandle> projectileAssetsLoadHandle;
 
 	void OnProjectileDataAssetsLoaded();

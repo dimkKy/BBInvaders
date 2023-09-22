@@ -8,9 +8,10 @@ public class BBInvadersTarget : TargetRules
 	public BBInvadersTarget( TargetInfo Target) : base(Target)
 	{
 		Type = TargetType.Game;
-		DefaultBuildSettings = BuildSettingsVersion.V2;
+		DefaultBuildSettings = BuildSettingsVersion.V4;
+        IncludeOrderVersion = EngineIncludeOrderVersion.Latest;
 
-		bUseAdaptiveUnityBuild = false;
+        bUseAdaptiveUnityBuild = false;
 
 		ExtraModuleNames.AddRange( new string[] { "BBInvaders" } );
 	}

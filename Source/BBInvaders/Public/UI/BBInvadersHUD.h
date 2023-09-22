@@ -10,7 +10,8 @@ class UGametimeUI;
 class UMainMenu;
 //class PauseMenu;
 
-class ABBInvadersGameModeBase;
+class ABBInvadersPlayerController;
+class UProjectileSelector;
 /**
  * 
  */
@@ -25,7 +26,9 @@ public:
 
 	void OnViewTargetChange(const AActor& newTarget);
 
-	void RequestBindings(ABBInvadersGameModeBase& gameMode);
+	void RequestBindings(ABBInvadersPlayerController& gameMode);
+
+	UProjectileSelector* GetProjectileSelector() const;
 
 #if WITH_EDITOR
 	virtual EDataValidationResult IsDataValid(FDataValidationContext& context) const override;

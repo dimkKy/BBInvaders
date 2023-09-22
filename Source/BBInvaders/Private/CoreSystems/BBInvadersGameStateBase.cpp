@@ -2,6 +2,8 @@
 
 
 #include "CoreSystems/BBInvadersGameStateBase.h"
+#include "CoreSystems/OutOfAreaActorTracker.h"
+#include "Player/PlayerPawn.h"
 #include "BBInvadersUtils.h"
 
 FPlayAreaInfo::FPlayAreaInfo() :
@@ -57,6 +59,31 @@ FVector ABBInvadersGameStateBase::CalcRandOutOfBoundsPos(double objectRadius) co
 float ABBInvadersGameStateBase::GetCurrentInflation() const
 {
     return currentInflation;
+}
+
+APawn* ABBInvadersGameStateBase::Refresh()
+{
+    UWorld* world{ GetWorld() };
+    APlayerPawn* pawn{ BBInvadersUtils::GetFirstActor<APlayerPawn>(world) };
+    check(world && pawn);
+
+    SetMapInfo(*pawn, pawn->CalcMapHalfSize());
+
+    AOutOfAreaActorTracker* tracker{
+        BBInvadersUtils::GetFirstActor<AOutOfAreaActorTracker>(world) };
+
+    if (tracker) {
+        tracker->SetTrackArea(pawn->GetActorTransform(), mapInfo.halfSize);
+    }
+    else {
+        FActorSpawnParameters params;
+        params.SpawnCollisionHandlingOverride =
+            ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+        tracker = world->SpawnActor<AOutOfAreaActorTracker>(
+            AOutOfAreaActorTracker::StaticClass(), pawn->GetActorTransform(), params);
+    }
+    return pawn;
 }
 
 void ABBInvadersGameStateBase::SetMapInfo(const AActor& center, const FVector& halfSize)

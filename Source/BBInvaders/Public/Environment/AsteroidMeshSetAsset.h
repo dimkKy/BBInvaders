@@ -23,7 +23,7 @@ public:
 	UStaticMesh* GetStaticMesh(EAsteroidSize size) const;
 
 #if WITH_EDITOR
-	virtual EDataValidationResult IsDataValid(TArray<FText>& ValidationErrors) override;
+	virtual EDataValidationResult IsDataValid(FDataValidationContext& context) const override;
 #endif
 
 protected:

@@ -22,7 +22,7 @@ UBBInvadersAssetManager& UBBInvadersAssetManager::Get()
 	return static_cast<ThisClass&>(Super::Get());
 }
 
-int32 UBBInvadersAssetManager::GetProjectilesAvailableToUserType(EShooterType userType, TArray<FSoftObjectPath>& outArray)
+int32 UBBInvadersAssetManager::GetProjectilesAvailableToUserType(EShooterType userType, TArray<TSoftObjectPtr<UProjectileDataAsset>>& outArray)
 {
 	check(outArray.Num() == 0);
 

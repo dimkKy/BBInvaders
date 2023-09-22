@@ -7,7 +7,7 @@
 #include "UI/PauseMenu.h"
 #include "Player/PlayerPawn.h"
 #include "Player/MainMenuPawn.h"
-#include "CoreSystems/BBInvadersGameModeBase.h"
+#include "Player/BBInvadersPlayerController.h"
 #include "Components/Button.h"
 #if WITH_EDITOR
 #include "Misc/DataValidation.h"
@@ -56,16 +56,21 @@ void ABBInvadersHUD::OnViewTargetChange(const AActor& newTarget)
 	}
 }
 
-void ABBInvadersHUD::RequestBindings(ABBInvadersGameModeBase& gameMode)
+void ABBInvadersHUD::RequestBindings(ABBInvadersPlayerController& controller)
 {
 	mainMenu->newGameButton->OnClicked.AddDynamic(
-		&gameMode, &ABBInvadersGameModeBase::StartGameplay);
+		&controller, &ABBInvadersPlayerController::OnGameplayInitiated);
 	gametimeUI->pauseMenu->toMainMenuButton->OnClicked.AddDynamic(
-		&gameMode, &ABBInvadersGameModeBase::GoToMainMenu);
+		&controller, &ABBInvadersPlayerController::OnGameplayEnd);
 	gametimeUI->pauseButton->OnClicked.AddDynamic(
-		&gameMode, &ABBInvadersGameModeBase::TogglePause);
+		&controller, &ABBInvadersPlayerController::RequestPauseToggle);
 	gametimeUI->pauseMenu->resumeButton->OnClicked.AddDynamic(
-		&gameMode, &ABBInvadersGameModeBase::TogglePause);
+		&controller, &ABBInvadersPlayerController::RequestPauseToggle);
+}
+
+UProjectileSelector* ABBInvadersHUD::GetProjectileSelector() const
+{
+	return gametimeUI->projectileSelector;
 }
 
 #if WITH_EDITOR

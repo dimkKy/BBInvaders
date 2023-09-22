@@ -27,12 +27,9 @@ public:
 	virtual void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) override;
 	virtual void Tick(float DeltaTime) override;
 
-	UFUNCTION()
-		void StartGameplay();
-	UFUNCTION()
-		void GoToMainMenu();
-	UFUNCTION()
-		void TogglePause();
+	void StartGameplay();
+	void GoToMainMenu();
+	void TogglePause();
 
 	void OnGameOver();
 
@@ -49,7 +46,6 @@ public:
 #endif // WITH_EDITOR
 protected:
 	virtual void BeginPlay() override;
-	APawn* RefreshGameState();
 
 	FVector CalcRandOutOfBoundsPos(double objectRadius) const;
 

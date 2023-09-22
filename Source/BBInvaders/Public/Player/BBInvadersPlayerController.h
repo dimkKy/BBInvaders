@@ -24,12 +24,16 @@ public:
 
 	UProjectileDataAsset* GetSelectedProjectile() const;
 
-	void OnGameplayInitiated();
-
+	UFUNCTION()
+		void OnGameplayInitiated();
+	UFUNCTION()
+		void OnGameplayEnd();
 	UFUNCTION()
 		void ExitGame();
-
+	UFUNCTION()
+		void RequestPauseToggle();
 protected:
+	virtual void BeginPlay() override;
 	virtual void AcknowledgePossession(APawn* P) override;
 
 	UPROPERTY()

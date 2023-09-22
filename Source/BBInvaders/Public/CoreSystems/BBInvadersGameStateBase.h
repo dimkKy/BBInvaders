@@ -38,6 +38,7 @@ public:
 	float GetCurrentInflation() const;
 
 protected:
+	APawn* Refresh();
 
 	FPlayAreaInfo mapInfo;
 	TWeakObjectPtr<const AActor> cachedCenter;

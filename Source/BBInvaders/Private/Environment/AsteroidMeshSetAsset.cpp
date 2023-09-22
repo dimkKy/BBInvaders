@@ -2,6 +2,9 @@
 
 
 #include "Environment/AsteroidMeshSetAsset.h"
+#if WITH_EDITOR
+#include "Misc/DataValidation.h"
+#endif
 
 const FPrimaryAssetType UAsteroidMeshSetAsset::assetType{ "AsteroidMeshSet" };
 
@@ -20,17 +23,17 @@ UStaticMesh* UAsteroidMeshSetAsset::GetStaticMesh(EAsteroidSize size) const
 	}
 }
 
-EDataValidationResult UAsteroidMeshSetAsset::IsDataValid(TArray<FText>& ValidationErrors)
+EDataValidationResult UAsteroidMeshSetAsset::IsDataValid(FDataValidationContext& context) const
 {
-	Super::IsDataValid(ValidationErrors);
+	Super::IsDataValid(context);
 	
 	for (auto& mesh : asteroidMeshes) {
 		if (mesh.IsNull()) {
-			ValidationErrors.Add(FText::FromString("all meshes should be valid"));
+			context.AddError(FText::FromString("all meshes should be valid"));
 			break;
 		}
 	}
 
-	return ValidationErrors.Num() > 0 ?
+	return context.GetNumErrors() > 0 ?
 		EDataValidationResult::Invalid : EDataValidationResult::Valid;
 }

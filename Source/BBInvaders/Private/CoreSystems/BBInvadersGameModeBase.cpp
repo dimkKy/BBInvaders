@@ -4,11 +4,9 @@
 #include "CoreSystems/BBInvadersGameModeBase.h"
 #include "UI/BBInvadersHUD.h"
 #include "Player/BBInvadersPlayerController.h"
-#include "Player/PlayerPawn.h"
 #include "Player/BBInvadersPlayerState.h"
 #include "BBInvadersUtils.h"
 #include "Player/MainMenuPawn.h"
-#include "CoreSystems/OutOfAreaActorTracker.h"
 #include "CoreSystems/BBInvadersProjectile.h"
 #include "CoreSystems/BBInvadersGameStateBase.h"
 #include "Environment/Invader.h"
@@ -71,13 +69,12 @@ void ABBInvadersGameModeBase::Tick(float DeltaTime)
 
 void ABBInvadersGameModeBase::StartGameplay()
 {
-	localController->Possess(RefreshGameState());
+	localController->Possess(GetGameState<ABBInvadersGameStateBase>()->Refresh());
 	SetActorTickEnabled(true);
 }
 
 void ABBInvadersGameModeBase::GoToMainMenu()
 {
-	//god I wasted like 2 hours trying to get why didnt camera switch work properly
 	ClearPause();
 	//load level
 	UWorld* world{ GetWorld() };
@@ -184,35 +181,7 @@ void ABBInvadersGameModeBase::_SpawnNewOrbit()
 void ABBInvadersGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
-	RefreshGameState();
-	localController->GetBBInvadersHUD()->RequestBindings(*this);
-}
-
-APawn* ABBInvadersGameModeBase::RefreshGameState()
-{
-	UWorld* world{ GetWorld() };
-	APlayerPawn* pawn{ BBInvadersUtils::GetFirstActor<APlayerPawn>(world) };
-	check(world && pawn);
-
-	auto* gameState{ GetGameState<ABBInvadersGameStateBase>() };
-	gameState->SetMapInfo(*pawn, pawn->CalcMapHalfSize());
-
-	AOutOfAreaActorTracker* tracker{ 
-		BBInvadersUtils::GetFirstActor<AOutOfAreaActorTracker>(world) };
-
-	if (tracker) {
-		tracker->SetTrackArea(pawn->GetActorTransform(), gameState->mapInfo.halfSize);
-	}
-	else {
-		FActorSpawnParameters params;
-		params.SpawnCollisionHandlingOverride =
-			ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-		tracker = world->SpawnActor<AOutOfAreaActorTracker>(
-			AOutOfAreaActorTracker::StaticClass(), pawn->GetActorTransform(), params);
-	}
-	
-	return pawn;
+	GetGameState<ABBInvadersGameStateBase>()->Refresh();
 }
 
 FVector ABBInvadersGameModeBase::CalcRandOutOfBoundsPos(double objectRadius) const
@@ -236,7 +205,7 @@ AOrbit* ABBInvadersGameModeBase::SpawnNewOrbit(double additionalRadius)
 		mapInfo->center };
 
 	auto* newOrbit{ AOrbit::SpawnOrbit(*GetWorld(), newOrbitTransform, newRadius)};
-	//cringe
+	
 	orbits.AddTail(TWeakObjectPtr<AOrbit>{newOrbit});
 	return newOrbit;
 }
@@ -282,7 +251,6 @@ AOrbit* ABBInvadersGameModeBase::ProcessCheckOrbits()
 			orbits.RemoveNode(node);
 		}
 	}
-
 	return orbits.Num() ?
 		orbits.GetTail()->GetValue().Get() :
 		nullptr;
@@ -303,7 +271,6 @@ AOrbit* ABBInvadersGameModeBase::ProcessCheckOrbits(TFunction<void(AOrbit&)>&& f
 			orbits.RemoveNode(node);
 		}
 	}
-
 	return orbits.Num() ?
 		orbits.GetTail()->GetValue().Get() :
 		nullptr;
