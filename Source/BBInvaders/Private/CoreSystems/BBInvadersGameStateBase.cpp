@@ -4,7 +4,11 @@
 #include "CoreSystems/BBInvadersGameStateBase.h"
 #include "CoreSystems/OutOfAreaActorTracker.h"
 #include "Player/PlayerPawn.h"
+#include "CoreSystems/ProjectileDataAsset.h"
 #include "BBInvadersUtils.h"
+#if WITH_EDITOR
+#include "Misc/DataValidation.h"
+#endif
 
 FPlayAreaInfo::FPlayAreaInfo() :
     center{ 0. }, forward{ 0. },
@@ -60,6 +64,35 @@ float ABBInvadersGameStateBase::GetCurrentInflation() const
 {
     return currentInflation;
 }
+
+bool ABBInvadersGameStateBase::IsProjectileBasekit(const UProjectileDataAsset& projectile) const
+{
+    return IsProjectileBasekit(TSoftObjectPtr<UProjectileDataAsset>{ &projectile });
+}
+
+bool ABBInvadersGameStateBase::IsProjectileBasekit(const TSoftObjectPtr<UProjectileDataAsset>& projectile) const
+{
+    return basicKitProjectiles.Contains(projectile);
+}
+
+int32 ABBInvadersGameStateBase::GetProjectilesBasekitSize() const
+{
+    return basicKitProjectiles.Num();
+}
+
+#if WITH_EDITOR
+EDataValidationResult ABBInvadersGameStateBase::IsDataValid(FDataValidationContext& context) const
+{
+    Super::IsDataValid(context);
+
+    if (!basicKitProjectiles.Num()) {
+        context.AddError(FText::FromString("empty basic kit"));
+    }
+
+    return context.GetNumErrors() > 0 ?
+        EDataValidationResult::Invalid : EDataValidationResult::Valid;
+}
+#endif
 
 APawn* ABBInvadersGameStateBase::Refresh()
 {

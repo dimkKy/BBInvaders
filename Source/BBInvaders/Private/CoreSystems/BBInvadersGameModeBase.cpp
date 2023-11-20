@@ -143,7 +143,9 @@ EDataValidationResult ABBInvadersGameModeBase::IsDataValid(FDataValidationContex
 
 	if (GameStateClass &&
 		GameStateClass->IsChildOf<ABBInvadersGameStateBase>()) {
-
+		if (!GameStateClass->IsInBlueprint()) {
+			context.AddWarning(FText::FromString("Consider blueprint GameStateClass"));
+		}
 	}
 	else {
 		context.AddError(FText::FromString("Invalid GameStateClass"));

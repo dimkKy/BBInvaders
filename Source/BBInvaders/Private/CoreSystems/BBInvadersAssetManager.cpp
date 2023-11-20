@@ -22,7 +22,7 @@ UBBInvadersAssetManager& UBBInvadersAssetManager::Get()
 	return static_cast<ThisClass&>(Super::Get());
 }
 
-int32 UBBInvadersAssetManager::GetProjectilesAvailableToUserType(EShooterType userType, TArray<TSoftObjectPtr<UProjectileDataAsset>>& outArray)
+int32 UBBInvadersAssetManager::GetProjectilesAvailableToUserType(EShooterType userType, TArray<TSoftObjectPtr<UProjectileDataAsset>>& outArray) const
 {
 	check(outArray.Num() == 0);
 
@@ -34,6 +34,18 @@ int32 UBBInvadersAssetManager::GetProjectilesAvailableToUserType(EShooterType us
 		
 	}
 	return outArray.Num();
+}
+
+TSoftObjectPtr<UProjectileDataAsset> UBBInvadersAssetManager::GetRandomProjectilesAvailableToUserType(EShooterType userType) const
+{
+	//TODO
+	check(userType != EShooterType::EST_PlayerOnly);
+	return TSoftObjectPtr<UProjectileDataAsset>();
+}
+
+TSoftObjectPtr<UAsteroidMeshSetAsset> UBBInvadersAssetManager::GetRandomAsteroidMeshSet() const
+{
+	return TSoftObjectPtr<UAsteroidMeshSetAsset>();
 }
 
 void UBBInvadersAssetManager::PostInitialAssetScan()
@@ -60,31 +72,31 @@ void UBBInvadersAssetManager::OnDataFailureDetected(bool bIsCritical, const FTex
 void UBBInvadersAssetManager::LoadProcessUnloadData(TSharedPtr<FStreamableHandle>& handle, 
 	TFunction<bool(UObject*)>&& processFunc, bool bForceGC)
 {
-	if (handle.IsValid()) {
-		int32 loadedNum, requestedNum;
-		handle->GetLoadedCount(loadedNum, requestedNum);
-		if (loadedNum) {
-			TArray<UObject*> loadedAssets;
-			loadedAssets.Reserve(loadedNum);
-			handle->GetLoadedAssets(loadedAssets);
+	if (!handle.IsValid()) {
+		return;
+	}
+	int32 loadedNum, requestedNum;
+	handle->GetLoadedCount(loadedNum, requestedNum);
+	if (loadedNum) {
+		TArray<UObject*> loadedAssets;
+		loadedAssets.Reserve(loadedNum);
+		handle->GetLoadedAssets(loadedAssets);
 
-			TArray<FPrimaryAssetId> assetsToUnload;
+		TArray<FPrimaryAssetId> assetsToUnload;
 
-			for (auto* asset : loadedAssets) {
-				if (processFunc(asset)) {
-					assetsToUnload.Add(asset->GetPrimaryAssetId());
-				}
+		for (auto* asset : loadedAssets) {
+			if (processFunc(asset)) {
+				assetsToUnload.Add(asset->GetPrimaryAssetId());
 			}
-			handle->ReleaseHandle();
+		}
 
-			UnloadPrimaryAssets(assetsToUnload);
+		UnloadPrimaryAssets(assetsToUnload);
 
-			if (bForceGC) {
-				GEngine->ForceGarbageCollection(true);
-			}
-			return;
+		if (bForceGC) {
+			GEngine->ForceGarbageCollection(true);
 		}
 	}
+	handle->ReleaseHandle();
 }
 
 void UBBInvadersAssetManager::OnProjectileDataAssetsLoaded()

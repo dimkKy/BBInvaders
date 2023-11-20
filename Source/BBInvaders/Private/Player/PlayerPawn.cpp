@@ -125,11 +125,11 @@ void APlayerPawn::ZoomCamera(float value)
 void APlayerPawn::Shoot()
 {
 	check(GetWorld());
-
-	ABBInvadersProjectile::SpawnProjectile(*GetWorld(),
-		platform->GetSocketTransform(BBInvadersUtils::muzzleSocket),
-		*CastChecked<ABBInvadersPlayerController>(GetController())->GetSelectedProjectile(),
-		this);
+	if (auto* projectile{ GetController<ABBInvadersPlayerController>()->GetSelectedProjectile() }) {
+		ABBInvadersProjectile::SpawnProjectile(*GetWorld(),
+			platform->GetSocketTransform(BBInvadersUtils::muzzleSocket),
+			*projectile, this);
+	}	
 }
 
 EShooterType APlayerPawn::GetShooterType() const

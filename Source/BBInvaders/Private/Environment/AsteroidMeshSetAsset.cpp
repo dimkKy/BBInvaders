@@ -2,6 +2,7 @@
 
 
 #include "Environment/AsteroidMeshSetAsset.h"
+#include "CoreSystems/BBInvadersAssetManager.h"
 #if WITH_EDITOR
 #include "Misc/DataValidation.h"
 #endif
@@ -15,10 +16,15 @@ FPrimaryAssetId UAsteroidMeshSetAsset::GetPrimaryAssetId() const
 
 UStaticMesh* UAsteroidMeshSetAsset::GetStaticMesh(EAsteroidSize size) const
 {
-	if (size != EAsteroidSize::EAS_MAX) {
-		return asteroidMeshes[static_cast<uint8>(size)].LoadSynchronous();
-	}
-	else {
+	switch (size) {
+	default:
+		//auto&& assetManager{ UBBInvadersAssetManager::Get() };
+		//assetManager.LoadAssetList(asteroidMeshes)
+		[[fallthrough]];
+	case EAsteroidSize::EAS_Small:
+		return asteroidMeshes[static_cast<uint8>(EAsteroidSize::EAS_Small)].LoadSynchronous();
+	case EAsteroidSize::EAS_MAX:
+		check(false);
 		return nullptr;
 	}
 }

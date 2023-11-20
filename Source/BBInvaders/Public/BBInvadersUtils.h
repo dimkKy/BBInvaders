@@ -21,26 +21,35 @@ namespace BBInvadersUtils {
 	inline bool IsIn(const S& subject, const O* other, const Os*... others);
 	
 	template <class TDerived, class TBase, bool allowSame = false>
-	concept ChildOf = std::is_base_of<TBase, TDerived>::value &&
-		(allowSame || std::negation<std::is_same<TBase, TDerived>>::value);
+	concept ChildOf = std::is_base_of_v<TBase, TDerived> &&
+		(allowSame || !std::is_same_v<TBase, TDerived>);
 
 	template <typename TDerived, template<typename> typename TBase>
 	struct is_derived_from_any
 	{
 		template<typename TParam>
-		static constexpr std::true_type is_derived(const volatile TBase<TParam>&);
+		static constexpr std::true_type is_derived(const TBase<TParam>&);
 		static constexpr std::false_type is_derived(...);
 		using type = decltype(is_derived(std::declval<TDerived&>()));
 	};
 
 	template <class TDerived, template<typename> typename TBase>
-	concept ChildOfAny = is_derived_from_any<TDerived, TBase>::type::value;
+	using is_derived_from_any_t = is_derived_from_any<TDerived, TBase>::type;
+
+	template <class TDerived, template<typename> typename TBase>
+	inline constexpr bool is_derived_from_any_v{ is_derived_from_any_t<TDerived, TBase>::value };
+
+	template <class TDerived, template<typename> typename TBase>
+	concept ChildOfAny = is_derived_from_any_v<TDerived, TBase>;
 
 	constexpr float defaultNearClipPlane{ 10.f };
 	float GetCameraNearPlane(const UCameraComponent& camera);
 
 	template <typename... Args>
 	concept NonEmpty = sizeof...(Args) > 0;
+
+	template<class T, class... Classes>
+	concept AllSame = (std::is_same_v<T, Classes> && ...);
 
 	template <ChildOf<AActor> TActor>
 	TActor* GetFirstActor(UWorld* world);
@@ -55,6 +64,9 @@ namespace BBInvadersUtils {
 	template<bool generateOverlapEvents, class...TChannels>
 	void ConfigureDefaultCollision(UPrimitiveComponent* comp, ECollisionChannel compType, 
 		TChannels...overlapChannels) requires NonEmpty<TChannels...>;
+
+	template <typename TBase, ChildOf<TBase> TChild, bool bDeleteNulls>
+	TArray<TChild*> DowncastArray(const TArray<TBase*>& array);
 
 	constexpr ECollisionChannel ECC_Projectile{ ECollisionChannel::ECC_GameTraceChannel1 };
 	constexpr ECollisionChannel ECC_Asteroid{ ECollisionChannel::ECC_GameTraceChannel2 };

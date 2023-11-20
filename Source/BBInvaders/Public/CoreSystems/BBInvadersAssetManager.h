@@ -25,7 +25,11 @@ public:
 	
 	static ThisClass& Get();
 
-	int32 GetProjectilesAvailableToUserType(EShooterType userType, TArray<TSoftObjectPtr<UProjectileDataAsset>>& outArray);
+	int32 GetProjectilesAvailableToUserType(EShooterType userType, TArray<TSoftObjectPtr<UProjectileDataAsset>>& outArray) const;
+
+	TSoftObjectPtr<UProjectileDataAsset> GetRandomProjectilesAvailableToUserType(EShooterType userType) const;
+
+	TSoftObjectPtr<UAsteroidMeshSetAsset> GetRandomAsteroidMeshSet() const;
 
 protected:
 	virtual void PostInitialAssetScan() override;

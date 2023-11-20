@@ -55,6 +55,17 @@ void BBInvadersUtils::ConfigureDefaultCollision(UPrimitiveComponent* comp, EColl
 	getter(overlapChannels...);
 }
 
+template<typename TBase, BBInvadersUtils::ChildOf<TBase> TChild, bool bDeleteNulls>
+TArray<TChild*> BBInvadersUtils::DowncastArray(const TArray<TBase*>& array)
+{
+	if constexpr (bDeleteNulls) {
+		return {};
+	}
+	else {
+		return {};
+	}
+}
+
 template<BBInvadersUtils::ChildOf<AActor> TActor>
 void BBInvadersUtils::ForActorsOfClass(UWorld* world, std::invocable<AActor*> auto&& func)
 {

@@ -11,6 +11,7 @@ class AAdvancedInvader;
 class AOrbit;
 class AAsteroid;
 class APawn;
+class UProjectileDataAsset;
 
 struct FStreamableHandle;
 

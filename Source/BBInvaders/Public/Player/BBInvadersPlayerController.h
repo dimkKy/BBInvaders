@@ -36,6 +36,8 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void AcknowledgePossession(APawn* P) override;
 
+	void OnProjectilesLoaded() const;
+
 	UPROPERTY()
 		TArray<UProjectileDataAsset*> availableProjectiles;
 

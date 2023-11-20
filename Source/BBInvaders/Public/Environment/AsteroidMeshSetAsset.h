@@ -8,6 +8,8 @@
 #include "AsteroidMeshSetAsset.generated.h"
 
 class UStaticMesh;
+struct FStreamableHandle;
+
 /**
  * 
  */
@@ -31,4 +33,6 @@ protected:
 	UPROPERTY(EditInstanceOnly)
 		TSoftObjectPtr<UStaticMesh> asteroidMeshes[EAS_MAX];
 #undef EAS_MAX
+
+	TSharedPtr<FStreamableHandle> meshesHanle;
 };

@@ -15,13 +15,21 @@ void UProjectileSelector::NativeOnInitialized()
 
 UProjectileDataAsset* UProjectileSelector::GetSelectedProjectile() const
 {
-    return ExactCast<UProjectileDataAsset>(listView->GetSelectedItem());
+    //return static_cast<decltype(GetSelectedProjectile())>(listView->GetSelectedItem());
+    return static_cast<UProjectileDataAsset*>(listView->GetSelectedItem());
 }
 
 void UProjectileSelector::SetAvailableProjectiles(const TArray<UProjectileDataAsset*>& projectiles)
 {
-    listView->SetListItems(projectiles);
-    selectedIndex = 0;
+    if (ensureAlways(projectiles.Num())) {
+        listView->SetListItems(projectiles);
+        selectedIndex = 0;
+        listView->SetSelectedIndex(selectedIndex);
+    }
+    else {
+        //try reload
+    }
+    
 }
 
 void UProjectileSelector::SelectNext(bool bReverse)
@@ -47,8 +55,7 @@ void UProjectileSelector::UpdatePrices()
     float currentInflation{ CastChecked<ABBInvadersGameStateBase>(GetWorld()->GetGameState())->GetCurrentInflation() };
 
     for (auto&& object : listView->GetDisplayedEntryWidgets()) {
-        if (auto&& entry{ ExactCast<UProjectileSelectorEntry>(object) }) {
-            entry->UpdateCost(currentInflation);
-        }
+        check(IsValid(object));
+        ExactCast<UProjectileSelectorEntry>(object)->UpdateCost(currentInflation);
     }
 }
