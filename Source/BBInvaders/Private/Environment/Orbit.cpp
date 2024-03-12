@@ -7,13 +7,13 @@
 #include "Components/SplineComponent.h"
 #include "BBInvadersUtils.h"
 #include "Environment/Invader.h"
+#include <CoreSystems/BBInvadersAssetManager.h>
 
-double AOrbit::shrinkingSpeed = 100.;
 float AOrbit::shrinkingStartDelay = 3.f;
 
 AOrbit::AOrbit() :
 	body{ CreateDefaultSubobject<USceneComponent>("body") },
-	rotator{ CreateDefaultSubobject<URotatingMovementComponent>("rotator") },
+	//rotator{ CreateDefaultSubobject<URotatingMovementComponent>("rotator") },
 	//invaders{ CreateDefaultSubobject<UHierarchicalInstancedStaticMeshComponent>("invaders") },
 	radius{ 100. }, invaderRadius{ 0. }, minRadius { radius }
 {
@@ -22,9 +22,9 @@ AOrbit::AOrbit() :
 
 	SetRootComponent(body);
 
-	rotator->bUpdateOnlyIfRendered = true;
-	rotator->RotationRate = FRotator::ZeroRotator;
-	rotator->SetUpdatedComponent(body);
+	//rotator->bUpdateOnlyIfRendered = true;
+	//rotator->RotationRate = FRotator::ZeroRotator;
+	//rotator->SetUpdatedComponent(body);
 	
 	//invaders->bMultiBodyOverlap = true;
 	//invaders->SetCollisionObjectType(BBInvadersUtils::ECC_Invader);
@@ -35,19 +35,23 @@ AOrbit::AOrbit() :
 void AOrbit::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	Shrink(DeltaTime * shrinkingSpeed);
+	//rotation only here
+	// 
+	//RequestShrink(DeltaTime * shrinkingSpeed);
+	using namespace BBInvadersUtils;
+	RootComponent->AddRelativeRotation(unitRotation, true);
 }
 
-AOrbit* AOrbit::SpawnOrbit(UWorld& w, const FTransform& transform, float radius, int32 invaderNum, bool bZeroRotationSpeed)
+AOrbit* AOrbit::SpawnOrbit(UWorld& w, const FTransform& tr, float radius, int32 invaderNum, bool bNoRotation)
 {
-	auto* newOrbit{ w.SpawnActorDeferred<ThisClass>(
-		ThisClass::StaticClass(), transform, nullptr,
+	AOrbit* newOrbit{ w.SpawnActorDeferred<AOrbit>(
+		AOrbit::StaticClass(), tr, nullptr,
 		nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn) };
 
-	newOrbit->InitWithInvaders(radius);
-	newOrbit->ChangeRotationSpeed(bZeroRotationSpeed);
+	newOrbit->InitWithInvaders(invaderNum, radius);
+	newOrbit->ChangeRotationSpeed(bNoRotation);
 
-	newOrbit->FinishSpawning(transform, true);
+	newOrbit->FinishSpawning(tr, true);
 	return newOrbit;
 }
 
@@ -64,10 +68,15 @@ void AOrbit::BeginPlay()
 
 void AOrbit::OnInvaderDestroyed(AInvader* invader)
 {
+#if DO_CHECK
 	check(invaders.Remove(invader) == 1);
+#else
+	invaders.Remove(invader);
+#endif
 
 	if (invaders.Num() < 1) {
 		Destroy();
+		onClearedDelegate.ExecuteIfBound(this);
 		SetActorTickEnabled(false);
 	}
 }
@@ -90,20 +99,15 @@ TArray<FVector> AOrbit::CalcRadiusVectors(int32 size, double length, double offs
 void AOrbit::ChangeRotationSpeed(bool bZero)
 {
 	if (bZero) {
-		rotator->RotationRate = FRotator::ZeroRotator;
+		//rotator->RotationRate = FRotator::ZeroRotator;
 	}
 	else {
-		rotator->RotationRate = BBInvadersUtils::unitRotation *
-			FMath::RandRange(0.f, maxRotationSpeed);
+		//rotator->RotationRate = BBInvadersUtils::unitRotation *
+			//FMath::RandRange(0.f, maxRotationSpeed);
 	}
 }
 
-void AOrbit::SetShrinkingSpeed(float speed)
-{
-	shrinkingSpeed = speed;
-}
-
-void AOrbit::Shrink(double distance)
+double AOrbit::RequestShrink(double distance)
 {
 	double oldRadius{ radius };
 
@@ -111,20 +115,21 @@ void AOrbit::Shrink(double distance)
 	if (radius < minRadius) {
 		radius = minRadius;
 	}
-
+	distance = oldRadius - radius;
 	for (auto* inv : invaders) {
-		inv->AddActorLocalOffset(FVector::ForwardVector * (oldRadius - radius), true);
+		inv->AddActorLocalOffset(FVector::ForwardVector * distance, true);
 	}
+	return distance;
 }
 
-void AOrbit::InitWithInvaders(double newRadius, bool bAdjustRadius/* = true*/)
+void AOrbit::InitWithInvaders(int32 invaderNum, double newRadius, bool bAdjustRadius/* = true*/)
 {
 	auto* world{ GetWorld() };
 	check(world && newRadius > 0.f);
 	check(invaders.Num() == 0);
 
 	check(false);
-	UStaticMesh* invaderMesh{ /*world->GetSubsystem<UAssetProvider>()->GetInvaderMesh()*/};
+	UStaticMesh* invaderMesh{ UBBInvadersAssetManager::Get().GetInvaderMesh() };
 
 	invaderRadius = invaderMesh->GetBounds().GetSphere().W;
 
@@ -132,8 +137,11 @@ void AOrbit::InitWithInvaders(double newRadius, bool bAdjustRadius/* = true*/)
 
 	minRadius = invaderRadius * 1.1;
 
-	int32 newInvaderCount{ FMath::RandRange(1, 
-		CalcMaxInvadersNum(invaderRadius, radius)) };
+	int32 maxInvaderCount{ CalcMaxInvadersNum(invaderRadius, radius) };
+	int32 newInvaderCount{ invaderNum ? 
+		std::max(maxInvaderCount, invaderNum) : 
+		FMath::RandRange(1, maxInvaderCount) };
+	invaders.Reserve(newInvaderCount);
 	
 	auto radiusVectors{ CalcRadiusVectors(
 		newInvaderCount, radius, FMath::RandRange(0., UE_DOUBLE_PI)) };
@@ -188,9 +196,14 @@ int32 AOrbit::CalcMaxInvadersNum(double invaderRadius, double orbitRadius)
 	}
 }
 
-double AOrbit::GetOuterRadius(double offsetMultiplier/* = 2.f*/) const
+double AOrbit::GetOuterRadius(double sizeMultiplier/* = 2.f*/) const
 {
-	return radius + invaderRadius * offsetMultiplier;
+	return radius + invaderRadius * sizeMultiplier;
+}
+
+UE_NODISCARD double AOrbit::GetInnerRadius(double sizeMultiplier) const
+{
+	return radius - invaderRadius * sizeMultiplier;
 }
 
 int32 AOrbit::GetInvadersNum() const

@@ -109,6 +109,7 @@ void AAdvancedInvader::BeginPlay()
 	
 	Super::BeginPlay();
 	check(target);
+	//start anim sequence?
 }
 
 void AAdvancedInvader::RotateMoveToTarget(float deltatime/* = 0.f*/)
@@ -118,7 +119,6 @@ void AAdvancedInvader::RotateMoveToTarget(float deltatime/* = 0.f*/)
 	}
 
 	FVector toThis{ GetActorLocation() - target.location };
-	toThis.GetSafeNormal() * descensionSpeed;
 	FVector newToThis{ 
 		(toThis - toThis.GetSafeNormal() * descensionSpeed * deltatime)
 		.RotateAngleAxis(rotationSpeed * deltatime , target.up) };

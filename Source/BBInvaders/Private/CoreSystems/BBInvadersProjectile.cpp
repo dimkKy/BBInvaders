@@ -17,10 +17,9 @@ ABBInvadersProjectile::ABBInvadersProjectile() :
 
 	SetRootComponent(body);
 
-	BBInvadersUtils::ConfigureDefaultCollision<true>
-		(body, BBInvadersUtils::ECC_Projectile,
-		BBInvadersUtils::ECC_Asteroid, ECC_Pawn, 
-		BBInvadersUtils::ECC_Invader, ECC_WorldDynamic);
+	using namespace BBInvadersUtils;
+	ConfigureDefaultCollision<true>(body, ECC_Projectile,
+		ECC_Asteroid, ECC_Pawn, ECC_Invader, ECC_WorldDynamic);
 
 	body->SetSimulatePhysics(true);
 	body->SetEnableGravity(false);

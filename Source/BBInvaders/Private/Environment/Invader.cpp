@@ -17,8 +17,11 @@ AInvader::AInvader() :
 	PrimaryActorTick.bCanEverTick = false;
 	SetRootComponent(body);
 
-	BBInvadersUtils::ConfigureDefaultCollision<true>(body, BBInvadersUtils::ECC_Invader,
-		BBInvadersUtils::ECC_Projectile, ECC_Pawn, ECC_WorldDynamic);
+	using namespace BBInvadersUtils;
+	ConfigureDefaultCollision<true>(body, ECC_Invader,
+		ECC_Projectile, ECC_Pawn, ECC_WorldDynamic);
+
+	//hide
 }
 
 void AInvader::SetMesh(UStaticMesh& newMesh)

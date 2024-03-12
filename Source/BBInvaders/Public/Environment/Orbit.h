@@ -10,6 +10,9 @@ class USplineComponent;
 class URotatingMovementComponent;
 class AInvader;
 
+DECLARE_DELEGATE_OneParam(FNotifyOrbitCleared, AOrbit*);
+
+
 // Rewrite as independent carrier
 UCLASS()
 class BBINVADERS_API AOrbit : public AActor
@@ -20,21 +23,24 @@ public:
 	AOrbit();
 	virtual void Tick(float DeltaTime) override;
 
-	UE_NODISCARD static ThisClass* SpawnOrbit(UWorld& w, const FTransform& transform,
-		float radius, int32 invaderNum = 0, bool bZeroRotationSpeed = false);
+	UE_NODISCARD static AOrbit* SpawnOrbit(UWorld& w, const FTransform& transform,
+		float radius, int32 invaderNum = 0, bool bNoRotation = false);
 
 	void ChangeRotationSpeed(bool bZero);
-	static void SetShrinkingSpeed(float speed);
 
-	void Shrink(double distance);
-	void InitWithInvaders(double newRadius, bool bAdjustRadius = true);
+	double RequestShrink(double distance);
+	void InitWithInvaders(int32 invaderNum, double newRadius, bool bAdjustRadius = true);
 
 	UE_NODISCARD static int32 CalcMaxInvadersNum(double invaderRadius, double orbitRadius);
 
-	UE_NODISCARD double GetOuterRadius(double offsetMultiplier = 2.) const;
+	UE_NODISCARD double GetOuterRadius(double sizeMultiplier = 2.) const;
+	UE_NODISCARD double GetInnerRadius(double sizeMultiplier = 2.) const;
+
 	UE_NODISCARD int32 GetInvadersNum() const;
 	
 	void Shoot();
+
+	FNotifyOrbitCleared onClearedDelegate;
 protected:
 	virtual void BeginPlay() override;
 
@@ -45,8 +51,8 @@ protected:
 		USceneComponent* body;
 
 	//do I need rotator?
-	UPROPERTY(EditInstanceOnly, BlueprintReadWrite)
-		URotatingMovementComponent* rotator;
+	//UPROPERTY(EditInstanceOnly, BlueprintReadWrite)
+		//URotatingMovementComponent* rotator;
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly)
 		TArray<AInvader*> invaders;
@@ -56,7 +62,6 @@ protected:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly)
 		double invaderRadius;
 
-	static double shrinkingSpeed;
 	static float shrinkingStartDelay;
 
 	double minRadius;

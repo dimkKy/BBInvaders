@@ -9,6 +9,7 @@
 
 class UProjectileDataAsset;
 class UAsteroidMeshSetAsset;
+class UStaticMesh;
 
 /**
  * 
@@ -23,13 +24,16 @@ public:
 	virtual void StartInitialLoading() override;
 	virtual void FinishInitialLoading() override;
 	
-	static ThisClass& Get();
+	static UBBInvadersAssetManager& Get();
 
 	int32 GetProjectilesAvailableToUserType(EShooterType userType, TArray<TSoftObjectPtr<UProjectileDataAsset>>& outArray) const;
 
 	TSoftObjectPtr<UProjectileDataAsset> GetRandomProjectilesAvailableToUserType(EShooterType userType) const;
 
 	TSoftObjectPtr<UAsteroidMeshSetAsset> GetRandomAsteroidMeshSet() const;
+
+	//redo
+	UStaticMesh* GetInvaderMesh() const { return nullptr; };
 
 protected:
 	virtual void PostInitialAssetScan() override;

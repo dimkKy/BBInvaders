@@ -78,14 +78,13 @@ void ABBInvadersGameModeBase::GoToMainMenu()
 	ClearPause();
 	//load level
 	UWorld* world{ GetWorld() };
-	AMainMenuPawn* menuPawn{
-		BBInvadersUtils::GetFirstActor<AMainMenuPawn>(world) };
+	using namespace BBInvadersUtils;
+	AMainMenuPawn* menuPawn{ GetFirstActor<AMainMenuPawn>(world) };
 
 	localController->Possess(menuPawn);
 	SetActorTickEnabled(false);
 
-	BBInvadersUtils::ForActorsOfClass<
-		AInvader, AOrbit, AAsteroid, ABBInvadersProjectile>
+	ForActorsOfClass<AInvader, AOrbit, AAsteroid, ABBInvadersProjectile>
 		(world, [](AActor* actor) {actor->Destroy(); });
 }
 
@@ -166,17 +165,17 @@ EDataValidationResult ABBInvadersGameModeBase::IsDataValid(FDataValidationContex
 
 void ABBInvadersGameModeBase::_SpawnNewAdvancedInvader() const
 {
-	check(SpawnNewAdvancedInvader());
+	verify(SpawnNewAdvancedInvader());
 }
 
 void ABBInvadersGameModeBase::_SpawnNewAsteroid() const
 {
-	check(SpawnNewAsteroid());
+	verify(SpawnNewAsteroid());
 }
 
 void ABBInvadersGameModeBase::_SpawnNewOrbit()
 {
-	check(SpawnNewOrbit());
+	verify(SpawnNewOrbit());
 }
 #endif
 
@@ -197,7 +196,7 @@ AOrbit* ABBInvadersGameModeBase::SpawnNewOrbit(double additionalRadius)
 	check(gameState);
 	const FPlayAreaInfo* mapInfo{ &gameState->mapInfo };
 
-	auto* outermostOrbit{ ProcessCheckOrbits() };
+	AOrbit* outermostOrbit{ ProcessCheckOrbits() };
 
 	double newRadius{ outermostOrbit ?
 		outermostOrbit->GetOuterRadius() : mapInfo->halfSize.Size2D() };
@@ -206,7 +205,7 @@ AOrbit* ABBInvadersGameModeBase::SpawnNewOrbit(double additionalRadius)
 		FRotationMatrix::MakeFromXZ(mapInfo->forward, mapInfo->up).ToQuat(),
 		mapInfo->center };
 
-	auto* newOrbit{ AOrbit::SpawnOrbit(*GetWorld(), newOrbitTransform, newRadius)};
+	AOrbit* newOrbit{ AOrbit::SpawnOrbit(*GetWorld(), newOrbitTransform, newRadius)};
 	
 	orbits.AddTail(TWeakObjectPtr<AOrbit>{newOrbit});
 	return newOrbit;
@@ -241,6 +240,11 @@ AAsteroid* ABBInvadersGameModeBase::SpawnNewAsteroid() const
 	return newAsteroid;
 }
 
+void ABBInvadersGameModeBase::OnOrbitCleared(AOrbit* orbit)
+{
+	ProcessDeleteOrbit(orbit);
+}
+
 AOrbit* ABBInvadersGameModeBase::ProcessCheckOrbits()
 {
 	for (decltype(orbits)::TIterator it{orbits.GetHead()}; it; ) {
@@ -261,10 +265,27 @@ AOrbit* ABBInvadersGameModeBase::ProcessCheckOrbits()
 AOrbit* ABBInvadersGameModeBase::ProcessCheckOrbits(TFunction<void(AOrbit&)>&& func)
 {
 	for (decltype(orbits)::TIterator it{orbits.GetHead()}; it; ) {
-		if (TWeakObjectPtr<AOrbit> weakP{ (*it) }; weakP.IsValid() /*&& (*it)->GetInvadersNum()*/) {
+		if ((*it).IsValid()/*&& (*it)->GetInvadersNum()*/) {
+			func(*(*it).Get());
+			++it;
+		}
+		else {
+			auto* node{ it.GetNode() };
+			++it;
+			orbits.RemoveNode(node);
+		}
+	}
+	return orbits.Num() ?
+		orbits.GetTail()->GetValue().Get() :
+		nullptr;
+}
 
-			func(*weakP.Get());
+AOrbit* ABBInvadersGameModeBase::ProcessDeleteOrbit(AOrbit* orbit)
+{
+	check(orbit);
 
+	for (decltype(orbits)::TIterator it{ orbits.GetHead() }; it; ) {
+		if ((*it).IsValid() && (*it).Get() != orbit) {
 			++it;
 		}
 		else {

@@ -54,11 +54,15 @@ protected:
 	UE_NODISCARD AAdvancedInvader* SpawnNewAdvancedInvader() const;
 	UE_NODISCARD AAsteroid* SpawnNewAsteroid() const;
 
+	UFUNCTION()
+	void OnOrbitCleared(AOrbit* orbit);
+
 	TWeakObjectPtr<ABBInvadersPlayerController> localController;
 	TDoubleLinkedList<TWeakObjectPtr<AOrbit>> orbits;
 
 	AOrbit* ProcessCheckOrbits();
 	AOrbit* ProcessCheckOrbits(TFunction<void(AOrbit&)>&& func);
+	AOrbit* ProcessDeleteOrbit(AOrbit* orbit);
 
 	static constexpr int32 maxOrbits{ 5 };
 };
