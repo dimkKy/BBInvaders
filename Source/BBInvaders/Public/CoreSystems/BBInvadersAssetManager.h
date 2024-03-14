@@ -5,10 +5,13 @@
 #include "CoreMinimal.h"
 #include "Engine/AssetManager.h"
 #include "CoreSystems/Shooter.h"
+//shorten to invaderType.h
+#include "Environment/Invader.h"
 #include "BBInvadersAssetManager.generated.h"
 
 class UProjectileDataAsset;
 class UAsteroidMeshSetAsset;
+class UInvaderVisualsAsset;
 class UStaticMesh;
 
 /**
@@ -26,14 +29,16 @@ public:
 	
 	static UBBInvadersAssetManager& Get();
 
-	int32 GetProjectilesAvailableToUserType(EShooterType userType, TArray<TSoftObjectPtr<UProjectileDataAsset>>& outArray) const;
+	int32 GetProjectilesAvailableToUserType(EShooterType userType, 
+		TArray<TSoftObjectPtr<UProjectileDataAsset>>& outArray) const;
 
+	//redo
 	TSoftObjectPtr<UProjectileDataAsset> GetRandomProjectilesAvailableToUserType(EShooterType userType) const;
 
 	TSoftObjectPtr<UAsteroidMeshSetAsset> GetRandomAsteroidMeshSet() const;
 
 	//redo
-	UStaticMesh* GetInvaderMesh() const { return nullptr; };
+	UStaticMesh* GetRandomInvaderMesh(EInvaderType type) const;
 
 protected:
 	virtual void PostInitialAssetScan() override;
@@ -45,12 +50,14 @@ protected:
 	TArray <TSoftObjectPtr<UProjectileDataAsset>> projectileDataAssets[static_cast<int32>(EShooterType::EST_MAX) + 1];
 	//TArray <FSoftObjectPath> projectileDataAssets[static_cast<int32>(EShooterType::EST_MAX) + 1];
 	TSharedPtr<FStreamableHandle> projectileAssetsLoadHandle;
-
 	void OnProjectileDataAssetsLoaded();
 	bool IsProjectilesDataSufficient();
 
 	TArray<TSoftObjectPtr<UAsteroidMeshSetAsset>> asteroidMeshSets;
 	TSharedPtr<FStreamableHandle> asteroidMeshSetsLoadHandle;
-
 	void OnAsteroidMeshSetsLoaded();
+
+	TArray <TSoftObjectPtr<UInvaderVisualsAsset>> invaderVisuals[static_cast<int32>(EInvaderType::EIT_MAX)];
+	TSharedPtr<FStreamableHandle> invaderVisualsLoadHandle;
+	void OnInvaderVisualsLoaded();
 };

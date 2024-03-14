@@ -54,7 +54,7 @@ void AAsteroid::CalculateRandomVelocity(const FVector& targetLocation)
 
 	velocity = toTarget.GetSafeNormal().RotateAngleAxis(
 		FMath::RandRange(-aimAngleAmplitude, aimAngleAmplitude), 
-		CastChecked<ABBInvadersGameStateBase>(GetWorld()->GetGameState())->GetUpVector()) *
+		ABBInvadersGameStateBase::Get(GetWorld())->GetMapInfo().GetUp()) *
 		FMath::RandRange(velocityRange.first, velocityRange.second);
 }
 
@@ -146,7 +146,7 @@ AAsteroid* AAsteroid::Split()
 	AAsteroid* newAsteroid{ AAsteroid::SpawnAsteroid(*world, GetActorLocation(), newSize) };
 
 	float splitHalfAngle{ BBInvadersUtils::RandAbsRange(splitAngleAmplitude) };
-	FVector up{ CastChecked<ABBInvadersGameStateBase>(world->GetGameState())->GetUpVector() };
+	FVector up{ ABBInvadersGameStateBase::Get(GetWorld())->GetMapInfo().GetUp() };
 
 	newAsteroid->velocity = velocity.RotateAngleAxis(splitHalfAngle, up);
 
@@ -182,8 +182,8 @@ AAsteroid* AAsteroid::SpawnAsteroid(UWorld& w, const FVector& location,
 
 UE_NODISCARD AAsteroid* AAsteroid::SpawnAsteroidDeferred(UWorld& w, EAsteroidSize size)
 {
-	auto* newAsteroid{ w.SpawnActorDeferred<ThisClass>(
-		ThisClass::StaticClass(), FTransform::Identity, nullptr,
+	auto* newAsteroid{ w.SpawnActorDeferred<AAsteroid>(
+		AAsteroid::StaticClass(), FTransform::Identity, nullptr,
 		nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn) };
 
 	//auto* provider{ world->GetSubsystem<UAssetProvider>() };

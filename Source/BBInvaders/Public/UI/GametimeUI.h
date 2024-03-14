@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// by Dmitry Kolontay
 
 #pragma once
 
@@ -33,8 +33,8 @@ public:
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 		UPauseMenu* pauseMenu;
 
-	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
-		UProjectileSelector* projectileSelector;
+	//UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+		//UProjectileSelector* projectileSelector;
 	
 protected:
 	UFUNCTION()

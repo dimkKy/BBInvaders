@@ -70,7 +70,9 @@ void ABBInvadersHUD::RequestBindings(ABBInvadersPlayerController& controller)
 
 UProjectileSelector* ABBInvadersHUD::GetProjectileSelector() const
 {
-	return gametimeUI->projectileSelector;
+	//return gametimeUI->projectileSelector;
+	check(false);
+	return nullptr;
 }
 
 #if WITH_EDITOR

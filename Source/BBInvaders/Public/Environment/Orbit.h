@@ -7,7 +7,6 @@
 #include "Orbit.generated.h"
 
 class USplineComponent;
-class URotatingMovementComponent;
 class AInvader;
 
 DECLARE_DELEGATE_OneParam(FNotifyOrbitCleared, AOrbit*);
@@ -49,10 +48,6 @@ protected:
 
 	UPROPERTY(EditInstanceOnly, BlueprintReadWrite)
 		USceneComponent* body;
-
-	//do I need rotator?
-	//UPROPERTY(EditInstanceOnly, BlueprintReadWrite)
-		//URotatingMovementComponent* rotator;
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly)
 		TArray<AInvader*> invaders;

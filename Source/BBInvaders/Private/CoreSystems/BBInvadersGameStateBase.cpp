@@ -10,27 +10,34 @@
 #include "Misc/DataValidation.h"
 #endif
 
-FPlayAreaInfo::FPlayAreaInfo() :
-    center{ 0. }, forward{ 0. },
-    up{ 0. }, halfSize{ 0. }
-{
 
+void FPlayAreaInfo::SetHalfSize(const FVector& hS)
+{
+    halfSize = hS;
+    radius = halfSize.Size();
 }
 
 FPlayAreaInfo::operator bool() const
 {
-    return !halfSize.IsZero();
+    return !FMath::IsNearlyZero(radius);
 }
 
-//---------
-
-ABBInvadersGameStateBase::ABBInvadersGameStateBase() :
-    mapInfo{}, cachedCenter{ nullptr }, currentInflation{ 1.f }
+void FPlayAreaInfo::Set(const FVector& cntr, const FVector& frwrd, const FVector& _up, const FVector& hlfSz)
 {
-
+    center = center;
+    forward = forward;
+    up = _up;
+    SetHalfSize(hlfSz);
+    RecalcTransform();
 }
 
-FPlayAreaInfo ABBInvadersGameStateBase::GetMapInfo() const
+void FPlayAreaInfo::RecalcTransform()
+{
+    defaultTransform = 
+        { FRotationMatrix::MakeFromXZ(forward, up).ToQuat(), center };
+}
+
+const FPlayAreaInfo& ABBInvadersGameStateBase::GetMapInfo() const
 {
     return mapInfo;
 }
@@ -40,15 +47,11 @@ const AActor* ABBInvadersGameStateBase::GetCenterActor() const
     return cachedCenter.Get();
 }
 
-FVector ABBInvadersGameStateBase::GetUpVector() const
-{
-    check(mapInfo);
-    return mapInfo.up;
-}
 
-FVector ABBInvadersGameStateBase::GetCenter() const
+ABBInvadersGameStateBase* ABBInvadersGameStateBase::Get(const UWorld* world)
 {
-    return mapInfo.center;
+    check(world);
+    return CastChecked<ABBInvadersGameStateBase>(world->GetGameState());
 }
 
 FVector ABBInvadersGameStateBase::CalcRandOutOfBoundsPos(double objectRadius) const
@@ -56,8 +59,8 @@ FVector ABBInvadersGameStateBase::CalcRandOutOfBoundsPos(double objectRadius) co
     check(mapInfo);
     
     double angle{ BBInvadersUtils::RandomAngle_Double() };
-    return mapInfo.forward.RotateAngleAxis(angle, mapInfo.up).GetSafeNormal()
-        * (mapInfo.halfSize.Size2D() + objectRadius);
+    return mapInfo.Forward().RotateAngleAxis(angle, mapInfo.GetUp()).GetSafeNormal()
+        * (mapInfo.Radius() + objectRadius);
 }
 
 float ABBInvadersGameStateBase::GetCurrentInflation() const
@@ -106,7 +109,7 @@ APawn* ABBInvadersGameStateBase::Refresh()
         BBInvadersUtils::GetFirstActor<AOutOfAreaActorTracker>(world) };
 
     if (tracker) {
-        tracker->SetTrackArea(pawn->GetActorTransform(), mapInfo.halfSize);
+        tracker->SetTrackArea(pawn->GetActorTransform(), mapInfo.HalfSize());
     }
     else {
         FActorSpawnParameters params;
@@ -131,9 +134,6 @@ void ABBInvadersGameStateBase::SetMapInfo(const AActor& center, const FVector& h
 void ABBInvadersGameStateBase::SetMapInfo(
     const FVector& center, const FVector& forward, const FVector& up, const FVector& halfSize)
 {
-    mapInfo.center = center;
-    mapInfo.forward = forward;
-    mapInfo.up = up;
-    mapInfo.halfSize = halfSize;
+    mapInfo.Set(center, forward, up, halfSize);
 }
 

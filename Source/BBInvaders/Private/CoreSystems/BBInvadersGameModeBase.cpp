@@ -194,18 +194,20 @@ AOrbit* ABBInvadersGameModeBase::SpawnNewOrbit(double additionalRadius)
 {
 	ABBInvadersGameStateBase* gameState{ GetGameState<ABBInvadersGameStateBase>() };
 	check(gameState);
-	const FPlayAreaInfo* mapInfo{ &gameState->mapInfo };
+	const FPlayAreaInfo& mapInfo{ gameState->GetMapInfo() };
 
+	//from tail?
 	AOrbit* outermostOrbit{ ProcessCheckOrbits() };
 
+	//out of sight always?
+	/*double newRadius{ outermostOrbit ?
+		outermostOrbit->GetOuterRadius() : mapInfo->halfSize.Size2D() };*/
+
 	double newRadius{ outermostOrbit ?
-		outermostOrbit->GetOuterRadius() : mapInfo->halfSize.Size2D() };
+		FMath::Max(outermostOrbit->GetOuterRadius(), mapInfo.Radius()) :
+		mapInfo.Radius() };
 
-	FTransform newOrbitTransform{ 
-		FRotationMatrix::MakeFromXZ(mapInfo->forward, mapInfo->up).ToQuat(),
-		mapInfo->center };
-
-	AOrbit* newOrbit{ AOrbit::SpawnOrbit(*GetWorld(), newOrbitTransform, newRadius)};
+	AOrbit* newOrbit{ AOrbit::SpawnOrbit(*GetWorld(), mapInfo.DefaultTransform(), newRadius)};
 	
 	orbits.AddTail(TWeakObjectPtr<AOrbit>{newOrbit});
 	return newOrbit;
@@ -235,7 +237,7 @@ AAsteroid* ABBInvadersGameModeBase::SpawnNewAsteroid() const
 	auto* newAsteroid{ AAsteroid::SpawnAsteroidDeferred(*world) };
 	newAsteroid->FinishSpawningSetVelocity(
 		CalcRandOutOfBoundsPos(newAsteroid->GetMeshRadius()), 
-		CastChecked<ABBInvadersGameStateBase>(world->GetGameState())->GetCenter());
+		CastChecked<ABBInvadersGameStateBase>(world->GetGameState())->GetMapInfo().Center());
 
 	return newAsteroid;
 }

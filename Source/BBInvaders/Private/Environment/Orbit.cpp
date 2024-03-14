@@ -7,13 +7,12 @@
 #include "Components/SplineComponent.h"
 #include "BBInvadersUtils.h"
 #include "Environment/Invader.h"
-#include <CoreSystems/BBInvadersAssetManager.h>
+#include "CoreSystems/BBInvadersAssetManager.h"
 
 float AOrbit::shrinkingStartDelay = 3.f;
 
 AOrbit::AOrbit() :
 	body{ CreateDefaultSubobject<USceneComponent>("body") },
-	//rotator{ CreateDefaultSubobject<URotatingMovementComponent>("rotator") },
 	//invaders{ CreateDefaultSubobject<UHierarchicalInstancedStaticMeshComponent>("invaders") },
 	radius{ 100. }, invaderRadius{ 0. }, minRadius { radius }
 {
@@ -21,10 +20,6 @@ AOrbit::AOrbit() :
 	PrimaryActorTick.bStartWithTickEnabled = false;
 
 	SetRootComponent(body);
-
-	//rotator->bUpdateOnlyIfRendered = true;
-	//rotator->RotationRate = FRotator::ZeroRotator;
-	//rotator->SetUpdatedComponent(body);
 	
 	//invaders->bMultiBodyOverlap = true;
 	//invaders->SetCollisionObjectType(BBInvadersUtils::ECC_Invader);
@@ -58,10 +53,10 @@ AOrbit* AOrbit::SpawnOrbit(UWorld& w, const FTransform& tr, float radius, int32 
 void AOrbit::BeginPlay()
 {
 	Super::BeginPlay();
-	FTimerHandle handle;
+	/*FTimerHandle handle;
 	GetWorld()->GetTimerManager().SetTimer(handle, FTimerDelegate{ 
 		FTimerDelegate::CreateUObject(this, &AOrbit::SetActorTickEnabled, true) },
-		shrinkingStartDelay, false);
+		shrinkingStartDelay, false);*/
 
 	check(invaders.Num());
 }
@@ -129,7 +124,8 @@ void AOrbit::InitWithInvaders(int32 invaderNum, double newRadius, bool bAdjustRa
 	check(invaders.Num() == 0);
 
 	check(false);
-	UStaticMesh* invaderMesh{ UBBInvadersAssetManager::Get().GetInvaderMesh() };
+	UStaticMesh* invaderMesh{ UBBInvadersAssetManager::Get().
+		GetRandomInvaderMesh(EInvaderType::EIT_Default) };
 
 	invaderRadius = invaderMesh->GetBounds().GetSphere().W;
 

@@ -9,13 +9,29 @@
 class UProjectileDataAsset;
 
 struct FPlayAreaInfo {	
-	FVector center;
-	FVector forward;
-	FVector up;
-	FVector halfSize;
-
-	FPlayAreaInfo();
 	explicit operator bool() const;
+
+	const FVector& Center() const { return center; };
+	const FVector& Forward() const { return forward; };
+	const FVector& GetUp() const { return up; };
+	double Radius() const { return radius; };
+	const FVector& HalfSize() const { return halfSize; };
+	const FTransform& DefaultTransform() const { return defaultTransform; };
+
+	void Set(const FVector& cntr, const FVector& frwrd, 
+		const FVector& _up, const FVector& hlfSz);
+
+protected:
+	FVector center{ 0. };
+	FVector forward{ 0. };
+	FVector up{ 0. };
+
+	FTransform defaultTransform{};
+	FVector halfSize{ 0. };
+	double radius{ 0. };
+
+	void SetHalfSize(const FVector& hS);
+	void RecalcTransform();
 };
 
 /**
@@ -27,13 +43,14 @@ class BBINVADERS_API ABBInvadersGameStateBase : public AGameStateBase
 	GENERATED_BODY()
 
 public:
-	ABBInvadersGameStateBase();
+	static ABBInvadersGameStateBase* Get(const UWorld* world);
 
 	FVector CalcRandOutOfBoundsPos(double objectRadius) const;
 
-	FPlayAreaInfo GetMapInfo() const;
-	FVector GetUpVector() const;
-	FVector GetCenter() const;
+	const FPlayAreaInfo& GetMapInfo() const;
+	//FVector GetUpVector() const;
+	//FVector GetCenter() const;
+	//double GetMapRadius() const;
 
 	const AActor* GetCenterActor() const;
 
@@ -56,10 +73,10 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 		TSet<TSoftObjectPtr<UProjectileDataAsset>> basicKitProjectiles;
 
-	FPlayAreaInfo mapInfo;
-	TWeakObjectPtr<const AActor> cachedCenter;
+	FPlayAreaInfo mapInfo{};
+	TWeakObjectPtr<const AActor> cachedCenter{ nullptr };
 
-	float currentInflation;
+	float currentInflation{ 1.f };
 
 	friend class ABBInvadersGameModeBase;
 };

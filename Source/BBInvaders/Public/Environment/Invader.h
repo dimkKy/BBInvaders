@@ -15,6 +15,16 @@ class APlayerPawn;
 
 DECLARE_DELEGATE_OneParam(FNotifyInvaderDestroyed, AInvader*);
 
+//Get rid of _MAX?
+UENUM(BlueprintType)
+enum class EInvaderType : uint8
+{
+	EIT_Default UMETA(DisplayName = "Default"),
+	//EAS_Medium UMETA(DisplayName = "Medium"),
+	EIT_Advanced UMETA(DisplayName = "Advanced"),
+	EIT_MAX UMETA(Hidden),
+};
+
 UCLASS()
 class BBINVADERS_API AInvader : public AActor, public IShooter, public IPlanetaryThreatable
 {

@@ -5,7 +5,9 @@
 #include "BBInvadersUtils.h"
 //#include "Player/PlayerPawn.h"
 #include "BBInvadersUtils.h"
-#include "GameFramework/SpringArmComponent.h"
+//#include "GameFramework/SpringArmComponent.h"
+#include "Components/StaticMeshComponent.h"
+#include "CoreSystems/BBInvadersAssetManager.h"
 
 FTargetInfo::FTargetInfo() :
 	bAimed{ false }, location{}, up{}
@@ -47,13 +49,20 @@ void AAdvancedInvader::Tick(float DeltaTime)
 
 UE_NODISCARD AAdvancedInvader* AAdvancedInvader::SpawnAdvancedInvaderDeferred(UWorld& w, const AActor& target)
 {
-	ThisClass* newInvader{ w.SpawnActorDeferred<ThisClass>(
-		ThisClass::StaticClass(), FTransform::Identity, nullptr,
+	AAdvancedInvader* newInvader{ w.SpawnActorDeferred<AAdvancedInvader>(
+		AAdvancedInvader::StaticClass(), FTransform::Identity, nullptr,
 		nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn) };
+
+	UStaticMesh* invaderMesh{ UBBInvadersAssetManager::Get().
+		GetRandomInvaderMesh(EInvaderType::EIT_Advanced) };
+
+	check(invaderMesh);
+
+	newInvader->SetMesh(*invaderMesh);
 
 	newInvader->SetTarget(target);
 
-	return nullptr;
+	return newInvader;
 }
 
 EShooterType AAdvancedInvader::GetShooterType() const
@@ -82,7 +91,7 @@ void AAdvancedInvader::SetTarget(const AActor& actor) &
 		*/
 
 	target.SetTarget(actor);
-	RotateMoveToTarget();
+	//RotateMoveToTarget();
 	//-----------
 	rotationSpeed = FMath::RandRange(
 		rotationSpeedRange.first, rotationSpeedRange.second);
