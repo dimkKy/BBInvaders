@@ -7,6 +7,8 @@
 #include "CoreSystems/Shooter.h"
 #include "ProjectileDataAsset.generated.h"
 
+class ABBIPlayerState;
+
 DECLARE_DELEGATE(FStreamableDelegate);
 
 //enum class EShooterType : uint8;
@@ -25,36 +27,41 @@ public:
 
 	void PreLoadAsync(bool bLoadMesh = false, FStreamableDelegate onIconLoaded = {});
 
-	static const FPrimaryAssetType assetType;
+	static inline const FPrimaryAssetType assetType{ "ProjectileData" };
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-		EShooterType userType;
+	UPROPERTY(EditInstanceOnly, BlueprintReadOnly)
+		FText visibleName{};
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-		FText visibleName;
+	UPROPERTY(EditInstanceOnly, BlueprintReadOnly)
+		float initialSpeed{ 0.f };
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-		float initialSpeed;
+	UPROPERTY(EditInstanceOnly, BlueprintReadOnly)
+		float maxSpeed{ 100 };
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-		float maxSpeed;
+	UPROPERTY(EditInstanceOnly, BlueprintReadOnly)
+	FText description{};
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-		FText description;
+	UPROPERTY(EditInstanceOnly, BlueprintReadOnly)
+		bool bIsHoming{ false };
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-		bool bIsHoming;
+	UPROPERTY(EditInstanceOnly, BlueprintReadOnly)
+		float baseCost{ 0.f };
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-		float baseCost;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditInstanceOnly, BlueprintReadOnly)
 		TSoftObjectPtr<UTexture2D> icon;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditInstanceOnly, BlueprintReadOnly)
 		TSoftObjectPtr<UStaticMesh> bodyMesh;
+
+	bool IsToShooter(EShooterType type) const;
+
+	//ufunction? BlueprintNativeEvent
+	virtual bool IsAvailableToPlayer(const ABBIPlayerState* state = nullptr) const;
 
 #if WITH_EDITOR
 	virtual EDataValidationResult IsDataValid(FDataValidationContext& context) const override;
 #endif
+protected:
+	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, meta = (Bitmask, BitmaskEnum = EShooterType))
+		uint8 shooterTypes{ 0 };
 };

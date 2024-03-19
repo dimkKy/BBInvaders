@@ -6,7 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "BBInvadersPlayerController.generated.h"
 
-class ABBInvadersHUD;
+class ABBIHUD;
 class UProjectileDataAsset;
 struct FStreamableHandle;
 
@@ -14,13 +14,13 @@ struct FStreamableHandle;
  * 
  */
 UCLASS()
-class BBINVADERS_API ABBInvadersPlayerController : public APlayerController
+class BBINVADERS_API ABBIPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 
 public:
-	ABBInvadersPlayerController();
-	ABBInvadersHUD* GetBBInvadersHUD() const;
+	ABBIPlayerController();
+	ABBIHUD* GetBBInvadersHUD() const;
 
 	UProjectileDataAsset* GetSelectedProjectile() const;
 

@@ -37,13 +37,14 @@ void AOrbit::Tick(float DeltaTime)
 	RootComponent->AddRelativeRotation(unitRotation, true);
 }
 
-AOrbit* AOrbit::SpawnOrbit(UWorld& w, const FTransform& tr, float radius, int32 invaderNum, bool bNoRotation)
+AOrbit* AOrbit::SpawnOrbit(UWorld& w, const FTransform& tr, float radius, 
+	int32 invaderNum, bool bNoRotation, double offsetAngle, double sectorAngle)
 {
 	AOrbit* newOrbit{ w.SpawnActorDeferred<AOrbit>(
 		AOrbit::StaticClass(), tr, nullptr,
 		nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn) };
 
-	newOrbit->InitWithInvaders(invaderNum, radius);
+	newOrbit->InitWithInvaders(invaderNum, radius, true, offsetAngle, sectorAngle);
 	newOrbit->ChangeRotationSpeed(bNoRotation);
 
 	newOrbit->FinishSpawning(tr, true);
@@ -76,16 +77,18 @@ void AOrbit::OnInvaderDestroyed(AInvader* invader)
 	}
 }
 
-TArray<FVector> AOrbit::CalcRadiusVectors(int32 size, double length, double offsetAngle)
+TArray<FVector> AOrbit::CalcRadiusVectors(int32 size, double length, double offsetAngle, double sectorAngle)
 {
 	check(size > 0);
+	check(sectorAngle <= 2. * UE_DOUBLE_PI); //?
 
 	TArray<FVector> out;
 	out.Reserve(size);
-	const double angle{ UE_DOUBLE_PI / static_cast<double>(size) * 2.};
-	for (int32 i{ 0 }; i < size; ++i) {
-		out.Emplace(FMath::Sin(angle * i + offsetAngle), 
-			FMath::Cos(angle * i + offsetAngle), 0.);
+	const double angle{ sectorAngle / static_cast<double>(size)};
+	double currAngle{ offsetAngle - sectorAngle * 0.5};
+	for (int32 i{ 0 }; i < size; currAngle += angle, ++i) {
+		out.Emplace(FMath::Sin(currAngle),
+			FMath::Cos(currAngle), 0.);
 		out.Last() *= length;
 	}
 	return out;
@@ -117,30 +120,29 @@ double AOrbit::RequestShrink(double distance)
 	return distance;
 }
 
-void AOrbit::InitWithInvaders(int32 invaderNum, double newRadius, bool bAdjustRadius/* = true*/)
+void AOrbit::InitWithInvaders(int32 invaderNum, double newRadius, bool bAdjustRadius, 
+	double offsetAngle, double sectorAngle)
 {
 	auto* world{ GetWorld() };
 	check(world && newRadius > 0.f);
 	check(invaders.Num() == 0);
 
 	check(false);
-	UStaticMesh* invaderMesh{ UBBInvadersAssetManager::Get().
-		GetRandomInvaderMesh(EInvaderType::EIT_Default) };
+	UStaticMesh* invaderMesh{ UBBIAssetManager::Get().
+		RandomInvaderVisuals(EInvaderType::EIT_Default) };
 
 	invaderRadius = invaderMesh->GetBounds().GetSphere().W;
 
 	radius = bAdjustRadius ? newRadius + invaderRadius : newRadius;
-
+	//wtf is that
 	minRadius = invaderRadius * 1.1;
-
-	int32 maxInvaderCount{ CalcMaxInvadersNum(invaderRadius, radius) };
-	int32 newInvaderCount{ invaderNum ? 
-		std::max(maxInvaderCount, invaderNum) : 
-		FMath::RandRange(1, maxInvaderCount) };
-	invaders.Reserve(newInvaderCount);
+	//earth radius into account?
+	invaderNum = invaderNum ? 
+		std::min(CalcMaxInvadersNum(invaderRadius, radius), invaderNum) :
+		FMath::RandRange(1, CalcMaxInvadersNum(invaderRadius, radius));
+	invaders.Reserve(invaderNum);
 	
-	auto radiusVectors{ CalcRadiusVectors(
-		newInvaderCount, radius, FMath::RandRange(0., UE_DOUBLE_PI)) };
+	auto radiusVectors{ CalcRadiusVectors(invaderNum, radius, offsetAngle, sectorAngle) };
 
 	FActorSpawnParameters spawnParams;
 	spawnParams.Owner = this;
@@ -150,7 +152,7 @@ void AOrbit::InitWithInvaders(int32 invaderNum, double newRadius, bool bAdjustRa
 	FVector thisLocation{ GetActorLocation() };
 	FRotator thisRotation{ GetActorRotation() };
 
-	for (int32 i{ 0 }; i < newInvaderCount; ++i) {
+	for (int32 i{ 0 }; i < invaderNum; ++i) {
 		radiusVectors[i] = thisRotation.RotateVector(radiusVectors[i]);
 
 		AInvader* invader{ world->SpawnActor<AInvader>(

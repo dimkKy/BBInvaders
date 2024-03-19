@@ -11,15 +11,15 @@ class UProjectileMovementComponent;
 class UProjectileDataAsset;
 
 UCLASS(Abstract)
-class BBINVADERS_API ABBInvadersProjectile : public AActor
+class BBINVADERS_API ABBIProjectile : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
-	ABBInvadersProjectile();
+	ABBIProjectile();
 	virtual void Tick(float DeltaTime) override;
 
-	static ABBInvadersProjectile* SpawnProjectile(UWorld& w, 
+	static ABBIProjectile* SpawnProjectile(UWorld& w, 
 		const FTransform& t, const UProjectileDataAsset& d, AActor* owner = nullptr);
 
 	UFUNCTION()

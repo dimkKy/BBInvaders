@@ -18,7 +18,7 @@ UStaticMesh* UAsteroidMeshSetAsset::GetStaticMesh(EAsteroidSize size) const
 {
 	switch (size) {
 	default:
-		//auto&& assetManager{ UBBInvadersAssetManager::Get() };
+		//auto&& assetManager{ UBBIAssetManager::Get() };
 		//assetManager.LoadAssetList(asteroidMeshes)
 		[[fallthrough]];
 	case EAsteroidSize::EAS_Small:

@@ -10,7 +10,7 @@
 
 class UStaticMeshComponent;
 class UStaticMesh;
-class ABBInvadersProjectile;
+class ABBIProjectile;
 class APlayerPawn;
 
 DECLARE_DELEGATE_OneParam(FNotifyInvaderDestroyed, AInvader*);

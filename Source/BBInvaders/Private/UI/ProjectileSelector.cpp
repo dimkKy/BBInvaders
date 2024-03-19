@@ -10,7 +10,6 @@
 void UProjectileSelector::NativeOnInitialized()
 {
     listView->SetSelectionMode(ESelectionMode::Single);
-    selectedIndex = 0;
 }
 
 UProjectileDataAsset* UProjectileSelector::GetSelectedProjectile() const
@@ -52,7 +51,7 @@ void UProjectileSelector::SelectNext(bool bReverse)
 
 void UProjectileSelector::UpdatePrices()
 {
-    float currentInflation{ CastChecked<ABBInvadersGameStateBase>(GetWorld()->GetGameState())->GetCurrentInflation() };
+    float currentInflation{ CastChecked<ABBIGameStateBase>(GetWorld()->GetGameState())->GetCurrentInflation() };
 
     for (auto&& object : listView->GetDisplayedEntryWidgets()) {
         check(IsValid(object));

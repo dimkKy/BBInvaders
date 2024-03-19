@@ -10,7 +10,7 @@
 class UStaticMeshComponent;
 class USpringArmComponent;
 class UCameraComponent;
-class ABBInvadersProjectile;
+class ABBIProjectile;
 
 /*
  *

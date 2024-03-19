@@ -20,7 +20,7 @@ void AMainMenuPawn::Shoot()
 
 EShooterType AMainMenuPawn::GetShooterType() const
 {
-	return EShooterType::EST_Human;
+	return EShooterType::EST_MenuPawn;
 }
 
 #if WITH_EDITOR

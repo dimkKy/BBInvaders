@@ -14,5 +14,5 @@ void UPauseMenu::NativeOnInitialized()
 	exitButton->SetClickMethod(EButtonClickMethod::PreciseClick);
 
 	exitButton->OnClicked.AddDynamic(
-		CastChecked<ABBInvadersPlayerController>(GetOwningPlayer()), &ABBInvadersPlayerController::ExitGame);
+		CastChecked<ABBIPlayerController>(GetOwningPlayer()), &ABBIPlayerController::ExitGame);
 }

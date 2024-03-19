@@ -8,7 +8,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "BBInvadersUtils.h"
 
-ABBInvadersProjectile::ABBInvadersProjectile() :
+ABBIProjectile::ABBIProjectile() :
 	movement{ CreateDefaultSubobject<UProjectileMovementComponent>("movementComp") },
 	body{ CreateDefaultSubobject<UStaticMeshComponent>("body") }, 
 	projectileData{ nullptr }
@@ -35,25 +35,25 @@ ABBInvadersProjectile::ABBInvadersProjectile() :
 	InitialLifeSpan = lifespan;
 }
 
-void ABBInvadersProjectile::BeginPlay()
+void ABBIProjectile::BeginPlay()
 {
 	Super::BeginPlay();
 	body->OnComponentBeginOverlap.AddDynamic(
-		this, &ABBInvadersProjectile::OnOverlapBegin);
+		this, &ABBIProjectile::OnOverlapBegin);
 	//movement
 }
 
-void ABBInvadersProjectile::Tick(float DeltaTime)
+void ABBIProjectile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
 
 }
 
-ABBInvadersProjectile* ABBInvadersProjectile::SpawnProjectile(UWorld& w, 
+ABBIProjectile* ABBIProjectile::SpawnProjectile(UWorld& w, 
 	const FTransform& transform, const UProjectileDataAsset& d, AActor* owner)
 {
-	ABBInvadersProjectile* projectile{ w.SpawnActorDeferred<ThisClass>(ThisClass::StaticClass(), 
+	ABBIProjectile* projectile{ w.SpawnActorDeferred<ThisClass>(ThisClass::StaticClass(), 
 		transform, owner, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn) };
 
 	projectile->SetProjectileData(d);
@@ -62,7 +62,7 @@ ABBInvadersProjectile* ABBInvadersProjectile::SpawnProjectile(UWorld& w,
 	return projectile;
 }
 
-void ABBInvadersProjectile::OnOverlapBegin(UPrimitiveComponent* component, AActor* otherActor, 
+void ABBIProjectile::OnOverlapBegin(UPrimitiveComponent* component, AActor* otherActor, 
 	UPrimitiveComponent* otherComp, int32 otherIndex, bool bFromSweep, const FHitResult& result)
 {
 	AActor* owner{ GetOwner() };
@@ -72,7 +72,7 @@ void ABBInvadersProjectile::OnOverlapBegin(UPrimitiveComponent* component, AActo
 	}
 }
 
-void ABBInvadersProjectile::SetProjectileData(const UProjectileDataAsset& data)
+void ABBIProjectile::SetProjectileData(const UProjectileDataAsset& data)
 {
 	projectileData = &data;
 	movement->InitialSpeed = data.initialSpeed;
@@ -80,7 +80,7 @@ void ABBInvadersProjectile::SetProjectileData(const UProjectileDataAsset& data)
 	movement->bIsHomingProjectile = data.bIsHoming;
 	/*TWeakObjectPtr<ThisClass> weakThis{ this };
 
-	//UBBInvadersAssetManager::Get().lo
+	//UBBIAssetManager::Get().lo
 
 	RequestAsyncLoad(SoftTexture,
 		[WeakThis, SoftTexture, bMatchSize]() {
@@ -94,7 +94,7 @@ void ABBInvadersProjectile::SetProjectileData(const UProjectileDataAsset& data)
 	body->SetStaticMesh(data.bodyMesh.LoadSynchronous());
 }
 
-const UProjectileDataAsset* ABBInvadersProjectile::GetProjectileData() const
+const UProjectileDataAsset* ABBIProjectile::GetProjectileData() const
 {
 	return projectileData;
 }

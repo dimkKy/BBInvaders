@@ -125,8 +125,8 @@ void APlayerPawn::ZoomCamera(float value)
 void APlayerPawn::Shoot()
 {
 	check(GetWorld());
-	if (auto* projectile{ GetController<ABBInvadersPlayerController>()->GetSelectedProjectile() }) {
-		ABBInvadersProjectile::SpawnProjectile(*GetWorld(),
+	if (auto* projectile{ GetController<ABBIPlayerController>()->GetSelectedProjectile() }) {
+		ABBIProjectile::SpawnProjectile(*GetWorld(),
 			platform->GetSocketTransform(BBInvadersUtils::muzzleSocket),
 			*projectile, this);
 	}	
@@ -134,7 +134,7 @@ void APlayerPawn::Shoot()
 
 EShooterType APlayerPawn::GetShooterType() const
 {
-	return EShooterType::EST_PlayerOnly;
+	return EShooterType::EST_Player;
 }
 
 float APlayerPawn::CalcDamping() const
@@ -167,7 +167,7 @@ void APlayerPawn::OnOverlapBegin(UPrimitiveComponent* comp, AActor* otherActor,
 
 void APlayerPawn::OnGameOver()
 {
-	GetWorld()->GetAuthGameMode<ABBInvadersGameModeBase>()->OnGameOver();
+	GetWorld()->GetAuthGameMode<ABBIGameModeBase>()->OnGameOver();
 }
 
 void APlayerPawn::Tick(float DeltaTime)

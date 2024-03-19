@@ -19,7 +19,7 @@
 #include "Misc/DataValidation.h"
 #endif
 
-ABBInvadersGameModeBase::ABBInvadersGameModeBase() :
+ABBIGameModeBase::ABBIGameModeBase() :
 	localController{ nullptr }
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -28,13 +28,13 @@ ABBInvadersGameModeBase::ABBInvadersGameModeBase() :
 	//SetActorTickInterval(2.f);
 }
 
-void ABBInvadersGameModeBase::HandleStartingNewPlayer_Implementation(APlayerController* player)
+void ABBIGameModeBase::HandleStartingNewPlayer_Implementation(APlayerController* player)
 {
 	Super::HandleStartingNewPlayer_Implementation(player);
-	localController = CastChecked<ABBInvadersPlayerController>(player);
+	localController = CastChecked<ABBIPlayerController>(player);
 }
 
-void ABBInvadersGameModeBase::Tick(float DeltaTime)
+void ABBIGameModeBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
@@ -67,13 +67,13 @@ void ABBInvadersGameModeBase::Tick(float DeltaTime)
 	}*/
 }
 
-void ABBInvadersGameModeBase::StartGameplay()
+void ABBIGameModeBase::StartGameplay()
 {
-	localController->Possess(GetGameState<ABBInvadersGameStateBase>()->Refresh());
+	localController->Possess(GetGameState<ABBIGameStateBase>()->Refresh());
 	SetActorTickEnabled(true);
 }
 
-void ABBInvadersGameModeBase::GoToMainMenu()
+void ABBIGameModeBase::GoToMainMenu()
 {
 	ClearPause();
 	//load level
@@ -84,11 +84,11 @@ void ABBInvadersGameModeBase::GoToMainMenu()
 	localController->Possess(menuPawn);
 	SetActorTickEnabled(false);
 
-	ForActorsOfClass<AInvader, AOrbit, AAsteroid, ABBInvadersProjectile>
+	ForActorsOfClass<AInvader, AOrbit, AAsteroid, ABBIProjectile>
 		(world, [](AActor* actor) {actor->Destroy(); });
 }
 
-void ABBInvadersGameModeBase::TogglePause()
+void ABBIGameModeBase::TogglePause()
 {
 	//since we have only one player I decided not to bother doing it via PC
 	if (IsPaused()) {
@@ -99,13 +99,13 @@ void ABBInvadersGameModeBase::TogglePause()
 	}
 }
 
-void ABBInvadersGameModeBase::OnGameOver()
+void ABBIGameModeBase::OnGameOver()
 {
 	GoToMainMenu();
 }
 
 #if WITH_EDITOR
-EDataValidationResult ABBInvadersGameModeBase::IsDataValid(FDataValidationContext& context) const
+EDataValidationResult ABBIGameModeBase::IsDataValid(FDataValidationContext& context) const
 {
 	Super::IsDataValid(context);
 
@@ -123,7 +123,7 @@ EDataValidationResult ABBInvadersGameModeBase::IsDataValid(FDataValidationContex
 		context.AddError(FText::FromString("Invalid mainMenuLevel"));
 	}*/
 
-	if (HUDClass && HUDClass->IsChildOf<ABBInvadersHUD>()) {
+	if (HUDClass && HUDClass->IsChildOf<ABBIHUD>()) {
 		if (!HUDClass->IsInBlueprint()) {
 			context.AddError(FText::FromString("Use blueprinted ABBInvadersHUD"));
 		}
@@ -133,7 +133,7 @@ EDataValidationResult ABBInvadersGameModeBase::IsDataValid(FDataValidationContex
 	}
 
 	if (PlayerControllerClass && 
-		PlayerControllerClass->IsChildOf<ABBInvadersPlayerController>()) {
+		PlayerControllerClass->IsChildOf<ABBIPlayerController>()) {
 
 	}
 	else {
@@ -141,7 +141,7 @@ EDataValidationResult ABBInvadersGameModeBase::IsDataValid(FDataValidationContex
 	}
 
 	if (GameStateClass &&
-		GameStateClass->IsChildOf<ABBInvadersGameStateBase>()) {
+		GameStateClass->IsChildOf<ABBIGameStateBase>()) {
 		if (!GameStateClass->IsInBlueprint()) {
 			context.AddWarning(FText::FromString("Consider blueprint GameStateClass"));
 		}
@@ -151,7 +151,7 @@ EDataValidationResult ABBInvadersGameModeBase::IsDataValid(FDataValidationContex
 	}
 
 	if (PlayerStateClass &&
-		PlayerStateClass->IsChildOf<ABBInvadersPlayerState>()) {
+		PlayerStateClass->IsChildOf<ABBIPlayerState>()) {
 
 	}
 	else {
@@ -163,36 +163,36 @@ EDataValidationResult ABBInvadersGameModeBase::IsDataValid(FDataValidationContex
 }
 
 
-void ABBInvadersGameModeBase::_SpawnNewAdvancedInvader() const
+void ABBIGameModeBase::_SpawnNewAdvancedInvader() const
 {
 	verify(SpawnNewAdvancedInvader());
 }
 
-void ABBInvadersGameModeBase::_SpawnNewAsteroid() const
+void ABBIGameModeBase::_SpawnNewAsteroid() const
 {
 	verify(SpawnNewAsteroid());
 }
 
-void ABBInvadersGameModeBase::_SpawnNewOrbit()
+void ABBIGameModeBase::_SpawnNewOrbit()
 {
 	verify(SpawnNewOrbit());
 }
 #endif
 
-void ABBInvadersGameModeBase::BeginPlay()
+void ABBIGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
-	GetGameState<ABBInvadersGameStateBase>()->Refresh();
+	GetGameState<ABBIGameStateBase>()->Refresh();
 }
 
-FVector ABBInvadersGameModeBase::CalcRandOutOfBoundsPos(double objectRadius) const
+FVector ABBIGameModeBase::CalcRandOutOfBoundsPos(double objectRadius) const
 {
-	return GetGameState<ABBInvadersGameStateBase>()->CalcRandOutOfBoundsPos(objectRadius);
+	return GetGameState<ABBIGameStateBase>()->CalcRandOutOfBoundsPos(objectRadius);
 }
 
-AOrbit* ABBInvadersGameModeBase::SpawnNewOrbit(double additionalRadius)
+AOrbit* ABBIGameModeBase::SpawnNewOrbit(double additionalRadius)
 {
-	ABBInvadersGameStateBase* gameState{ GetGameState<ABBInvadersGameStateBase>() };
+	ABBIGameStateBase* gameState{ GetGameState<ABBIGameStateBase>() };
 	check(gameState);
 	const FPlayAreaInfo& mapInfo{ gameState->GetMapInfo() };
 
@@ -213,10 +213,10 @@ AOrbit* ABBInvadersGameModeBase::SpawnNewOrbit(double additionalRadius)
 	return newOrbit;
 }
 
-AAdvancedInvader* ABBInvadersGameModeBase::SpawnNewAdvancedInvader() const
+AAdvancedInvader* ABBIGameModeBase::SpawnNewAdvancedInvader() const
 {	
 	UWorld* world{ GetWorld() };
-	const AActor* target{ GetGameState<ABBInvadersGameStateBase>()->GetCenterActor() };
+	const AActor* target{ GetGameState<ABBIGameStateBase>()->GetCenterActor() };
 	//ensure?
 	check(world && target);
 
@@ -228,7 +228,7 @@ AAdvancedInvader* ABBInvadersGameModeBase::SpawnNewAdvancedInvader() const
 	return newInvader;
 }
 
-AAsteroid* ABBInvadersGameModeBase::SpawnNewAsteroid() const
+AAsteroid* ABBIGameModeBase::SpawnNewAsteroid() const
 {
 	UWorld* world{ GetWorld() };
 	//ensure?
@@ -237,17 +237,17 @@ AAsteroid* ABBInvadersGameModeBase::SpawnNewAsteroid() const
 	auto* newAsteroid{ AAsteroid::SpawnAsteroidDeferred(*world) };
 	newAsteroid->FinishSpawningSetVelocity(
 		CalcRandOutOfBoundsPos(newAsteroid->GetMeshRadius()), 
-		CastChecked<ABBInvadersGameStateBase>(world->GetGameState())->GetMapInfo().Center());
+		CastChecked<ABBIGameStateBase>(world->GetGameState())->GetMapInfo().Center());
 
 	return newAsteroid;
 }
 
-void ABBInvadersGameModeBase::OnOrbitCleared(AOrbit* orbit)
+void ABBIGameModeBase::OnOrbitCleared(AOrbit* orbit)
 {
 	ProcessDeleteOrbit(orbit);
 }
 
-AOrbit* ABBInvadersGameModeBase::ProcessCheckOrbits()
+AOrbit* ABBIGameModeBase::ProcessCheckOrbits()
 {
 	for (decltype(orbits)::TIterator it{orbits.GetHead()}; it; ) {
 		if ((*it).IsValid()) {
@@ -264,7 +264,7 @@ AOrbit* ABBInvadersGameModeBase::ProcessCheckOrbits()
 		nullptr;
 }
 
-AOrbit* ABBInvadersGameModeBase::ProcessCheckOrbits(TFunction<void(AOrbit&)>&& func)
+AOrbit* ABBIGameModeBase::ProcessCheckOrbits(TFunction<void(AOrbit&)>&& func)
 {
 	for (decltype(orbits)::TIterator it{orbits.GetHead()}; it; ) {
 		if ((*it).IsValid()/*&& (*it)->GetInvadersNum()*/) {
@@ -282,7 +282,7 @@ AOrbit* ABBInvadersGameModeBase::ProcessCheckOrbits(TFunction<void(AOrbit&)>&& f
 		nullptr;
 }
 
-AOrbit* ABBInvadersGameModeBase::ProcessDeleteOrbit(AOrbit* orbit)
+AOrbit* ABBIGameModeBase::ProcessDeleteOrbit(AOrbit* orbit)
 {
 	check(orbit);
 

@@ -38,12 +38,12 @@ protected:
  * 
  */
 UCLASS()
-class BBINVADERS_API ABBInvadersGameStateBase : public AGameStateBase
+class BBINVADERS_API ABBIGameStateBase : public AGameStateBase
 {
 	GENERATED_BODY()
 
 public:
-	static ABBInvadersGameStateBase* Get(const UWorld* world);
+	static ABBIGameStateBase* Get(const UWorld* world);
 
 	FVector CalcRandOutOfBoundsPos(double objectRadius) const;
 
@@ -54,11 +54,7 @@ public:
 
 	const AActor* GetCenterActor() const;
 
-	UE_NODISCARD float GetCurrentInflation() const;
-
-	UE_NODISCARD bool IsProjectileBasekit(const UProjectileDataAsset& projectile) const;
-	UE_NODISCARD bool IsProjectileBasekit(const TSoftObjectPtr<UProjectileDataAsset>& projectile) const;
-	UE_NODISCARD int32 GetProjectilesBasekitSize() const;
+	UE_NODISCARD float GetCurrentInflation() const;;
 
 #if WITH_EDITOR
 	virtual EDataValidationResult IsDataValid(FDataValidationContext& context) const override;
@@ -70,13 +66,10 @@ protected:
 	void SetMapInfo(const FVector& center, const FVector& forward,
 		const FVector& up, const FVector& halfSize);
 
-	UPROPERTY(EditDefaultsOnly)
-		TSet<TSoftObjectPtr<UProjectileDataAsset>> basicKitProjectiles;
-
 	FPlayAreaInfo mapInfo{};
 	TWeakObjectPtr<const AActor> cachedCenter{ nullptr };
 
 	float currentInflation{ 1.f };
 
-	friend class ABBInvadersGameModeBase;
+	friend class ABBIGameModeBase;
 };

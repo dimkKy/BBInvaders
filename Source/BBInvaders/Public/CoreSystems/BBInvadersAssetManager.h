@@ -18,7 +18,7 @@ class UStaticMesh;
  * 
  */
 UCLASS(Blueprintable)
-class BBINVADERS_API UBBInvadersAssetManager : public UAssetManager
+class BBINVADERS_API UBBIAssetManager : public UAssetManager
 {
 	GENERATED_BODY()
 
@@ -27,18 +27,18 @@ public:
 	virtual void StartInitialLoading() override;
 	virtual void FinishInitialLoading() override;
 	
-	static UBBInvadersAssetManager& Get();
+	static UBBIAssetManager& Get();
 
-	int32 GetProjectilesAvailableToUserType(EShooterType userType, 
+	int32 ProjectileAssets(EShooterType userType, 
 		TArray<TSoftObjectPtr<UProjectileDataAsset>>& outArray) const;
 
 	//redo
-	TSoftObjectPtr<UProjectileDataAsset> GetRandomProjectilesAvailableToUserType(EShooterType userType) const;
+	TSoftObjectPtr<UProjectileDataAsset> RandomProjectile(EShooterType userType) const;
 
-	TSoftObjectPtr<UAsteroidMeshSetAsset> GetRandomAsteroidMeshSet() const;
+	TSoftObjectPtr<UAsteroidMeshSetAsset> RandomAsteroidMeshSet() const;
 
 	//redo
-	UStaticMesh* GetRandomInvaderMesh(EInvaderType type) const;
+	UStaticMesh* RandomInvaderVisuals(EInvaderType type) const;
 
 protected:
 	virtual void PostInitialAssetScan() override;
@@ -47,8 +47,7 @@ protected:
 
 	void LoadProcessUnloadData(TSharedPtr<FStreamableHandle>& handle, TFunction<bool(UObject*)>&& processFunc, bool bForceGC = false);
 	
-	TArray <TSoftObjectPtr<UProjectileDataAsset>> projectileDataAssets[static_cast<int32>(EShooterType::EST_MAX) + 1];
-	//TArray <FSoftObjectPath> projectileDataAssets[static_cast<int32>(EShooterType::EST_MAX) + 1];
+	TArray <TSoftObjectPtr<UProjectileDataAsset>> projectileDataAssets[static_cast<int32>(EShooterType::EST_MAX) - 1];
 	TSharedPtr<FStreamableHandle> projectileAssetsLoadHandle;
 	void OnProjectileDataAssetsLoaded();
 	bool IsProjectilesDataSufficient();

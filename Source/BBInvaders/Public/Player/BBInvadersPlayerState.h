@@ -37,12 +37,12 @@ protected:
  * 
  */
 UCLASS()
-class BBINVADERS_API ABBInvadersPlayerState : public APlayerState
+class BBINVADERS_API ABBIPlayerState : public APlayerState
 {
 	GENERATED_BODY()
 
 public:
-	ABBInvadersPlayerState();
+	ABBIPlayerState();
 	
 	int32 GetMoneyCount() const;
 	float GetApprovalRating() const;
@@ -60,7 +60,7 @@ protected:
 
 	TArray<TArray<FFactoryInstanceInfo>> factories;
 
-	friend class ABBInvadersGameModeBase;
+	friend class ABBIGameModeBase;
 
 
 };

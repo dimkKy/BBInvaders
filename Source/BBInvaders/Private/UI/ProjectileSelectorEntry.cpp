@@ -53,7 +53,7 @@ void UProjectileSelectorEntry::NativeOnListItemObjectSet(UObject* ListItemObject
 	cachedInfo = CastChecked<UProjectileDataAsset>(ListItemObject);
 
 	SetCost(projectileInfo->baseCost
-		//* CastChecked<ABBInvadersGameStateBase>(GetWorld()->GetGameState())->GetCurrentInflation()
+		//* CastChecked<ABBIGameStateBase>(GetWorld()->GetGameState())->GetCurrentInflation()
 	);
 
 	visibleName->SetText(projectileInfo->visibleName);

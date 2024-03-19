@@ -27,7 +27,7 @@ public:
 
 protected:
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
-		UListView* listView;
+		UListView* listView{ nullptr };
 
-	int32 selectedIndex;
+		int32 selectedIndex{ 0 };
 };

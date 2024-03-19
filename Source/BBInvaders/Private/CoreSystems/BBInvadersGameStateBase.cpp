@@ -37,24 +37,26 @@ void FPlayAreaInfo::RecalcTransform()
         { FRotationMatrix::MakeFromXZ(forward, up).ToQuat(), center };
 }
 
-const FPlayAreaInfo& ABBInvadersGameStateBase::GetMapInfo() const
+//================================================================================
+
+const FPlayAreaInfo& ABBIGameStateBase::GetMapInfo() const
 {
     return mapInfo;
 }
 
-const AActor* ABBInvadersGameStateBase::GetCenterActor() const
+const AActor* ABBIGameStateBase::GetCenterActor() const
 {
     return cachedCenter.Get();
 }
 
 
-ABBInvadersGameStateBase* ABBInvadersGameStateBase::Get(const UWorld* world)
+ABBIGameStateBase* ABBIGameStateBase::Get(const UWorld* world)
 {
     check(world);
-    return CastChecked<ABBInvadersGameStateBase>(world->GetGameState());
+    return CastChecked<ABBIGameStateBase>(world->GetGameState());
 }
 
-FVector ABBInvadersGameStateBase::CalcRandOutOfBoundsPos(double objectRadius) const
+FVector ABBIGameStateBase::CalcRandOutOfBoundsPos(double objectRadius) const
 {
     check(mapInfo);
     
@@ -63,50 +65,32 @@ FVector ABBInvadersGameStateBase::CalcRandOutOfBoundsPos(double objectRadius) co
         * (mapInfo.Radius() + objectRadius);
 }
 
-float ABBInvadersGameStateBase::GetCurrentInflation() const
+float ABBIGameStateBase::GetCurrentInflation() const
 {
     return currentInflation;
 }
 
-bool ABBInvadersGameStateBase::IsProjectileBasekit(const UProjectileDataAsset& projectile) const
-{
-    return IsProjectileBasekit(TSoftObjectPtr<UProjectileDataAsset>{ &projectile });
-}
-
-bool ABBInvadersGameStateBase::IsProjectileBasekit(const TSoftObjectPtr<UProjectileDataAsset>& projectile) const
-{
-    return basicKitProjectiles.Contains(projectile);
-}
-
-int32 ABBInvadersGameStateBase::GetProjectilesBasekitSize() const
-{
-    return basicKitProjectiles.Num();
-}
 
 #if WITH_EDITOR
-EDataValidationResult ABBInvadersGameStateBase::IsDataValid(FDataValidationContext& context) const
+EDataValidationResult ABBIGameStateBase::IsDataValid(FDataValidationContext& context) const
 {
     Super::IsDataValid(context);
-
-    if (!basicKitProjectiles.Num()) {
-        context.AddError(FText::FromString("empty basic kit"));
-    }
 
     return context.GetNumErrors() > 0 ?
         EDataValidationResult::Invalid : EDataValidationResult::Valid;
 }
 #endif
 
-APawn* ABBInvadersGameStateBase::Refresh()
+APawn* ABBIGameStateBase::Refresh()
 {
+    using namespace BBInvadersUtils;
     UWorld* world{ GetWorld() };
-    APlayerPawn* pawn{ BBInvadersUtils::GetFirstActor<APlayerPawn>(world) };
+    APlayerPawn* pawn{ GetFirstActor<APlayerPawn>(world) };
     check(world && pawn);
 
     SetMapInfo(*pawn, pawn->CalcMapHalfSize());
 
-    AOutOfAreaActorTracker* tracker{
-        BBInvadersUtils::GetFirstActor<AOutOfAreaActorTracker>(world) };
+    AOutOfAreaActorTracker* tracker{ GetFirstActor<AOutOfAreaActorTracker>(world) };
 
     if (tracker) {
         tracker->SetTrackArea(pawn->GetActorTransform(), mapInfo.HalfSize());
@@ -122,7 +106,7 @@ APawn* ABBInvadersGameStateBase::Refresh()
     return pawn;
 }
 
-void ABBInvadersGameStateBase::SetMapInfo(const AActor& center, const FVector& halfSize)
+void ABBIGameStateBase::SetMapInfo(const AActor& center, const FVector& halfSize)
 {
     check(IsValid(&center));
     cachedCenter = MakeWeakObjectPtr(&center);
@@ -131,7 +115,7 @@ void ABBInvadersGameStateBase::SetMapInfo(const AActor& center, const FVector& h
         center.GetActorForwardVector(), center.GetActorUpVector(), halfSize);
 }
 
-void ABBInvadersGameStateBase::SetMapInfo(
+void ABBIGameStateBase::SetMapInfo(
     const FVector& center, const FVector& forward, const FVector& up, const FVector& halfSize)
 {
     mapInfo.Set(center, forward, up, halfSize);

@@ -58,26 +58,26 @@ void FFactoryInstanceInfo::FinishConstruction()
 
 ///////////////////////////////////////////////////////////////////////////////////
 
-ABBInvadersPlayerState::ABBInvadersPlayerState() :
+ABBIPlayerState::ABBIPlayerState() :
 	money{100}, approvalRating{100.f}
 {
 }
 
-int32 ABBInvadersPlayerState::GetMoneyCount() const
+int32 ABBIPlayerState::GetMoneyCount() const
 {
 	return money;
 }
 
-void ABBInvadersPlayerState::ChangeMoneyCount(int32 term)
+void ABBIPlayerState::ChangeMoneyCount(int32 term)
 {
 }
 
-float ABBInvadersPlayerState::GetApprovalRating() const
+float ABBIPlayerState::GetApprovalRating() const
 {
 	return approvalRating;
 }
 
-void ABBInvadersPlayerState::ChangeApprovalRating(float term)
+void ABBIPlayerState::ChangeApprovalRating(float term)
 {
 }
 

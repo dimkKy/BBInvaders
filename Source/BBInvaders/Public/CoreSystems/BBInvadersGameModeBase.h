@@ -6,7 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "BBInvadersGameModeBase.generated.h"
 
-class ABBInvadersPlayerController;
+class ABBIPlayerController;
 class AAdvancedInvader;
 class AOrbit;
 class AAsteroid;
@@ -19,12 +19,12 @@ struct FStreamableHandle;
  * TO BE REFACTORED
  */
 UCLASS()
-class BBINVADERS_API ABBInvadersGameModeBase : public AGameModeBase
+class BBINVADERS_API ABBIGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 
 public:
-	ABBInvadersGameModeBase();
+	ABBIGameModeBase();
 	virtual void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) override;
 	virtual void Tick(float DeltaTime) override;
 
@@ -57,7 +57,7 @@ protected:
 	UFUNCTION()
 	void OnOrbitCleared(AOrbit* orbit);
 
-	TWeakObjectPtr<ABBInvadersPlayerController> localController;
+	TWeakObjectPtr<ABBIPlayerController> localController;
 	TDoubleLinkedList<TWeakObjectPtr<AOrbit>> orbits;
 
 	AOrbit* ProcessCheckOrbits();

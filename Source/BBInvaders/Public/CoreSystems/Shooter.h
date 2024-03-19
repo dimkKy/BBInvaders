@@ -7,19 +7,21 @@
 #include "Shooter.generated.h"
 
 //UHT does not see it for some reason
-UENUM(BlueprintType)
+UENUM(BlueprintType, meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
 enum class EShooterType : uint8
 {
+	EST_None UMETA(Hidden),
 	/***/
-	EST_PlayerOnly,
+	EST_Player,
 	/**Player and menu pawn*/
-	EST_Human,
+	EST_MenuPawn,
 	/***/
 	EST_Invader,
 	/*Both invaders**/
 	EST_AdvancedInvader,
 	EST_MAX	UMETA(Hidden),
 };
+ENUM_CLASS_FLAGS(EShooterType);
 
 UINTERFACE(MinimalAPI)
 class UShooter : public UInterface

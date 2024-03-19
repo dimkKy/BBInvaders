@@ -13,19 +13,19 @@
 #include "Misc/DataValidation.h"
 #endif
 
-ABBInvadersHUD::ABBInvadersHUD() :
+ABBIHUD::ABBIHUD() :
 	gametimeUI{ nullptr }, mainMenu{ nullptr }
 {
 }
 
-void ABBInvadersHUD::PostInitializeComponents()
+void ABBIHUD::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 	gametimeUI = CreateWidget<UGametimeUI>(PlayerOwner, gametimeUIClass);
 	mainMenu = CreateWidget<UMainMenu>(PlayerOwner, mainMenuClass);
 }
 
-void ABBInvadersHUD::OnViewTargetChange(const AActor& newTarget)
+void ABBIHUD::OnViewTargetChange(const AActor& newTarget)
 {
 	if (newTarget.IsA(APlayerPawn::StaticClass())) {
 		if (mainMenu->IsInViewport()) {
@@ -56,19 +56,19 @@ void ABBInvadersHUD::OnViewTargetChange(const AActor& newTarget)
 	}
 }
 
-void ABBInvadersHUD::RequestBindings(ABBInvadersPlayerController& controller)
+void ABBIHUD::RequestBindings(ABBIPlayerController& controller)
 {
 	mainMenu->newGameButton->OnClicked.AddDynamic(
-		&controller, &ABBInvadersPlayerController::OnGameplayInitiated);
+		&controller, &ABBIPlayerController::OnGameplayInitiated);
 	gametimeUI->pauseMenu->toMainMenuButton->OnClicked.AddDynamic(
-		&controller, &ABBInvadersPlayerController::OnGameplayEnd);
+		&controller, &ABBIPlayerController::OnGameplayEnd);
 	gametimeUI->pauseButton->OnClicked.AddDynamic(
-		&controller, &ABBInvadersPlayerController::RequestPauseToggle);
+		&controller, &ABBIPlayerController::RequestPauseToggle);
 	gametimeUI->pauseMenu->resumeButton->OnClicked.AddDynamic(
-		&controller, &ABBInvadersPlayerController::RequestPauseToggle);
+		&controller, &ABBIPlayerController::RequestPauseToggle);
 }
 
-UProjectileSelector* ABBInvadersHUD::GetProjectileSelector() const
+UProjectileSelector* ABBIHUD::GetProjectileSelector() const
 {
 	//return gametimeUI->projectileSelector;
 	check(false);
@@ -76,7 +76,7 @@ UProjectileSelector* ABBInvadersHUD::GetProjectileSelector() const
 }
 
 #if WITH_EDITOR
-EDataValidationResult ABBInvadersHUD::IsDataValid(FDataValidationContext& context) const
+EDataValidationResult ABBIHUD::IsDataValid(FDataValidationContext& context) const
 {
 	Super::IsDataValid(context);
 

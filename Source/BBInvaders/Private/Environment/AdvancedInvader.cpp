@@ -53,8 +53,8 @@ UE_NODISCARD AAdvancedInvader* AAdvancedInvader::SpawnAdvancedInvaderDeferred(UW
 		AAdvancedInvader::StaticClass(), FTransform::Identity, nullptr,
 		nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn) };
 
-	UStaticMesh* invaderMesh{ UBBInvadersAssetManager::Get().
-		GetRandomInvaderMesh(EInvaderType::EIT_Advanced) };
+	UStaticMesh* invaderMesh{ UBBIAssetManager::Get().
+		RandomInvaderVisuals(EInvaderType::EIT_Advanced) };
 
 	check(invaderMesh);
 

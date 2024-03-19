@@ -10,23 +10,23 @@ class UGametimeUI;
 class UMainMenu;
 //class PauseMenu;
 
-class ABBInvadersPlayerController;
+class ABBIPlayerController;
 class UProjectileSelector;
 /**
  * 
  */
 UCLASS(Abstract)
-class BBINVADERS_API ABBInvadersHUD : public AHUD
+class BBINVADERS_API ABBIHUD : public AHUD
 {
 	GENERATED_BODY()
 
 public:
-	ABBInvadersHUD();
+	ABBIHUD();
 	virtual void PostInitializeComponents() override;
 
 	void OnViewTargetChange(const AActor& newTarget);
 
-	void RequestBindings(ABBInvadersPlayerController& gameMode);
+	void RequestBindings(ABBIPlayerController& gameMode);
 
 	UProjectileSelector* GetProjectileSelector() const;
 

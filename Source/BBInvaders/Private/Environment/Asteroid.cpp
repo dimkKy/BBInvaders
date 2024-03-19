@@ -54,7 +54,7 @@ void AAsteroid::CalculateRandomVelocity(const FVector& targetLocation)
 
 	velocity = toTarget.GetSafeNormal().RotateAngleAxis(
 		FMath::RandRange(-aimAngleAmplitude, aimAngleAmplitude), 
-		ABBInvadersGameStateBase::Get(GetWorld())->GetMapInfo().GetUp()) *
+		ABBIGameStateBase::Get(GetWorld())->GetMapInfo().GetUp()) *
 		FMath::RandRange(velocityRange.first, velocityRange.second);
 }
 
@@ -146,7 +146,7 @@ AAsteroid* AAsteroid::Split()
 	AAsteroid* newAsteroid{ AAsteroid::SpawnAsteroid(*world, GetActorLocation(), newSize) };
 
 	float splitHalfAngle{ BBInvadersUtils::RandAbsRange(splitAngleAmplitude) };
-	FVector up{ ABBInvadersGameStateBase::Get(GetWorld())->GetMapInfo().GetUp() };
+	FVector up{ ABBIGameStateBase::Get(GetWorld())->GetMapInfo().GetUp() };
 
 	newAsteroid->velocity = velocity.RotateAngleAxis(splitHalfAngle, up);
 

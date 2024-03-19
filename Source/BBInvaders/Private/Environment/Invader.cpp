@@ -40,7 +40,7 @@ void AInvader::Shoot()
 	auto* world{ GetWorld() };
 	check(GetWorld() && false);
 
-	/*ABBInvadersProjectile::SpawnProjectile(*GetWorld(), 
+	/*ABBIProjectile::SpawnProjectile(*GetWorld(), 
 		body->GetSocketTransform(BBInvadersUtils::muzzleSocket),
 		, this);*/
 
