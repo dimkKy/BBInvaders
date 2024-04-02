@@ -1,7 +1,7 @@
 // by Dmitry Kolontay
 
 
-#include "Player/BBInvadersPlayerState.h"
+#include "Player/BBIPlayerState.h"
 #include "Environment/FactoryInfoBase.h"
 
 FFactoryInstanceInfo::FFactoryInstanceInfo(const UFactoryInfoBase& i) :

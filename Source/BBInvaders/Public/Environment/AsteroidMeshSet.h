@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
 #include "Environment/Asteroid.h"
-#include "AsteroidMeshSetAsset.generated.h"
+#include "AsteroidMeshSet.generated.h"
 
 class UStaticMesh;
 struct FStreamableHandle;
@@ -14,7 +14,7 @@ struct FStreamableHandle;
  * 
  */
 UCLASS()
-class BBINVADERS_API UAsteroidMeshSetAsset : public UPrimaryDataAsset
+class BBINVADERS_API UAsteroidMeshSet : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 public:

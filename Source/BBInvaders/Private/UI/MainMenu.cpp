@@ -3,7 +3,7 @@
 
 #include "UI/MainMenu.h"
 #include "Components/Button.h"
-#include "Player/BBInvadersPlayerController.h"
+#include "Player/BBIPlayerController.h"
 
 void UMainMenu::NativeOnInitialized()
 {

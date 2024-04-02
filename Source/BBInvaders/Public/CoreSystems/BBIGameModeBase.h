@@ -4,14 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
-#include "BBInvadersGameModeBase.generated.h"
+#include "BBIGameModeBase.generated.h"
 
 class ABBIPlayerController;
 class AAdvancedInvader;
 class AOrbit;
 class AAsteroid;
 class APawn;
-class UProjectileDataAsset;
+class UProjectileData;
 
 struct FStreamableHandle;
 

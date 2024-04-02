@@ -21,7 +21,7 @@ enum class EAsteroidSize : uint8
 //class UInstancedStaticMeshComponent;
 class UStaticMeshComponent;
 class UStaticMesh;
-class UAsteroidMeshSetAsset;
+class UAsteroidMeshSet;
 
 UCLASS()
 class BBINVADERS_API AAsteroid : public AActor, public IPlanetaryThreatable
@@ -68,7 +68,7 @@ protected:
 		UStaticMeshComponent* body;
 
 	UPROPERTY()
-		const UAsteroidMeshSetAsset* projectileData;
+		const UAsteroidMeshSet* projectileData;
 
 	EAsteroidSize size;
 	FVector velocity;

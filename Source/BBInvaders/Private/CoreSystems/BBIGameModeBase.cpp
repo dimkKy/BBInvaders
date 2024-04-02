@@ -1,20 +1,20 @@
 // by Dmitry Kolontay
 
 
-#include "CoreSystems/BBInvadersGameModeBase.h"
-#include "UI/BBInvadersHUD.h"
-#include "Player/BBInvadersPlayerController.h"
-#include "Player/BBInvadersPlayerState.h"
+#include "CoreSystems/BBIGameModeBase.h"
+#include "UI/BBIHUD.h"
+#include "Player/BBIPlayerController.h"
+#include "Player/BBIPlayerState.h"
 #include "BBInvadersUtils.h"
 #include "Player/MainMenuPawn.h"
-#include "CoreSystems/BBInvadersProjectile.h"
-#include "CoreSystems/BBInvadersGameStateBase.h"
+#include "CoreSystems/BBIProjectile.h"
+#include "CoreSystems/BBIGameStateBase.h"
 #include "Environment/Invader.h"
 #include "Environment/AdvancedInvader.h"
 #include "Environment/Asteroid.h"
 #include "Environment/Orbit.h"
 #include "Containers/List.h"
-#include "CoreSystems/ProjectileDataAsset.h"
+#include "CoreSystems/ProjectileData.h"
 #if WITH_EDITOR
 #include "Misc/DataValidation.h"
 #endif

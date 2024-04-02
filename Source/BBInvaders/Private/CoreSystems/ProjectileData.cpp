@@ -1,27 +1,27 @@
 // by Dmitry Kolontay
 
 
-#include "CoreSystems/ProjectileDataAsset.h"
+#include "CoreSystems/ProjectileData.h"
 #include "Engine/Texture2D.h"
-#include "CoreSystems/BBInvadersAssetManager.h"
+#include "CoreSystems/BBIAssetManager.h"
 //#include "CoreSystems/Shooter.h"
 #if WITH_EDITOR
 #include "Misc/DataValidation.h"
 #endif
 
-UProjectileDataAsset::UProjectileDataAsset()// :
+UProjectileData::UProjectileData()// :
 	//*userType{ EShooterType::EST_MAX },*/ visibleName {}, initialSpeed{ 0.f }, 
 	//maxSpeed{ 100.f }, bIsHoming{ false }, baseCost { 0.f }
 {
 
 }
 
-FPrimaryAssetId UProjectileDataAsset::GetPrimaryAssetId() const
+FPrimaryAssetId UProjectileData::GetPrimaryAssetId() const
 {
 	return {assetType, GetFName()};
 }
 
-void UProjectileDataAsset::PreLoadAsync(bool bLoadMesh, FStreamableDelegate onIconLoaded)
+void UProjectileData::PreLoadAsync(bool bLoadMesh, FStreamableDelegate onIconLoaded)
 {
 	if (icon.IsPending()) {
 		UBBIAssetManager::Get().GetStreamableManager().RequestAsyncLoad(
@@ -34,19 +34,19 @@ void UProjectileDataAsset::PreLoadAsync(bool bLoadMesh, FStreamableDelegate onIc
 	
 }
 
-bool UProjectileDataAsset::IsToShooter(EShooterType type) const
+bool UProjectileData::IsToShooter(EShooterType type) const
 {
 	return static_cast<uint8>(type) & shooterTypes;
 }
 
-bool UProjectileDataAsset::IsAvailableToPlayer(const ABBIPlayerState* state) const
+bool UProjectileData::IsAvailableToPlayer(const ABBIPlayerState* state) const
 {
 	return IsToShooter(EShooterType::EST_Player);
 }
 
 #if WITH_EDITOR
 
-EDataValidationResult UProjectileDataAsset::IsDataValid(FDataValidationContext& context) const
+EDataValidationResult UProjectileData::IsDataValid(FDataValidationContext& context) const
 {
 	Super::IsDataValid(context);
 

@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
-#include "BBInvadersHUD.generated.h"
+#include "BBIHUD.generated.h"
 
 class UGametimeUI;
 class UMainMenu;

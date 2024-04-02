@@ -3,10 +3,10 @@
 
 #include "Environment/Invader.h"
 #include "Components/StaticMeshComponent.h"
-#include "CoreSystems/BBInvadersProjectile.h"
+#include "CoreSystems/BBIProjectile.h"
 #include "BBInvadersUtils.h"
 #include "Player/PlayerPawn.h"
-#include "Player/BBInvadersPlayerState.h"
+#include "Player/BBIPlayerState.h"
 #if WITH_EDITOR
 #include "Misc/DataValidation.h"
 #endif

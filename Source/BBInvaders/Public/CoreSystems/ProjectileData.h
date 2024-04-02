@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
 #include "CoreSystems/Shooter.h"
-#include "ProjectileDataAsset.generated.h"
+#include "ProjectileData.generated.h"
 
 class ABBIPlayerState;
 
@@ -17,11 +17,11 @@ DECLARE_DELEGATE(FStreamableDelegate);
  * 
  */
 UCLASS()
-class BBINVADERS_API UProjectileDataAsset : public UPrimaryDataAsset
+class BBINVADERS_API UProjectileData : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 public:
-	UProjectileDataAsset();
+	UProjectileData();
 
 	virtual FPrimaryAssetId GetPrimaryAssetId() const override;
 

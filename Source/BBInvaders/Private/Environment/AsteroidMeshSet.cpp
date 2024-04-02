@@ -1,20 +1,20 @@
 // by Dmitry Kolontay
 
 
-#include "Environment/AsteroidMeshSetAsset.h"
-#include "CoreSystems/BBInvadersAssetManager.h"
+#include "Environment/AsteroidMeshSet.h"
+#include "CoreSystems/BBIAssetManager.h"
 #if WITH_EDITOR
 #include "Misc/DataValidation.h"
 #endif
 
-const FPrimaryAssetType UAsteroidMeshSetAsset::assetType{ "AsteroidMeshSet" };
+const FPrimaryAssetType UAsteroidMeshSet::assetType{ "AsteroidMeshSet" };
 
-FPrimaryAssetId UAsteroidMeshSetAsset::GetPrimaryAssetId() const
+FPrimaryAssetId UAsteroidMeshSet::GetPrimaryAssetId() const
 {
 	return {assetType, GetFName()};
 }
 
-UStaticMesh* UAsteroidMeshSetAsset::GetStaticMesh(EAsteroidSize size) const
+UStaticMesh* UAsteroidMeshSet::GetStaticMesh(EAsteroidSize size) const
 {
 	switch (size) {
 	default:
@@ -29,7 +29,7 @@ UStaticMesh* UAsteroidMeshSetAsset::GetStaticMesh(EAsteroidSize size) const
 	}
 }
 
-EDataValidationResult UAsteroidMeshSetAsset::IsDataValid(FDataValidationContext& context) const
+EDataValidationResult UAsteroidMeshSet::IsDataValid(FDataValidationContext& context) const
 {
 	Super::IsDataValid(context);
 	

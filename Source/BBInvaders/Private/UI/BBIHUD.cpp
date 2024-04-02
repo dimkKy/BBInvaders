@@ -1,13 +1,13 @@
 // by Dmitry Kolontay
 
 
-#include "UI/BBInvadersHUD.h"
+#include "UI/BBIHUD.h"
 #include "UI/GametimeUI.h"
 #include "UI/MainMenu.h"
 #include "UI/PauseMenu.h"
 #include "Player/PlayerPawn.h"
 #include "Player/MainMenuPawn.h"
-#include "Player/BBInvadersPlayerController.h"
+#include "Player/BBIPlayerController.h"
 #include "Components/Button.h"
 #if WITH_EDITOR
 #include "Misc/DataValidation.h"

@@ -1,10 +1,10 @@
 // by Dmitry Kolontay
 
 
-#include "CoreSystems/BBInvadersAssetManager.h"
-#include "CoreSystems/ProjectileDataAsset.h"
-#include "Environment/AsteroidMeshSetAsset.h"
-#include "Environment/InvaderVisualsAsset.h"
+#include "CoreSystems/BBIAssetManager.h"
+#include "CoreSystems/ProjectileData.h"
+#include "Environment/AsteroidMeshSet.h"
+#include "Environment/InvaderVisuals.h"
 
 void UBBIAssetManager::StartInitialLoading()
 {
@@ -24,7 +24,7 @@ UBBIAssetManager& UBBIAssetManager::Get()
 }
 
 int32 UBBIAssetManager::ProjectileAssets(EShooterType userType, 
-	TArray<TSoftObjectPtr<UProjectileDataAsset>>& outArray) const
+	TArray<TSoftObjectPtr<UProjectileData>>& outArray) const
 {
 	check(outArray.Num() == 0);
 	int32 userTypeI{ static_cast<int32>(userType) };
@@ -36,7 +36,7 @@ int32 UBBIAssetManager::ProjectileAssets(EShooterType userType,
 	return outArray.Num();
 }
 
-TSoftObjectPtr<UProjectileDataAsset> UBBIAssetManager::
+TSoftObjectPtr<UProjectileData> UBBIAssetManager::
 	RandomProjectile(EShooterType userType) const
 {
 	//TODO
@@ -44,10 +44,10 @@ TSoftObjectPtr<UProjectileDataAsset> UBBIAssetManager::
 
 	verify(userTypeI > static_cast<int8>(EShooterType::EST_None)
 		&& userTypeI < static_cast<int8>(EShooterType::EST_MAX));
-	return TSoftObjectPtr<UProjectileDataAsset>();
+	return TSoftObjectPtr<UProjectileData>();
 }
 
-TSoftObjectPtr<UAsteroidMeshSetAsset> UBBIAssetManager::RandomAsteroidMeshSet() const
+TSoftObjectPtr<UAsteroidMeshSet> UBBIAssetManager::RandomAsteroidMeshSet() const
 {
 	return asteroidMeshSets[FMath::RandHelper(asteroidMeshSets.Num())];
 }
@@ -55,7 +55,7 @@ TSoftObjectPtr<UAsteroidMeshSetAsset> UBBIAssetManager::RandomAsteroidMeshSet() 
 UStaticMesh* UBBIAssetManager::RandomInvaderVisuals(EInvaderType type) const
 {
 	
-	const TArray<TSoftObjectPtr<UInvaderVisualsAsset>>& arrayRef{ invaderVisuals[static_cast<int32>(type)] };
+	const TArray<TSoftObjectPtr<UInvaderVisuals>>& arrayRef{ invaderVisuals[static_cast<int32>(type)] };
 	return arrayRef[FMath::RandHelper(arrayRef.Num())].LoadSynchronous()->GetStaticMesh();
 }
 
@@ -64,17 +64,17 @@ void UBBIAssetManager::PostInitialAssetScan()
 	Super::PostInitialAssetScan();
 
 	/*TArray<FSoftObjectPath> projectileAssetsPaths;
-	if (GetPrimaryAssetPathList(UProjectileDataAsset::assetType, projectileAssetsPaths)) {
+	if (GetPrimaryAssetPathList(UProjectileData::assetType, projectileAssetsPaths)) {
 		for()
 	}*/
 
-	projectileAssetsLoadHandle = LoadPrimaryAssetsWithType(UProjectileDataAsset::assetType, {},
+	projectileAssetsLoadHandle = LoadPrimaryAssetsWithType(UProjectileData::assetType, {},
 		FStreamableDelegate::CreateUObject(this, &UBBIAssetManager::OnProjectileDataAssetsLoaded));
 
-	asteroidMeshSetsLoadHandle = LoadPrimaryAssetsWithType(UAsteroidMeshSetAsset::assetType, {},
+	asteroidMeshSetsLoadHandle = LoadPrimaryAssetsWithType(UAsteroidMeshSet::assetType, {},
 		FStreamableDelegate::CreateUObject(this, &UBBIAssetManager::OnAsteroidMeshSetsLoaded));
 
-	invaderVisualsLoadHandle = LoadPrimaryAssetsWithType(UInvaderVisualsAsset::assetType, {},
+	invaderVisualsLoadHandle = LoadPrimaryAssetsWithType(UInvaderVisuals::assetType, {},
 		FStreamableDelegate::CreateUObject(this, &UBBIAssetManager::OnInvaderVisualsLoaded));
 }
 
@@ -120,7 +120,7 @@ void UBBIAssetManager::LoadProcessUnloadData(TSharedPtr<FStreamableHandle>& hand
 void UBBIAssetManager::OnProjectileDataAssetsLoaded()
 {
 	auto processor = [this](UObject* object) {
-		if (auto* projectileData{ ExactCast<UProjectileDataAsset>(object) }) {
+		if (auto* projectileData{ ExactCast<UProjectileData>(object) }) {
 			for (int32 i{ 1 }; i < static_cast<int32>(EShooterType::EST_MAX); ++i) {
 				if (projectileData->IsToShooter(static_cast<EShooterType>(i))) {
 					projectileDataAssets[i - 1].Emplace(projectileData);
@@ -144,7 +144,7 @@ bool UBBIAssetManager::IsProjectilesDataSufficient()
 void UBBIAssetManager::OnAsteroidMeshSetsLoaded()
 {
 	auto processor = [this](UObject* object) {
-		if (auto* projectileData{ ExactCast<UAsteroidMeshSetAsset>(object) }) {
+		if (auto* projectileData{ ExactCast<UAsteroidMeshSet>(object) }) {
 			asteroidMeshSets.Emplace(projectileData);
 			return true;
 		}
@@ -159,7 +159,7 @@ void UBBIAssetManager::OnAsteroidMeshSetsLoaded()
 void UBBIAssetManager::OnInvaderVisualsLoaded()
 {
 	auto processor = [this](UObject* object) {
-		if (auto* invaderVisual{ ExactCast<UInvaderVisualsAsset>(object) }) {
+		if (auto* invaderVisual{ ExactCast<UInvaderVisuals>(object) }) {
 			invaderVisuals[invaderVisual->GetInvaderTypeI()].Emplace(invaderVisual);
 			return true;
 		}

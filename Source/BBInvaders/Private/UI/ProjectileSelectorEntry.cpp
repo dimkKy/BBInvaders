@@ -2,8 +2,8 @@
 
 
 #include "UI/ProjectileSelectorEntry.h"
-#include "CoreSystems/ProjectileDataAsset.h"
-#include "CoreSystems/BBInvadersGameStateBase.h"
+#include "CoreSystems/ProjectileData.h"
+#include "CoreSystems/BBIGameStateBase.h"
 #include "Components/TextBlock.h"
 #include "Components/Image.h"
 #include "Blueprint/WidgetTree.h"
@@ -49,8 +49,8 @@ void UProjectileSelectorEntry::NativeOnItemSelectionChanged(bool bIsSelected)
 
 void UProjectileSelectorEntry::NativeOnListItemObjectSet(UObject* ListItemObject)
 {
-	UProjectileDataAsset* projectileInfo{ CastChecked<UProjectileDataAsset>(ListItemObject) };
-	cachedInfo = CastChecked<UProjectileDataAsset>(ListItemObject);
+	UProjectileData* projectileInfo{ CastChecked<UProjectileData>(ListItemObject) };
+	cachedInfo = CastChecked<UProjectileData>(ListItemObject);
 
 	SetCost(projectileInfo->baseCost
 		//* CastChecked<ABBIGameStateBase>(GetWorld()->GetGameState())->GetCurrentInflation()

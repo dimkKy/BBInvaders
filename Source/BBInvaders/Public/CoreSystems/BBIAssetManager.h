@@ -7,11 +7,11 @@
 #include "CoreSystems/Shooter.h"
 //shorten to invaderType.h
 #include "Environment/Invader.h"
-#include "BBInvadersAssetManager.generated.h"
+#include "BBIAssetManager.generated.h"
 
-class UProjectileDataAsset;
-class UAsteroidMeshSetAsset;
-class UInvaderVisualsAsset;
+class UProjectileData;
+class UAsteroidMeshSet;
+class UInvaderVisuals;
 class UStaticMesh;
 
 /**
@@ -30,12 +30,12 @@ public:
 	static UBBIAssetManager& Get();
 
 	int32 ProjectileAssets(EShooterType userType, 
-		TArray<TSoftObjectPtr<UProjectileDataAsset>>& outArray) const;
+		TArray<TSoftObjectPtr<UProjectileData>>& outArray) const;
 
 	//redo
-	TSoftObjectPtr<UProjectileDataAsset> RandomProjectile(EShooterType userType) const;
+	TSoftObjectPtr<UProjectileData> RandomProjectile(EShooterType userType) const;
 
-	TSoftObjectPtr<UAsteroidMeshSetAsset> RandomAsteroidMeshSet() const;
+	TSoftObjectPtr<UAsteroidMeshSet> RandomAsteroidMeshSet() const;
 
 	//redo
 	UStaticMesh* RandomInvaderVisuals(EInvaderType type) const;
@@ -47,16 +47,16 @@ protected:
 
 	void LoadProcessUnloadData(TSharedPtr<FStreamableHandle>& handle, TFunction<bool(UObject*)>&& processFunc, bool bForceGC = false);
 	
-	TArray <TSoftObjectPtr<UProjectileDataAsset>> projectileDataAssets[static_cast<int32>(EShooterType::EST_MAX) - 1];
+	TArray <TSoftObjectPtr<UProjectileData>> projectileDataAssets[static_cast<int32>(EShooterType::EST_MAX) - 1];
 	TSharedPtr<FStreamableHandle> projectileAssetsLoadHandle;
 	void OnProjectileDataAssetsLoaded();
 	bool IsProjectilesDataSufficient();
 
-	TArray<TSoftObjectPtr<UAsteroidMeshSetAsset>> asteroidMeshSets;
+	TArray<TSoftObjectPtr<UAsteroidMeshSet>> asteroidMeshSets;
 	TSharedPtr<FStreamableHandle> asteroidMeshSetsLoadHandle;
 	void OnAsteroidMeshSetsLoaded();
 
-	TArray <TSoftObjectPtr<UInvaderVisualsAsset>> invaderVisuals[static_cast<int32>(EInvaderType::EIT_MAX)];
+	TArray <TSoftObjectPtr<UInvaderVisuals>> invaderVisuals[static_cast<int32>(EInvaderType::EIT_MAX)];
 	TSharedPtr<FStreamableHandle> invaderVisualsLoadHandle;
 	void OnInvaderVisualsLoaded();
 };

@@ -4,10 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
-#include "BBInvadersPlayerController.generated.h"
+#include "BBIPlayerController.generated.h"
 
 class ABBIHUD;
-class UProjectileDataAsset;
+class UProjectileData;
 struct FStreamableHandle;
 
 /**
@@ -22,7 +22,7 @@ public:
 	ABBIPlayerController();
 	ABBIHUD* GetBBInvadersHUD() const;
 
-	UProjectileDataAsset* GetSelectedProjectile() const;
+	UProjectileData* GetSelectedProjectile() const;
 
 	UFUNCTION()
 		void OnGameplayInitiated();
@@ -39,7 +39,7 @@ protected:
 	void OnProjectilesLoaded() const;
 
 	UPROPERTY()
-		TArray<UProjectileDataAsset*> availableProjectiles;
+		TArray<UProjectileData*> availableProjectiles;
 
 	TSharedPtr<FStreamableHandle> projectilesHanle;
 };

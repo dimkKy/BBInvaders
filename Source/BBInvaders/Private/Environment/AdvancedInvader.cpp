@@ -7,7 +7,7 @@
 #include "BBInvadersUtils.h"
 //#include "GameFramework/SpringArmComponent.h"
 #include "Components/StaticMeshComponent.h"
-#include "CoreSystems/BBInvadersAssetManager.h"
+#include "CoreSystems/BBIAssetManager.h"
 
 FTargetInfo::FTargetInfo() :
 	bAimed{ false }, location{}, up{}

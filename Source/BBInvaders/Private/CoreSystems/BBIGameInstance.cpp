@@ -1,13 +1,13 @@
 // by Dmitry Kolontay
 
 
-#include "CoreSystems/BBInvadersGameInstance.h"
+#include "CoreSystems/BBIGameInstance.h"
 #if WITH_EDITOR
 #include "Misc/DataValidation.h"
 #endif
 
 #if WITH_EDITOR
-EDataValidationResult UBBInvadersGameInstance::IsDataValid(FDataValidationContext& context) const
+EDataValidationResult UBBIGameInstance::IsDataValid(FDataValidationContext& context) const
 {
 	Super::IsDataValid(context);
 	

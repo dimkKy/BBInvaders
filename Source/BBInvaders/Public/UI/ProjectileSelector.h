@@ -7,7 +7,7 @@
 #include "ProjectileSelector.generated.h"
 
 class UListView;
-class UProjectileDataAsset;
+class UProjectileData;
 
 /**
  * 
@@ -19,8 +19,8 @@ class BBINVADERS_API UProjectileSelector : public UUserWidget
 public:
 	virtual void NativeOnInitialized() override;
 
-	UProjectileDataAsset* GetSelectedProjectile() const;
-	void SetAvailableProjectiles(const TArray<UProjectileDataAsset*>& projectiles);
+	UProjectileData* GetSelectedProjectile() const;
+	void SetAvailableProjectiles(const TArray<UProjectileData*>& projectiles);
 	void SelectNext(bool bReverse = false);
 
 	void UpdatePrices();

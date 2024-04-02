@@ -3,22 +3,22 @@
 
 #include "UI/ProjectileSelector.h"
 #include "UI/ProjectileSelectorEntry.h"
-#include "CoreSystems/BBInvadersGameStateBase.h"
+#include "CoreSystems/BBIGameStateBase.h"
 #include "Components/ListView.h"
-#include "CoreSystems/ProjectileDataAsset.h"
+#include "CoreSystems/ProjectileData.h"
 
 void UProjectileSelector::NativeOnInitialized()
 {
     listView->SetSelectionMode(ESelectionMode::Single);
 }
 
-UProjectileDataAsset* UProjectileSelector::GetSelectedProjectile() const
+UProjectileData* UProjectileSelector::GetSelectedProjectile() const
 {
     //return static_cast<decltype(GetSelectedProjectile())>(listView->GetSelectedItem());
-    return static_cast<UProjectileDataAsset*>(listView->GetSelectedItem());
+    return static_cast<UProjectileData*>(listView->GetSelectedItem());
 }
 
-void UProjectileSelector::SetAvailableProjectiles(const TArray<UProjectileDataAsset*>& projectiles)
+void UProjectileSelector::SetAvailableProjectiles(const TArray<UProjectileData*>& projectiles)
 {
     if (ensureAlways(projectiles.Num())) {
         listView->SetListItems(projectiles);

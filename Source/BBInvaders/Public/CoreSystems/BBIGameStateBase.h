@@ -4,9 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameStateBase.h"
-#include "BBInvadersGameStateBase.generated.h"
+#include "BBIGameStateBase.generated.h"
 
-class UProjectileDataAsset;
+class UProjectileData;
 
 struct FPlayAreaInfo {	
 	explicit operator bool() const;

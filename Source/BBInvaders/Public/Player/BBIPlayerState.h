@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerState.h"
-#include "BBInvadersPlayerState.generated.h"
+#include "BBIPlayerState.generated.h"
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnMoneyCountChanged, int32);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnApprovalRatingChanged, int32);

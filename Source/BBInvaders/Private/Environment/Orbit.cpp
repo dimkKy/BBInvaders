@@ -7,7 +7,7 @@
 #include "Components/SplineComponent.h"
 #include "BBInvadersUtils.h"
 #include "Environment/Invader.h"
-#include "CoreSystems/BBInvadersAssetManager.h"
+#include "CoreSystems/BBIAssetManager.h"
 
 float AOrbit::shrinkingStartDelay = 3.f;
 

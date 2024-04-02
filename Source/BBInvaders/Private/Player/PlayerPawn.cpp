@@ -2,13 +2,13 @@
 
 
 #include "Player/PlayerPawn.h"
-#include "Player/BBInvadersPlayerController.h"
+#include "Player/BBIPlayerController.h"
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
-#include "CoreSystems/BBInvadersProjectile.h"
+#include "CoreSystems/BBIProjectile.h"
 #include "CoreSystems/Shooter.h"
-#include "CoreSystems/BBInvadersGameModeBase.h"
+#include "CoreSystems/BBIGameModeBase.h"
 #include "Environment/PlanetaryThreatable.h"
 #include "BBInvadersUtils.h"
 #if WITH_EDITOR

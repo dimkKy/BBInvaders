@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
-#include "BBInvadersGameInstance.generated.h"
+#include "BBIGameInstance.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class BBINVADERS_API UBBInvadersGameInstance : public UGameInstance
+class BBINVADERS_API UBBIGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
 public:

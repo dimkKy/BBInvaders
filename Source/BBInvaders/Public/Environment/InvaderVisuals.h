@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
 #include "Environment/Invader.h"
-#include "InvaderVisualsAsset.generated.h"
+#include "InvaderVisuals.generated.h"
 
 //class AInvader
 
@@ -13,7 +13,7 @@
  * 
  */
 UCLASS()
-class BBINVADERS_API UInvaderVisualsAsset : public UPrimaryDataAsset
+class BBINVADERS_API UInvaderVisuals : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 public:

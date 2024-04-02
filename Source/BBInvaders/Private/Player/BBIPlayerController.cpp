@@ -1,12 +1,12 @@
 // by Dmitry Kolontay
 
 
-#include "Player/BBInvadersPlayerController.h"
-#include "CoreSystems/BBInvadersAssetManager.h"
-#include "CoreSystems/BBInvadersGameModeBase.h"
-#include "CoreSystems/BBInvadersGameStateBase.h"
-#include "CoreSystems/ProjectileDataAsset.h"
-#include "UI/BBInvadersHUD.h"
+#include "Player/BBIPlayerController.h"
+#include "CoreSystems/BBIAssetManager.h"
+#include "CoreSystems/BBIGameModeBase.h"
+#include "CoreSystems/BBIGameStateBase.h"
+#include "CoreSystems/ProjectileData.h"
+#include "UI/BBIHUD.h"
 #include "UI/ProjectileSelector.h"
 
 
@@ -21,15 +21,15 @@ ABBIHUD* ABBIPlayerController::GetBBInvadersHUD() const
 	return CastChecked<ABBIHUD>(MyHUD);
 }
 
-UProjectileDataAsset* ABBIPlayerController::GetSelectedProjectile() const
+UProjectileData* ABBIPlayerController::GetSelectedProjectile() const
 {
 	return GetBBInvadersHUD()->GetProjectileSelector()->GetSelectedProjectile();
 }
 
 void ABBIPlayerController::OnGameplayInitiated()
 {
-	auto&& assetManager{ UBBIAssetManager::Get() };
-	TArray<TSoftObjectPtr<UProjectileDataAsset>> projectiles;
+	UBBIAssetManager& assetManager{ UBBIAssetManager::Get() };
+	TArray<TSoftObjectPtr<UProjectileData>> projectiles;
 
 	if (!assetManager.ProjectileAssets(EShooterType::EST_Player, projectiles)) {
 		//some error
@@ -90,15 +90,15 @@ void ABBIPlayerController::OnProjectilesLoaded() const
 		loadedAssets.Reserve(loadedNum);
 		projectilesHanle->GetLoadedAssets(loadedAssets);
 
-		TArray<UProjectileDataAsset*> loadedProjectiles;
+		TArray<UProjectileData*> loadedProjectiles;
 		loadedProjectiles.Reserve(loadedAssets.Num());
 
 		for (auto&& asset : loadedAssets) {
 			if (!asset) {
 				continue;
 			}
-			check(asset->IsA(UProjectileDataAsset::StaticClass()));
-			loadedProjectiles.Add(static_cast<UProjectileDataAsset*>(asset));
+			check(asset->IsA(UProjectileData::StaticClass()));
+			loadedProjectiles.Add(static_cast<UProjectileData*>(asset));
 		}
 		GetBBInvadersHUD()->GetProjectileSelector()->SetAvailableProjectiles(loadedProjectiles);
 	}

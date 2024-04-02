@@ -3,7 +3,7 @@
 
 #include "UI/PauseMenu.h"
 #include "Components/Button.h"
-#include "Player/BBInvadersPlayerController.h"
+#include "Player/BBIPlayerController.h"
 
 void UPauseMenu::NativeOnInitialized()
 {

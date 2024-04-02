@@ -9,7 +9,7 @@
 
 class UTextBlock;
 class UImage;
-class UProjectileDataAsset;
+class UProjectileData;
 
 /**
  * 
@@ -44,5 +44,5 @@ protected:
 	static const FNumberFormattingOptions formattingOptions;
 	
 	//for faster access?
-	const UProjectileDataAsset* cachedInfo;
+	const UProjectileData* cachedInfo;
 };

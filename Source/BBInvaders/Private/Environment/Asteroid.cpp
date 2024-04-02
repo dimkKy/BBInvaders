@@ -4,7 +4,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "BBInvadersUtils.h"
 #include "Player/PlayerPawn.h"
-#include "CoreSystems/BBInvadersGameStateBase.h"
+#include "CoreSystems/BBIGameStateBase.h"
 
 AAsteroid::AAsteroid() :
 	body{CreateDefaultSubobject<UStaticMeshComponent>("body")},

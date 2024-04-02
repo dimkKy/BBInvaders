@@ -1,9 +1,9 @@
 // by Dmitry Kolontay
 
 
-#include "CoreSystems/BBInvadersProjectile.h"
-#include "CoreSystems/BBInvadersAssetManager.h"
-#include "CoreSystems/ProjectileDataAsset.h"
+#include "CoreSystems/BBIProjectile.h"
+#include "CoreSystems/BBIAssetManager.h"
+#include "CoreSystems/ProjectileData.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "BBInvadersUtils.h"
@@ -51,7 +51,7 @@ void ABBIProjectile::Tick(float DeltaTime)
 }
 
 ABBIProjectile* ABBIProjectile::SpawnProjectile(UWorld& w, 
-	const FTransform& transform, const UProjectileDataAsset& d, AActor* owner)
+	const FTransform& transform, const UProjectileData& d, AActor* owner)
 {
 	ABBIProjectile* projectile{ w.SpawnActorDeferred<ThisClass>(ThisClass::StaticClass(), 
 		transform, owner, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn) };
@@ -72,7 +72,7 @@ void ABBIProjectile::OnOverlapBegin(UPrimitiveComponent* component, AActor* othe
 	}
 }
 
-void ABBIProjectile::SetProjectileData(const UProjectileDataAsset& data)
+void ABBIProjectile::SetProjectileData(const UProjectileData& data)
 {
 	projectileData = &data;
 	movement->InitialSpeed = data.initialSpeed;
@@ -94,7 +94,7 @@ void ABBIProjectile::SetProjectileData(const UProjectileDataAsset& data)
 	body->SetStaticMesh(data.bodyMesh.LoadSynchronous());
 }
 
-const UProjectileDataAsset* ABBIProjectile::GetProjectileData() const
+const UProjectileData* ABBIProjectile::GetProjectileData() const
 {
 	return projectileData;
 }

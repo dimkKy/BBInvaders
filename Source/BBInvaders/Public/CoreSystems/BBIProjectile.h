@@ -5,10 +5,10 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Engine/DataTable.h"
-#include "BBInvadersProjectile.generated.h"
+#include "BBIProjectile.generated.h"
 
 class UProjectileMovementComponent;
-class UProjectileDataAsset;
+class UProjectileData;
 
 UCLASS(Abstract)
 class BBINVADERS_API ABBIProjectile : public AActor
@@ -20,16 +20,16 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	static ABBIProjectile* SpawnProjectile(UWorld& w, 
-		const FTransform& t, const UProjectileDataAsset& d, AActor* owner = nullptr);
+		const FTransform& t, const UProjectileData& d, AActor* owner = nullptr);
 
 	UFUNCTION()
 		void OnOverlapBegin(UPrimitiveComponent* component, 
 			AActor* otherActor, UPrimitiveComponent* otherComp, 
 			int32 otherIndex, bool bFromSweep, const FHitResult& result);
 
-	void SetProjectileData(const UProjectileDataAsset& data);
+	void SetProjectileData(const UProjectileData& data);
 
-	const UProjectileDataAsset* GetProjectileData() const;
+	const UProjectileData* GetProjectileData() const;
 
 protected:
 	virtual void BeginPlay() override;
@@ -40,7 +40,7 @@ protected:
 		UStaticMeshComponent* body;
 
 	UPROPERTY()
-		const UProjectileDataAsset* projectileData;
+		const UProjectileData* projectileData;
 
 	static constexpr float lifespan{ 40.f };
 	static constexpr int32 simulationInteractions{ 3 };
