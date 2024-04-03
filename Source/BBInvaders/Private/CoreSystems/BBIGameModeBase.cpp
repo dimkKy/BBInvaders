@@ -14,7 +14,7 @@
 #include "Environment/Asteroid.h"
 #include "Environment/Orbit.h"
 #include "Containers/List.h"
-#include "CoreSystems/ProjectileData.h"
+#include "Projectiles/ProjectileData.h"
 #if WITH_EDITOR
 #include "Misc/DataValidation.h"
 #endif

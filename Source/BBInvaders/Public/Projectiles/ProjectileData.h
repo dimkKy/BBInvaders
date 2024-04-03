@@ -16,7 +16,7 @@ DECLARE_DELEGATE(FStreamableDelegate);
 /**
  * 
  */
-UCLASS()
+UCLASS(Abstract, NotBlueprintable)
 class BBINVADERS_API UProjectileData : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
@@ -29,29 +29,20 @@ public:
 
 	static inline const FPrimaryAssetType assetType{ "ProjectileData" };
 
+	virtual void OnShooting()
+		PURE_VIRTUAL(UProjectileData::OnShooting, return; );
+
 	UPROPERTY(EditInstanceOnly, BlueprintReadOnly)
 		FText visibleName{};
 
 	UPROPERTY(EditInstanceOnly, BlueprintReadOnly)
-		float initialSpeed{ 0.f };
-
-	UPROPERTY(EditInstanceOnly, BlueprintReadOnly)
-		float maxSpeed{ 100 };
-
-	UPROPERTY(EditInstanceOnly, BlueprintReadOnly)
-	FText description{};
-
-	UPROPERTY(EditInstanceOnly, BlueprintReadOnly)
-		bool bIsHoming{ false };
+		FText description{};
 
 	UPROPERTY(EditInstanceOnly, BlueprintReadOnly)
 		float baseCost{ 0.f };
 
 	UPROPERTY(EditInstanceOnly, BlueprintReadOnly)
 		TSoftObjectPtr<UTexture2D> icon;
-
-	UPROPERTY(EditInstanceOnly, BlueprintReadOnly)
-		TSoftObjectPtr<UStaticMesh> bodyMesh;
 
 	bool IsToShooter(EShooterType type) const;
 

@@ -1,7 +1,7 @@
 // by Dmitry Kolontay
 
 
-#include "CoreSystems/ProjectileData.h"
+#include "Projectiles/ProjectileData.h"
 #include "Engine/Texture2D.h"
 #include "CoreSystems/BBIAssetManager.h"
 //#include "CoreSystems/Shooter.h"
@@ -27,10 +27,10 @@ void UProjectileData::PreLoadAsync(bool bLoadMesh, FStreamableDelegate onIconLoa
 		UBBIAssetManager::Get().GetStreamableManager().RequestAsyncLoad(
 			icon.ToSoftObjectPath(), MoveTemp(onIconLoaded), FStreamableManager::AsyncLoadHighPriority);
 	}
-	if (bLoadMesh && bodyMesh.IsPending()) {
+	/*if (bLoadMesh && bodyMesh.IsPending()) {
 		UBBIAssetManager::Get().GetStreamableManager().RequestAsyncLoad(
 			bodyMesh.ToSoftObjectPath(), FStreamableDelegate{}, FStreamableManager::AsyncLoadHighPriority);
-	}
+	}*/
 	
 }
 
@@ -49,12 +49,6 @@ bool UProjectileData::IsAvailableToPlayer(const ABBIPlayerState* state) const
 EDataValidationResult UProjectileData::IsDataValid(FDataValidationContext& context) const
 {
 	Super::IsDataValid(context);
-
-	if (maxSpeed <= 0.f)
-		context.AddError(FText::FromString("maxSpeed have to be positive"));
-
-	if (maxSpeed < initialSpeed)
-		context.AddError(FText::FromString("maxSpeed can not be lower then initialSpeed"));
 
 	if (baseCost < 0.f) {
 		context.AddError(FText::FromString("baseCost can not be negative"));

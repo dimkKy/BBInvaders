@@ -3,7 +3,7 @@
 
 #include "CoreSystems/BBIProjectile.h"
 #include "CoreSystems/BBIAssetManager.h"
-#include "CoreSystems/ProjectileData.h"
+#include "Projectiles/ProjectileData.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "BBInvadersUtils.h"
@@ -74,7 +74,7 @@ void ABBIProjectile::OnOverlapBegin(UPrimitiveComponent* component, AActor* othe
 
 void ABBIProjectile::SetProjectileData(const UProjectileData& data)
 {
-	projectileData = &data;
+	/*projectileData = &data;
 	movement->InitialSpeed = data.initialSpeed;
 	movement->MaxSpeed = data.maxSpeed;
 	movement->bIsHomingProjectile = data.bIsHoming;
@@ -90,8 +90,8 @@ void ABBIProjectile::SetProjectileData(const UProjectileData& data)
 				StrongThis->SetBrushFromTexture(SoftTexture.Get(), bMatchSize);
 			}
 		}
-	);*/
-	body->SetStaticMesh(data.bodyMesh.LoadSynchronous());
+	);*
+	body->SetStaticMesh(data.bodyMesh.LoadSynchronous());*/
 }
 
 const UProjectileData* ABBIProjectile::GetProjectileData() const

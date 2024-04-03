@@ -5,7 +5,7 @@
 #include "UI/ProjectileSelectorEntry.h"
 #include "CoreSystems/BBIGameStateBase.h"
 #include "Components/ListView.h"
-#include "CoreSystems/ProjectileData.h"
+#include "Projectiles/ProjectileData.h"
 
 void UProjectileSelector::NativeOnInitialized()
 {

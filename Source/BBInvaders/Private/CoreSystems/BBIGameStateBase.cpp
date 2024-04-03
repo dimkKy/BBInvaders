@@ -4,7 +4,7 @@
 #include "CoreSystems/BBIGameStateBase.h"
 #include "CoreSystems/OutOfAreaActorTracker.h"
 #include "Player/PlayerPawn.h"
-#include "CoreSystems/ProjectileData.h"
+#include "Projectiles/ProjectileData.h"
 #include "BBInvadersUtils.h"
 #if WITH_EDITOR
 #include "Misc/DataValidation.h"

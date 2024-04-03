@@ -5,7 +5,7 @@
 #include "CoreSystems/BBIAssetManager.h"
 #include "CoreSystems/BBIGameModeBase.h"
 #include "CoreSystems/BBIGameStateBase.h"
-#include "CoreSystems/ProjectileData.h"
+#include "Projectiles/ProjectileData.h"
 #include "UI/BBIHUD.h"
 #include "UI/ProjectileSelector.h"
 

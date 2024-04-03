@@ -2,7 +2,7 @@
 
 
 #include "CoreSystems/BBIAssetManager.h"
-#include "CoreSystems/ProjectileData.h"
+#include "Projectiles/ProjectileData.h"
 #include "Environment/AsteroidMeshSet.h"
 #include "Environment/InvaderVisuals.h"
 
