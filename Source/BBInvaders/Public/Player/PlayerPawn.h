@@ -10,7 +10,7 @@
 class UStaticMeshComponent;
 class USpringArmComponent;
 class UCameraComponent;
-class ABBIProjectile;
+class UProjectileData;
 
 /*
  *
@@ -44,7 +44,7 @@ protected:
 
 	void ZoomCamera(float value);
 
-	virtual void Shoot() override;
+	virtual void Shoot(UProjectileData* data) override;
 	virtual EShooterType GetShooterType() const override;
 
 	UE_NODISCARD float CalcDamping() const;

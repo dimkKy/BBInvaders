@@ -8,6 +8,7 @@
 #include "MainMenuPawn.generated.h"
 
 class UCameraComponent;
+class UProjectileData;;
 
 UCLASS()
 class BBINVADERS_API AMainMenuPawn : public APawn, public IShooter
@@ -17,7 +18,7 @@ class BBINVADERS_API AMainMenuPawn : public APawn, public IShooter
 public:
 	AMainMenuPawn();
 
-	virtual void Shoot() override;
+	virtual void Shoot(UProjectileData* data) override;
 	virtual EShooterType GetShooterType() const override;
 
 #if WITH_EDITOR

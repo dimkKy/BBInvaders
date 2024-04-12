@@ -10,8 +10,8 @@
 
 class UStaticMeshComponent;
 class UStaticMesh;
-class ABBIProjectile;
 class APlayerPawn;
+class UProjectileData;
 
 DECLARE_DELEGATE_OneParam(FNotifyInvaderDestroyed, AInvader*);
 
@@ -36,7 +36,7 @@ public:
 	void SetMesh(UStaticMesh& newMesh);
 	double GetCollisionRadius() const;
 
-	virtual void Shoot() override;
+	virtual void Shoot(UProjectileData* data) override;
 	virtual EShooterType GetShooterType() const override;
 
 	//void SetLookAt(const FVector& worldPos);

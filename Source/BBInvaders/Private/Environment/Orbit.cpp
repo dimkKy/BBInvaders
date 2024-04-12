@@ -211,6 +211,6 @@ int32 AOrbit::GetInvadersNum() const
 
 void AOrbit::Shoot()
 {
-	invaders[FMath::RandRange(0, invaders.Num() - 1)]->Shoot();
+	//invaders[FMath::RandRange(0, invaders.Num() - 1)]->Shoot();
 }
 

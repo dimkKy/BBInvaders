@@ -18,10 +18,31 @@ enum class EAsteroidSize : uint8
 	EAS_MAX UMETA(Hidden),
 };
 
+namespace EAS {
+	inline constexpr EAsteroidSize Small{ EAsteroidSize::EAS_Small };
+	inline constexpr EAsteroidSize Medium{ EAsteroidSize::EAS_Medium };
+	inline constexpr EAsteroidSize Big{ EAsteroidSize::EAS_Big };
+
+	inline EAsteroidSize Smaller(EAsteroidSize size) {
+		if (size != Small
+			/*ensureAlways(!BBInvadersUtils::IsIn(_size, EAsteroidSize::EAS_MAX, EAsteroidSize::EAS_Small))*/) {
+			return static_cast<EAsteroidSize>(static_cast<int32>(size) - 1);
+		}
+		else {
+			return Small;
+		}
+	}
+	inline EAsteroidSize Random() {
+		return static_cast<EAsteroidSize>(
+			FMath::RandRange(0, static_cast<int32>(EAsteroidSize::EAS_MAX) - 1));
+	}
+}
+
 //class UInstancedStaticMeshComponent;
 class UStaticMeshComponent;
 class UStaticMesh;
 class UAsteroidMeshSet;
+struct FDamageEvent;
 
 UCLASS()
 class BBINVADERS_API AAsteroid : public AActor, public IPlanetaryThreatable
@@ -32,13 +53,10 @@ public:
 	AAsteroid();
 	virtual void Tick(float DeltaTime) override;
 
-	static ThisClass* SpawnAsteroid(UWorld& w, const FVector& location,
-		const FVector& targetLoc, EAsteroidSize size = AAsteroid::RandomSize());
-	UE_NODISCARD static ThisClass* SpawnAsteroidDeferred(UWorld& w, EAsteroidSize size = AAsteroid::RandomSize());
+	static AAsteroid* SpawnAsteroid(UWorld& w, const FVector& location,
+		const FVector& targetLoc, EAsteroidSize size = EAS::Random());
+	UE_NODISCARD static AAsteroid* SpawnAsteroidDeferred(UWorld& w, EAsteroidSize size = EAS::Random());
 	void FinishSpawningSetVelocity(const FVector& location, const FVector& targetLoc);
-
-	static EAsteroidSize GetSmaller(EAsteroidSize _size);
-	static EAsteroidSize RandomSize();
 
 	void SetSizeAssignMesh(EAsteroidSize newSize);
 
@@ -51,6 +69,8 @@ public:
 	float GetMeshRadius() const;
 	
 	virtual float GetOnPlanetCollisionDamage() const override;
+
+	virtual float TakeDamage(float amount, FDamageEvent const& dEvent, AController* instigator, AActor* causer) override;
 
 protected:
 	virtual void BeginPlay() override;
@@ -68,11 +88,11 @@ protected:
 		UStaticMeshComponent* body;
 
 	UPROPERTY()
-		const UAsteroidMeshSet* projectileData;
+		const UAsteroidMeshSet* meshSet;
 
 	EAsteroidSize size;
 	FVector velocity;
-
+	float health{ 100.f };
 	constexpr static float aimAngleAmplitude{ 40.f } /** PI / 180.f*/;
 	constexpr static float splitAngleAmplitude{ 30.f } /** PI / 180.f*/;
 	constexpr static float onHitVelocityMultiplier{ 0.9f };

@@ -6,10 +6,11 @@
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
-#include "CoreSystems/BBIProjectile.h"
 #include "CoreSystems/Shooter.h"
 #include "CoreSystems/BBIGameModeBase.h"
+//redo
 #include "Environment/PlanetaryThreatable.h"
+#include "Projectiles/ProjectileData.h"
 #include "BBInvadersUtils.h"
 #if WITH_EDITOR
 #include "Misc/DataValidation.h"
@@ -25,20 +26,20 @@ APlayerPawn::APlayerPawn() :
 	PrimaryActorTick.bCanEverTick = true;
 
 	SetRootComponent(planet);
+
+	using namespace BBInvadersUtils;
 	planet->SetMobility(EComponentMobility::Stationary);
-	BBInvadersUtils::ConfigureDefaultCollision<true>(planet, ECC_WorldDynamic,
-		BBInvadersUtils::ECC_Asteroid, BBInvadersUtils::ECC_Invader);
+	ConfigureDefaultCollision<true>(planet, ECC_WorldDynamic,
+		ECC_Asteroid, ECC_Invader);
 	
 	//
 	platform->SetupAttachment(planet);
 	platform->BodyInstance.bEnableGravity = false;
-	BBInvadersUtils::ConfigureDefaultCollision<true>(platform, ECC_Pawn,
-		BBInvadersUtils::ECC_Projectile,
-		BBInvadersUtils::ECC_Asteroid,
-		BBInvadersUtils::ECC_Invader);
+	ConfigureDefaultCollision<true>(platform, ECC_Pawn,
+		ECC_Projectile, ECC_Asteroid, ECC_Invader);
 	//
 	cameraArm->SetupAttachment(planet);
-	cameraArm->SetRelativeRotation(BBInvadersUtils::UpRotation);
+	cameraArm->SetRelativeRotation(UpRotation);
 	cameraArm->TargetArmLength = 300.f;
 	cameraArm->bDoCollisionTest = false;
 	cameraArm->SetCanEverAffectNavigation(false);
@@ -122,14 +123,14 @@ void APlayerPawn::ZoomCamera(float value)
 		cameraArmLengthRange.X, cameraArmLengthRange.Y);
 }
 
-void APlayerPawn::Shoot()
+void APlayerPawn::Shoot(UProjectileData* data)
 {
 	check(GetWorld());
-	if (auto* projectile{ GetController<ABBIPlayerController>()->GetSelectedProjectile() }) {
+	/*if (auto* projectile{ GetController<ABBIPlayerController>()->GetSelectedProjectile() }) {
 		ABBIProjectile::SpawnProjectile(*GetWorld(),
 			platform->GetSocketTransform(BBInvadersUtils::muzzleSocket),
 			*projectile, this);
-	}	
+	}*/	
 }
 
 EShooterType APlayerPawn::GetShooterType() const
@@ -196,7 +197,7 @@ void APlayerPawn::SetupPlayerInputComponent(UInputComponent* InputComp)
 	InputComp->BindAction("ZoomInAction", IE_Pressed, this, &APlayerPawn::ZoomInAction);
 	InputComp->BindAction("ZoomOUtAction", IE_Pressed, this, &APlayerPawn::ZoomOutAction);
 
-	InputComp->BindAction("Shoot", IE_Released, this, &APlayerPawn::Shoot);
+	//InputComp->BindAction("Shoot", IE_Released, this, &APlayerPawn::Shoot);
 }
 
 FVector APlayerPawn::CalcMapHalfSize() const

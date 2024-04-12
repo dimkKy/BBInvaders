@@ -6,6 +6,8 @@
 #include "UObject/Interface.h"
 #include "Shooter.generated.h"
 
+class UProjectileData;
+
 //UHT does not see it for some reason
 UENUM(BlueprintType, meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
 enum class EShooterType : uint8
@@ -36,7 +38,7 @@ class BBINVADERS_API IShooter
 {
 	GENERATED_BODY()
 public:
-	virtual void Shoot()
+	virtual void Shoot(UProjectileData* data)
 		PURE_VIRTUAL(IShooter::Shoot, return; );
 
 	virtual EShooterType GetShooterType() const

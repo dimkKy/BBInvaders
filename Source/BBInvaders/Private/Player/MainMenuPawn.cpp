@@ -3,6 +3,7 @@
 
 #include "Player/MainMenuPawn.h"
 #include "Camera/CameraComponent.h"
+#include "Projectiles/ProjectileData.h"
 #if WITH_EDITOR
 #include "Misc/DataValidation.h"
 #endif
@@ -14,7 +15,7 @@ AMainMenuPawn::AMainMenuPawn() :
 	SetRootComponent(camera);
 }
 
-void AMainMenuPawn::Shoot()
+void AMainMenuPawn::Shoot(UProjectileData* data)
 {
 }
 

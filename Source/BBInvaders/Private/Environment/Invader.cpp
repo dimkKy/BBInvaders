@@ -3,10 +3,10 @@
 
 #include "Environment/Invader.h"
 #include "Components/StaticMeshComponent.h"
-#include "CoreSystems/BBIProjectile.h"
 #include "BBInvadersUtils.h"
 #include "Player/PlayerPawn.h"
 #include "Player/BBIPlayerState.h"
+#include "Projectiles/ProjectileData.h"
 #if WITH_EDITOR
 #include "Misc/DataValidation.h"
 #endif
@@ -35,7 +35,7 @@ double AInvader::GetCollisionRadius() const
 	return body->GetStaticMesh()->GetBounds().GetSphere().W;
 }
 
-void AInvader::Shoot()
+void AInvader::Shoot(UProjectileData* data)
 {
 	auto* world{ GetWorld() };
 	check(GetWorld() && false);
