@@ -18,7 +18,7 @@ AInvader::AInvader() :
 	SetRootComponent(body);
 
 	using namespace BBInvadersUtils;
-	ConfigureDefaultCollision<true>(body, ECC_Invader,
+	ConfigureOverlapCollision<true>(body, ECC_Invader,
 		ECC_Projectile, ECC_Pawn, ECC_WorldDynamic);
 
 	//hide

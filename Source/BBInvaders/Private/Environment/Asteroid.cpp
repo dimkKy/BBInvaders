@@ -16,7 +16,7 @@ AAsteroid::AAsteroid() :
 
 	using namespace BBInvadersUtils;
 
-	ConfigureDefaultCollision<true>(body, ECC_Asteroid,
+	ConfigureOverlapCollision<true>(body, ECC_Asteroid,
 		ECC_WorldStatic, ECC_Projectile, ECC_WorldDynamic, ECC_Pawn);
 
 	//asteroids->bMultiBodyOverlap = true;

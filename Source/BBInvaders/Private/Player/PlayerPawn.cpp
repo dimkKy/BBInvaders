@@ -29,14 +29,18 @@ APlayerPawn::APlayerPawn() :
 
 	using namespace BBInvadersUtils;
 	planet->SetMobility(EComponentMobility::Stationary);
-	ConfigureDefaultCollision<true>(planet, ECC_WorldDynamic,
+	ConfigureOverlapCollision<true>(planet, ECC_WorldDynamic,
 		ECC_Asteroid, ECC_Invader);
+	ConfigureBlockCollision(planet, ECC_WorldDynamic,
+		ECC_Projectile);
 	
 	//
 	platform->SetupAttachment(planet);
 	platform->BodyInstance.bEnableGravity = false;
-	ConfigureDefaultCollision<true>(platform, ECC_Pawn,
-		ECC_Projectile, ECC_Asteroid, ECC_Invader);
+	ConfigureOverlapCollision<true>(platform, ECC_Pawn,
+		ECC_Asteroid, ECC_Invader);
+	ConfigureBlockCollision(platform, ECC_Pawn,
+		ECC_Projectile);
 	//
 	cameraArm->SetupAttachment(planet);
 	cameraArm->SetRelativeRotation(UpRotation);

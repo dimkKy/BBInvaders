@@ -43,4 +43,6 @@ public:
 
 	virtual EShooterType GetShooterType() const
 		PURE_VIRTUAL(IShooter::GetShooterType, return EShooterType::EST_MAX; );
+
+
 };

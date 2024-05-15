@@ -7,7 +7,7 @@
 #include "Player/BBIPlayerState.h"
 #include "BBInvadersUtils.h"
 #include "Player/MainMenuPawn.h"
-#include "CoreSystems/BBIProjectile.h"
+#include "Projectiles/BBIProjectile.h"
 #include "CoreSystems/BBIGameStateBase.h"
 #include "Environment/Invader.h"
 #include "Environment/AdvancedInvader.h"

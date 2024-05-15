@@ -50,9 +50,13 @@ struct FBBIDamageEvent : public FDamageEvent
 
 	virtual int32 GetTypeID() const override 
 		{ return FBBIDamageEvent::ClassID; };
-	virtual bool IsOfType(int32 InID) const override 
-		{ return (FBBIDamageEvent::ClassID == InID) || FDamageEvent::IsOfType(InID); };
 };
+
+namespace BBIDamageEvents {
+	inline const FBBIDamageEvent Explosive{ EDT::Explosive };
+	inline const FBBIDamageEvent Kinetic{ EDT::Kinetic };
+	inline const FBBIDamageEvent Laser{ EDT::Laser };
+}
 
 /**
  * 

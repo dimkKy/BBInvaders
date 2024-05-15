@@ -25,12 +25,12 @@ AOutOfAreaActorTracker::AOutOfAreaActorTracker() :
 	
 	SetRootComponent(asteroidTrackBox);
 
-	BBInvadersUtils::ConfigureDefaultCollision<true>(asteroidTrackBox, ECC_WorldStatic,
+	BBInvadersUtils::ConfigureOverlapCollision<true>(asteroidTrackBox, ECC_WorldStatic,
 		BBInvadersUtils::ECC_Asteroid);
 
 	auto&& configureKillBox{ [this](UBoxComponent* box) {
 		box->SetupAttachment(RootComponent);
-		BBInvadersUtils::ConfigureDefaultCollision<true>(box, ECC_WorldStatic,
+		BBInvadersUtils::ConfigureOverlapCollision<true>(box, ECC_WorldStatic,
 			BBInvadersUtils::ECC_Asteroid/*, BBInvadersUtils::ECC_Invader, 
 			BBInvadersUtils::ECC_Projectile*/);
 			

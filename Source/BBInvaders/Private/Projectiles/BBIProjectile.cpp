@@ -1,15 +1,15 @@
 // by Dmitry Kolontay
 
 
-#include "CoreSystems/BBIProjectile.h"
+#include "Projectiles/BBIProjectile.h"
 #include "CoreSystems/BBIAssetManager.h"
 #include "Projectiles/ProjectileData.h"
-#include "GameFramework/ProjectileMovementComponent.h"
+//#include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "BBInvadersUtils.h"
 
 ABBIProjectile::ABBIProjectile() :
-	movement{ CreateDefaultSubobject<UProjectileMovementComponent>("movementComp") },
+	//movement{ CreateDefaultSubobject<UProjectileMovementComponent>("movementComp") },
 	body{ CreateDefaultSubobject<UStaticMeshComponent>("body") }, 
 	projectileData{ nullptr }
 {
@@ -18,20 +18,20 @@ ABBIProjectile::ABBIProjectile() :
 	SetRootComponent(body);
 
 	using namespace BBInvadersUtils;
-	ConfigureDefaultCollision<true>(body, ECC_Projectile,
+	ConfigureBlockCollision(body, ECC_Projectile,
 		ECC_Asteroid, ECC_Pawn, ECC_Invader, ECC_WorldDynamic);
 
 	body->SetSimulatePhysics(true);
 	body->SetEnableGravity(false);
 	body->BodyInstance.LinearDamping = 0.f;
 
-	movement->UpdatedComponent = body;
+	//movement->updatedComponent = body;
 	//movement->InitialSpeed = speed;
 	//movement->MaxSpeed = speed;
 	//movement->bRotationFollowsVelocity = true;
-	movement->bShouldBounce = false;
-	movement->ProjectileGravityScale = 0.f;
-	movement->MaxSimulationIterations = simulationInteractions;
+	//movement->bShouldBounce = false;
+	//movement->ProjectileGravityScale = 0.f;
+	//movement->MaxSimulationIterations = simulationInteractions;
 	InitialLifeSpan = lifespan;
 }
 
@@ -53,7 +53,7 @@ void ABBIProjectile::Tick(float DeltaTime)
 ABBIProjectile* ABBIProjectile::SpawnProjectile(UWorld& w, 
 	const FTransform& transform, const UProjectileData& d, AActor* owner)
 {
-	ABBIProjectile* projectile{ w.SpawnActorDeferred<ThisClass>(ThisClass::StaticClass(), 
+	ABBIProjectile* projectile{ w.SpawnActorDeferred<ABBIProjectile>(ABBIProjectile::StaticClass(),
 		transform, owner, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn) };
 
 	projectile->SetProjectileData(d);

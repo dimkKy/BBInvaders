@@ -4,6 +4,7 @@
 
 #include <type_traits>
 #include <concepts>
+#include "Engine/EngineTypes.h"
 
 class UCameraComponent;
 class UButton;
@@ -62,8 +63,13 @@ namespace BBInvadersUtils {
 		requires NonEmpty<TOthers...>;
 
 	template<bool generateOverlapEvents, class...TChannels>
-	void ConfigureDefaultCollision(UPrimitiveComponent* comp, ECollisionChannel compType, 
+	void ConfigureOverlapCollision(UPrimitiveComponent* comp, ECollisionChannel compType,
 		TChannels...overlapChannels) requires NonEmpty<TChannels...>;
+
+	template<class...TChannels>
+	void ConfigureBlockCollision(UPrimitiveComponent* comp, ECollisionChannel compType,
+		TChannels...overlapChannels) requires NonEmpty<TChannels...>;
+
 
 	template <typename TBase, ChildOf<TBase> TChild, bool bDeleteNulls>
 	TArray<TChild*> DowncastArray(const TArray<TBase*>& array);

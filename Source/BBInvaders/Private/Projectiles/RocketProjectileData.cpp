@@ -6,6 +6,16 @@
 #include "Misc/DataValidation.h"
 #endif
 
+void URocketProjectileData::OnShooting(const FVector& from, const FVector& to, AActor* owner, AActor* target) const
+{
+	if (bIsHoming) {
+
+	}
+	else {
+		//as kinetic
+	}
+}
+
 EDataValidationResult URocketProjectileData::IsDataValid(FDataValidationContext& context) const
 {
 	Super::IsDataValid(context);

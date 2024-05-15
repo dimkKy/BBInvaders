@@ -4,10 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Engine/DataTable.h"
+//#include "Engine/DataTable.h"
 #include "BBIProjectile.generated.h"
 
-class UProjectileMovementComponent;
 class UProjectileData;
 
 UCLASS(Abstract)
@@ -34,8 +33,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-		UProjectileMovementComponent* movement;
+public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 		UStaticMeshComponent* body;
 

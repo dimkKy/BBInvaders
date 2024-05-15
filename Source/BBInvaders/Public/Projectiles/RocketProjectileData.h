@@ -14,19 +14,19 @@ class BBINVADERS_API URocketProjectileData : public UProjectileData
 {
 	GENERATED_BODY()
 public:
+	virtual void OnShooting(const FVector& from, const FVector& to, AActor* owner, AActor* target) const override;
 
-UPROPERTY(EditInstanceOnly, BlueprintReadOnly)
-	float initialSpeed{ 0.f };
+	UPROPERTY(EditInstanceOnly, BlueprintReadOnly)
+		float initialSpeed{ 0.f };
 
-UPROPERTY(EditInstanceOnly, BlueprintReadOnly)
-	float maxSpeed{ 100 };
+	UPROPERTY(EditInstanceOnly, BlueprintReadOnly)
+		float maxSpeed{ 100 };
 
-UPROPERTY(EditInstanceOnly, BlueprintReadOnly)
-	bool bIsHoming{ false };
+	UPROPERTY(EditInstanceOnly, BlueprintReadOnly)
+		bool bIsHoming{ false };
 
-
-UPROPERTY(EditInstanceOnly, BlueprintReadOnly)
-	TSoftObjectPtr<UStaticMesh> bodyMesh;
+	UPROPERTY(EditInstanceOnly, BlueprintReadOnly)
+		TSoftObjectPtr<UStaticMesh> bodyMesh;
 
 #if WITH_EDITOR
 	virtual EDataValidationResult IsDataValid(FDataValidationContext& context) const override;

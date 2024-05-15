@@ -37,13 +37,13 @@ TActor* BBInvadersUtils::GetFirstActor(UWorld* world)
 }
 
 template<bool generateOverlapEvents, class ...TChannels>
-void BBInvadersUtils::ConfigureDefaultCollision(UPrimitiveComponent* comp, ECollisionChannel compType, 
+void BBInvadersUtils::ConfigureOverlapCollision(UPrimitiveComponent* comp, ECollisionChannel compType, 
 	TChannels ...overlapChannels) requires BBInvadersUtils::NonEmpty<TChannels...> 
 {
 	comp->SetCanEverAffectNavigation(false);
 	comp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	comp->SetCollisionObjectType(compType);
-	comp->SetCollisionResponseToAllChannels(ECR_Ignore);
+	//comp->SetCollisionResponseToAllChannels(ECR_Ignore);
 	comp->SetGenerateOverlapEvents(generateOverlapEvents);
 
 	auto setter = [=](ECollisionChannel channel) constexpr {
@@ -52,6 +52,24 @@ void BBInvadersUtils::ConfigureDefaultCollision(UPrimitiveComponent* comp, EColl
 	auto getter = [=](auto...channels) constexpr {
 		(setter(channels), ...);
 	};
+	getter(overlapChannels...);
+}
+
+template<class ...TChannels>
+void BBInvadersUtils::ConfigureBlockCollision(UPrimitiveComponent* comp, ECollisionChannel compType,
+	TChannels ...overlapChannels) requires BBInvadersUtils::NonEmpty<TChannels...>
+{
+	comp->SetCanEverAffectNavigation(false);
+	comp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	comp->SetCollisionObjectType(compType);
+	//comp->SetCollisionResponseToAllChannels(ECR_Ignore);
+
+	auto setter = [=](ECollisionChannel channel) constexpr {
+		comp->SetCollisionResponseToChannel(channel, ECR_Block);
+		};
+	auto getter = [=](auto...channels) constexpr {
+		(setter(channels), ...);
+		};
 	getter(overlapChannels...);
 }
 
