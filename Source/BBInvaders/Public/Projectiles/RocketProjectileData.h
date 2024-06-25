@@ -20,7 +20,13 @@ public:
 		float initialSpeed{ 0.f };
 
 	UPROPERTY(EditInstanceOnly, BlueprintReadOnly)
-		float maxSpeed{ 100 };
+		float maxSpeed{ 100.f };
+
+	UPROPERTY(EditInstanceOnly, BlueprintReadOnly)
+		float accelerationSpeed{ 10.f };
+
+	UPROPERTY(EditInstanceOnly, BlueprintReadOnly)
+		float decelerationSpeed{ 10.f };
 
 	UPROPERTY(EditInstanceOnly, BlueprintReadOnly)
 		bool bIsHoming{ false };

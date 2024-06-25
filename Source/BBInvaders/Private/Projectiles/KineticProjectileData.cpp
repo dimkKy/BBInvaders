@@ -4,7 +4,7 @@
 #include "Projectiles/KineticProjectileData.h"
 #include "Projectiles/BBIProjectile.h"
 #include "Projectiles/KineticMoveComponent.h"
-#include "BBInvadersUtils.h"
+//#include "BBInvadersUtils.h"
 
 void UKineticProjectileData::OnShooting(const FVector& from, const FVector& to, AActor* owner, AActor* target) const
 {
@@ -18,7 +18,9 @@ void UKineticProjectileData::OnShooting(const FVector& from, const FVector& to, 
 	UActorComponent* movecomp{ projectile->AddComponentByClass(
 		UKineticMoveComponent::StaticClass(), false, FTransform::Identity, true)};
 
-	projectile->body->SetStaticMesh(projectileMesh.LoadSynchronous());
+
+	//projectile->body->SetCollisionResponseToChannel(, ECR_Ignore);
+	projectile->body->SetStaticMesh(bodyMesh.LoadSynchronous());
 
 	CastChecked<UKineticMoveComponent>(movecomp)->SetParams(initialSpeed, deceleration);
 	projectile->FinishAddComponent(movecomp, false, FTransform::Identity);

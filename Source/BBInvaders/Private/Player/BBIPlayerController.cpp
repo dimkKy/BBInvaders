@@ -45,6 +45,8 @@ void ABBIPlayerController::OnGameplayInitiated()
 		projectilesHanle = assetManager.LoadAssetList(projectilesToLoad,
 			FStreamableDelegate::CreateUObject(this, &ABBIPlayerController::OnProjectilesLoaded),
 			FStreamableManager::AsyncLoadHighPriority);
+	//getcamer
+	//PlayerCameraManager->
 	
 }
 

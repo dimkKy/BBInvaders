@@ -21,9 +21,9 @@ ABBIProjectile::ABBIProjectile() :
 	ConfigureBlockCollision(body, ECC_Projectile,
 		ECC_Asteroid, ECC_Pawn, ECC_Invader, ECC_WorldDynamic);
 
-	body->SetSimulatePhysics(true);
-	body->SetEnableGravity(false);
-	body->BodyInstance.LinearDamping = 0.f;
+	//body->SetSimulatePhysics(true);
+	//body->SetEnableGravity(false);
+	//body->BodyInstance.LinearDamping = 0.f;
 
 	//movement->updatedComponent = body;
 	//movement->InitialSpeed = speed;
@@ -33,13 +33,15 @@ ABBIProjectile::ABBIProjectile() :
 	//movement->ProjectileGravityScale = 0.f;
 	//movement->MaxSimulationIterations = simulationInteractions;
 	InitialLifeSpan = lifespan;
+
+	//body->GetSocketByName
 }
 
 void ABBIProjectile::BeginPlay()
 {
 	Super::BeginPlay();
-	body->OnComponentBeginOverlap.AddDynamic(
-		this, &ABBIProjectile::OnOverlapBegin);
+	//body->OnComponentBeginOverlap.AddDynamic(
+		//this, &ABBIProjectile::OnOverlapBegin);
 	//movement
 }
 
@@ -62,7 +64,20 @@ ABBIProjectile* ABBIProjectile::SpawnProjectile(UWorld& w,
 	return projectile;
 }
 
-void ABBIProjectile::OnOverlapBegin(UPrimitiveComponent* component, AActor* otherActor, 
+void ABBIProjectile::NotifyHit(UPrimitiveComponent* myComp, AActor* other, 
+	UPrimitiveComponent* otherComp, bool bSelfMoved, FVector hitLoc, 
+	FVector hitNormal, FVector normalImpulse, const FHitResult& Hit)
+{
+	check(myComp == body);
+
+	if (other->CanBeDamaged()) {
+		//other->TakeDamage(projectileData->baseDamage, )
+	}
+
+	Destroy();
+}
+
+/*void ABBIProjectile::OnOverlapBegin(UPrimitiveComponent* component, AActor* otherActor, 
 	UPrimitiveComponent* otherComp, int32 otherIndex, bool bFromSweep, const FHitResult& result)
 {
 	AActor* owner{ GetOwner() };
@@ -70,7 +85,7 @@ void ABBIProjectile::OnOverlapBegin(UPrimitiveComponent* component, AActor* othe
 	if (owner && owner->StaticClass() != otherActor->StaticClass()) {
 		Destroy();
 	}
-}
+}*/
 
 void ABBIProjectile::SetProjectileData(const UProjectileData& data)
 {

@@ -74,6 +74,8 @@ namespace BBInvadersUtils {
 	template <typename TBase, ChildOf<TBase> TChild, bool bDeleteNulls>
 	TArray<TChild*> DowncastArray(const TArray<TBase*>& array);
 
+	constexpr ECollisionChannel ECC_Planet{ ECollisionChannel::ECC_WorldDynamic };
+	constexpr ECollisionChannel ECC_Platform{ ECollisionChannel::ECC_WorldDynamic };
 	constexpr ECollisionChannel ECC_Projectile{ ECollisionChannel::ECC_GameTraceChannel1 };
 	constexpr ECollisionChannel ECC_Asteroid{ ECollisionChannel::ECC_GameTraceChannel2 };
 	constexpr ECollisionChannel ECC_Invader{ ECollisionChannel::ECC_GameTraceChannel3 };

@@ -26,6 +26,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComp) override;
 
+	void SwitchCameraProjectionMode();
+
 	FVector CalcMapHalfSize() const;
 #if WITH_EDITOR
 	virtual EDataValidationResult IsDataValid(FDataValidationContext& context) const override;

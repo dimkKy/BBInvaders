@@ -23,5 +23,5 @@ public:
 		float deceleration{ 0.01f };
 
 	UPROPERTY(EditInstanceOnly)
-		TSoftObjectPtr<UStaticMesh> projectileMesh;
+		TSoftObjectPtr<UStaticMesh> bodyMesh;
 };

@@ -29,17 +29,17 @@ APlayerPawn::APlayerPawn() :
 
 	using namespace BBInvadersUtils;
 	planet->SetMobility(EComponentMobility::Stationary);
-	ConfigureOverlapCollision<true>(planet, ECC_WorldDynamic,
+	ConfigureOverlapCollision<true>(planet, ECC_Planet,
 		ECC_Asteroid, ECC_Invader);
-	ConfigureBlockCollision(planet, ECC_WorldDynamic,
+	ConfigureBlockCollision(planet, ECC_Planet,
 		ECC_Projectile);
 	
 	//
 	platform->SetupAttachment(planet);
 	platform->BodyInstance.bEnableGravity = false;
-	ConfigureOverlapCollision<true>(platform, ECC_Pawn,
+	ConfigureOverlapCollision<true>(platform, ECC_Platform,
 		ECC_Asteroid, ECC_Invader);
-	ConfigureBlockCollision(platform, ECC_Pawn,
+	ConfigureBlockCollision(platform, ECC_Platform,
 		ECC_Projectile);
 	//
 	cameraArm->SetupAttachment(planet);
@@ -202,6 +202,16 @@ void APlayerPawn::SetupPlayerInputComponent(UInputComponent* InputComp)
 	InputComp->BindAction("ZoomOUtAction", IE_Pressed, this, &APlayerPawn::ZoomOutAction);
 
 	//InputComp->BindAction("Shoot", IE_Released, this, &APlayerPawn::Shoot);
+}
+
+void APlayerPawn::SwitchCameraProjectionMode()
+{
+	if (camera->ProjectionMode == ECameraProjectionMode::Orthographic) {
+		camera->SetProjectionMode(ECameraProjectionMode::Perspective);
+	}
+	else {
+		camera->SetProjectionMode(ECameraProjectionMode::Orthographic);
+	}
 }
 
 FVector APlayerPawn::CalcMapHalfSize() const

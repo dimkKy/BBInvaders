@@ -9,7 +9,7 @@
 
 class UProjectileData;
 
-UCLASS(Abstract)
+UCLASS()
 class BBINVADERS_API ABBIProjectile : public AActor
 {
 	GENERATED_BODY()
@@ -21,10 +21,9 @@ public:
 	static ABBIProjectile* SpawnProjectile(UWorld& w, 
 		const FTransform& t, const UProjectileData& d, AActor* owner = nullptr);
 
-	UFUNCTION()
-		void OnOverlapBegin(UPrimitiveComponent* component, 
-			AActor* otherActor, UPrimitiveComponent* otherComp, 
-			int32 otherIndex, bool bFromSweep, const FHitResult& result);
+	virtual void NotifyHit(class UPrimitiveComponent* myComp, AActor* other, 
+		class UPrimitiveComponent* otherComp, bool bSelfMoved, FVector hitLoc, 
+		FVector hitNormal, FVector normalImpulse, const FHitResult& Hit) override;
 
 	void SetProjectileData(const UProjectileData& data);
 
@@ -36,6 +35,9 @@ protected:
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 		UStaticMeshComponent* body;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+		UStaticMeshSocket* test;
 
 	UPROPERTY()
 		const UProjectileData* projectileData;
